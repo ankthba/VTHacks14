@@ -128,12 +128,14 @@ export default function Home() {
           Photograph the bottles on the kitchen table. Get back questions worth
           asking your pharmacist.
         </p>
-        <a
-          href="/clinician"
-          className="meta-chip mt-4 hover:border-[color:var(--accent)]"
-        >
-          Prescribing? Open the clinician view &rarr;
-        </a>
+        <div className="flex flex-wrap gap-2 mt-4">
+          <a href="/explain" className="meta-chip hover:border-[color:var(--accent)]">
+            Explaining to a patient? Open the explain view &rarr;
+          </a>
+          <a href="/clinician" className="meta-chip hover:border-[color:var(--accent)]">
+            Prescribing? Open the clinician view &rarr;
+          </a>
+        </div>
       </header>
 
       {error && (
