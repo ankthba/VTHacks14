@@ -30,8 +30,8 @@
   --line: #d8cfbf;
   --line-soft: #e6dfd2;
 
-  /* The ink every drawing is made of: deep forest green. */
-  --ink: #1d3b2c;
+  /* The ink every drawing is made of: a warm black. */
+  --ink: #1f1c19;
   --accent: #8fb257;
   --accent-hover: #7fa348;
   --accent-ink: #1c2612;
@@ -113,32 +113,31 @@ body > * { position: relative; z-index: 1; }
 }
 
 /*
- * Buttons drawn in ink. The outline is a touch uneven, there is a hard offset
- * behind it like a sticker, hovering lifts it, pressing flattens it.
+ * Buttons: a soft, slightly uneven shape with no outline. Hovering lifts it a
+ * pixel, pressing settles it.
  */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 11px 22px;
+  padding: 12px 22px;
   font-weight: 600;
-  border: 2px solid var(--ink);
+  border: 0;
   border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px;
-  box-shadow: 2px 2px 0 var(--ink);
-  transition: transform 90ms ease, box-shadow 90ms ease, background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+  transition: transform 90ms ease, background-color 120ms ease, color 120ms ease, border-color 120ms ease;
 }
-.btn:hover:not(:disabled) { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
-.btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
-.btn:disabled { box-shadow: none; border-color: var(--line); cursor: not-allowed; }
+.btn:hover:not(:disabled) { transform: translateY(-1px); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:disabled { cursor: not-allowed; }
 .btn .arrow { transition: transform 160ms ease; }
 .btn:hover:not(:disabled) .arrow { transform: translateX(4px); }
 
 .btn-primary { background: var(--accent); color: var(--accent-ink); }
 .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
 
-.btn-secondary { background: var(--surface); color: var(--foreground); }
-.btn-secondary:hover:not(:disabled) { background: #fff; }
+.btn-secondary { background: transparent; color: var(--foreground); border: 1px solid var(--line); }
+.btn-secondary:hover:not(:disabled) { border-color: var(--foreground); }
 
 /* Small choices: plain text, an underline that draws itself when you arrive. */
 .chip {
@@ -475,8 +474,8 @@ html { scroll-behavior: smooth; }
 
 /* The turn button leans into the turn. */
 .btn-turn { transform-origin: 8% 50%; transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 120ms ease; }
-.btn-turn:hover:not(:disabled) { transform: perspective(700px) rotateY(-10deg) translate(-1px, -1px); }
-.btn-turn:active:not(:disabled) { transform: perspective(700px) rotateY(-16deg) translate(2px, 2px); }
+.btn-turn:hover:not(:disabled) { transform: perspective(700px) rotateY(-10deg) translateY(-1px); }
+.btn-turn:active:not(:disabled) { transform: perspective(700px) rotateY(-16deg) translateY(1px); }
 
 /* The voice is speaking: the arcs ripple outward. */
 .speaking path { animation: speak 900ms ease-in-out infinite; }
@@ -500,9 +499,8 @@ html { scroll-behavior: smooth; }
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  border: 2px solid var(--ink);
+  border: 0;
   border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px;
-  box-shadow: 2px 2px 0 var(--ink);
   background: var(--accent);
   color: var(--accent-ink);
   font-weight: 600;
@@ -511,11 +509,11 @@ html { scroll-behavior: smooth; }
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none;
-  transition: opacity 200ms ease, transform 120ms ease, box-shadow 90ms ease, background-color 120ms ease;
+  transition: opacity 200ms ease, transform 120ms ease, background-color 120ms ease;
 }
 .up-link.show { opacity: 1; transform: none; pointer-events: auto; }
-.up-link:hover { background: var(--accent-hover); transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
-.up-link:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+.up-link:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.up-link:active { transform: translateY(1px); }
 
 /* The radio ring beside a condition, drawn rather than stamped. */
 .ink-radio {
