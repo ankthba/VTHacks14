@@ -22,13 +22,13 @@ export function ReconcileTable({ rows }: { rows: ReconcileRow[] }) {
       <table className="w-full border-collapse text-[15px]">
         <thead>
           <tr className="text-left">
-            <th className="border-b-2 border-[color:var(--foreground)] pb-2 pr-3 w-32">
+            <th className="border-b border-[color:var(--foreground)] pb-3 text-xs uppercase tracking-[0.08em] text-[color:var(--muted)] font-semibold pr-3 w-32">
               Status
             </th>
-            <th className="border-b-2 border-[color:var(--foreground)] pb-2 pr-3">
+            <th className="border-b border-[color:var(--foreground)] pb-3 text-xs uppercase tracking-[0.08em] text-[color:var(--muted)] font-semibold pr-3">
               Discharge paperwork
             </th>
-            <th className="border-b-2 border-[color:var(--foreground)] pb-2">
+            <th className="border-b border-[color:var(--foreground)] pb-3 text-xs uppercase tracking-[0.08em] text-[color:var(--muted)] font-semibold">
               Bottle on the table
             </th>
           </tr>
@@ -38,7 +38,7 @@ export function ReconcileTable({ rows }: { rows: ReconcileRow[] }) {
             const s = STATUS[r.status];
             return (
               <tr key={i} style={{ background: s.bg }} className="align-top">
-                <td className="py-3 pr-3 border-b border-[color:var(--line)]">
+                <td className="py-4 pr-3 border-b border-[color:var(--line-soft)]">
                   <span
                     className="text-xs font-bold uppercase tracking-wide px-2 py-1 rounded whitespace-nowrap"
                     style={{ background: s.fg, color: "#fff" }}
@@ -49,7 +49,7 @@ export function ReconcileTable({ rows }: { rows: ReconcileRow[] }) {
                     {s.label}
                   </span>
                 </td>
-                <td className="py-3 pr-3 border-b border-[color:var(--line)]">
+                <td className="py-4 pr-3 border-b border-[color:var(--line-soft)]">
                   {r.discharge ? (
                     <>
                       <span className="font-semibold">{displayName(r.discharge)}</span>
@@ -61,7 +61,7 @@ export function ReconcileTable({ rows }: { rows: ReconcileRow[] }) {
                     <span className="text-[color:var(--muted)]">&mdash;</span>
                   )}
                 </td>
-                <td className="py-3 border-b border-[color:var(--line)]">
+                <td className="py-4 border-b border-[color:var(--line-soft)]">
                   {r.bottle ? (
                     <>
                       <span className="font-semibold">{displayName(r.bottle)}</span>

@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Instrument_Sans, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+/* Stand-ins for Granola's licensed quadrant/melange: a display serif used at
+   regular weight, paired with a neutral sans from the same family. */
+const display = Instrument_Serif({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: "400",
+});
+const body = Instrument_Sans({ variable: "--font-body", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "PillPile - medication reconciliation from a photo",
@@ -15,7 +21,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${display.variable} ${body.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {/*
@@ -24,7 +30,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         */}
         <div
           role="note"
-          className="w-full bg-[#141414] text-white text-center px-4 py-2 text-sm font-medium"
+          className="w-full text-center px-4 py-2 text-sm font-medium"
+          style={{ background: "var(--foreground-deep)", color: "var(--accent-ink)" }}
         >
           Educational demo. Not medical advice. Always confirm with your
           pharmacist or physician.

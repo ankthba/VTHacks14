@@ -71,7 +71,7 @@ export function ReadAloud({ text, lang }: { text: string; lang: string }) {
         type="button"
         onClick={state === "playing" ? stop : play}
         disabled={state === "loading"}
-        className="rounded-lg border-2 border-[color:var(--accent)] px-4 py-2 font-semibold text-[color:var(--accent)] hover:bg-[color:var(--accent)] hover:text-white disabled:opacity-60"
+        className="btn btn-secondary disabled:opacity-60"
       >
         {state === "loading"
           ? "Preparing audio..."

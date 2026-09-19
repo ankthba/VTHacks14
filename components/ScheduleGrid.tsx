@@ -9,17 +9,24 @@ const ICON: Record<string, string> = {
   "as needed": "Only when needed",
 };
 
+const GLYPH: Record<string, string> = {
+  morning: "\u25D0",
+  midday: "\u25CB",
+  evening: "\u25D1",
+  bedtime: "\u25CF",
+  "as needed": "\u25C7",
+};
+
 export function ScheduleGrid({ schedule }: { schedule: ScheduleSlot[] }) {
   const used = SLOTS.filter((s) => schedule.some((x) => x.slot === s));
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="list-hairline border-t border-[color:var(--line-soft)]">
       {used.map((slot) => (
-        <section
-          key={slot}
-          className="rounded-xl border border-[color:var(--line)] bg-[color:var(--surface)] p-4"
-        >
-          <h3 className="font-bold text-base mb-2">{ICON[slot]}</h3>
+        <section key={slot} className="row">
+          <span className="icon-box">{GLYPH[slot]}</span>
+          <div className="flex-1">
+          <h3 className="font-semibold text-base mb-1">{ICON[slot]}</h3>
           <ul className="space-y-2">
             {schedule
               .filter((s) => s.slot === slot)
@@ -32,6 +39,7 @@ export function ScheduleGrid({ schedule }: { schedule: ScheduleSlot[] }) {
                 </li>
               ))}
           </ul>
+          </div>
         </section>
       ))}
     </div>

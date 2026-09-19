@@ -12,12 +12,12 @@ export function FindingCard({ finding }: { finding: Finding }) {
 
   return (
     <article
-      className="finding-card rounded-xl border p-5"
-      style={{ background: tone.bg, borderColor: tone.fg + "40" }}
+      className="finding-card float-card p-6"
+      style={{ background: tone.bg, borderColor: tone.fg + "33" }}
     >
       <div className="flex flex-wrap items-center gap-2 mb-2">
         <span
-          className="text-xs font-bold uppercase tracking-wide px-2 py-1 rounded"
+          className="text-xs font-bold uppercase tracking-[0.08em] px-2.5 py-1 rounded-full"
           style={{ background: tone.fg, color: "#fff" }}
         >
           {tone.word}
@@ -30,7 +30,7 @@ export function FindingCard({ finding }: { finding: Finding }) {
           label text) but may have their wording rephrased by a model.
         */}
         <span
-          className="text-xs font-semibold px-2 py-1 rounded border"
+          className="text-xs font-semibold px-2.5 py-1 rounded-full border"
           style={{ color: tone.fg, borderColor: tone.fg + "60" }}
           title={
             isArithmetic
@@ -42,7 +42,7 @@ export function FindingCard({ finding }: { finding: Finding }) {
         </span>
       </div>
 
-      <h3 className="text-lg font-bold leading-snug" style={{ color: tone.fg }}>
+      <h3 className="display-sm text-2xl leading-snug" style={{ color: tone.fg }}>
         {finding.headline}
       </h3>
 

@@ -25,8 +25,8 @@ export function BottleReview({
         return (
           <div
             key={i}
-            className="rounded-xl border bg-[color:var(--surface)] p-4"
-            style={{ borderColor: low ? "var(--moderate)" : "var(--line)" }}
+            className="float-card p-5"
+            style={{ borderColor: low ? "var(--moderate)" : undefined }}
           >
             <div className="flex items-start justify-between gap-3 mb-3">
               <span
@@ -92,7 +92,7 @@ function Field({
         value={value ?? ""}
         placeholder="not readable"
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-[color:var(--line)] bg-white px-3 py-2 text-[15px]"
+        className="w-full rounded-lg border border-[color:var(--line)] bg-white px-3 py-2.5 text-[15px]"
       />
     </label>
   );

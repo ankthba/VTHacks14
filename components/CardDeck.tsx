@@ -46,18 +46,18 @@ export function CardDeck({
   return (
     <section>
       <div className="flex items-baseline justify-between mb-3 no-print">
-        <h2 className="text-2xl font-bold">Your medicines, one at a time</h2>
+        <h2 className="display-sm text-3xl">Your medicines, one at a time</h2>
         <span className="text-[15px] font-semibold text-[color:var(--muted)]">
           {i + 1} of {cards.length}
         </span>
       </div>
 
       <article
-        className="rounded-2xl border-2 p-6 sm:p-8"
-        style={{ background: tone.bg, borderColor: tone.fg }}
+        className="float-card p-6 sm:p-9"
+        style={{ background: tone.bg, borderColor: card.warning ? tone.fg : undefined }}
       >
         <span
-          className="inline-block text-sm font-bold uppercase tracking-wide px-3 py-1.5 rounded-lg"
+          className="inline-block text-xs font-bold uppercase tracking-[0.08em] px-3 py-1.5 rounded-full"
           style={{ background: tone.fg, color: "#fff" }}
         >
           {card.shortLabel}
@@ -65,28 +65,26 @@ export function CardDeck({
 
         {/* The name is never translated - it has to be matchable against the
             printed bottle by eye. */}
-        <h3 className="text-4xl sm:text-5xl font-black leading-tight mt-4 break-words">
+        <h3 className="display text-6xl sm:text-7xl mt-5 break-words">
           {card.name}
         </h3>
 
         <p className="text-2xl leading-snug mt-5">{card.purpose}</p>
 
-        <div className="mt-6 rounded-xl bg-white/70 border border-[color:var(--line)] p-4">
-          <p className="text-sm font-bold uppercase tracking-wide text-[color:var(--muted)]">
-            How to take it
-          </p>
-          <p className="text-2xl font-semibold leading-snug mt-1">{card.howToTake}</p>
+        <div className="mt-7 pt-6 border-t border-[color:var(--line-soft)]">
+          <span className="meta-chip">How to take it</span>
+          <p className="text-2xl font-semibold leading-snug mt-3">{card.howToTake}</p>
         </div>
 
         {card.warning && (
-          <div
-            className="mt-5 rounded-xl p-4 border-2"
-            style={{ borderColor: "var(--high)", background: "#fff" }}
-          >
-            <p className="text-sm font-bold uppercase tracking-wide" style={{ color: "var(--high)" }}>
+          <div className="mt-6 pt-6 border-t border-[color:var(--line-soft)]">
+            <span
+              className="meta-chip"
+              style={{ color: "var(--high)", borderColor: "var(--high)" }}
+            >
               Ask your pharmacist
-            </p>
-            <p className="text-xl leading-snug mt-1 font-semibold">{card.warning}</p>
+            </span>
+            <p className="text-xl leading-snug mt-3 font-semibold">{card.warning}</p>
           </div>
         )}
 
@@ -106,14 +104,14 @@ export function CardDeck({
         <button
           onClick={() => setI((n) => Math.max(0, n - 1))}
           disabled={i === 0}
-          className="flex-1 rounded-xl border-2 border-[color:var(--foreground)] px-4 py-4 text-lg font-bold disabled:opacity-30"
+          className="btn btn-secondary flex-1 py-4 text-lg disabled:opacity-30"
         >
           &larr; Back
         </button>
         <button
           onClick={() => setI((n) => Math.min(cards.length - 1, n + 1))}
           disabled={i >= cards.length - 1}
-          className="flex-1 rounded-xl bg-[color:var(--accent)] px-4 py-4 text-lg font-bold text-white disabled:opacity-30"
+          className="btn btn-primary flex-1 py-4 text-lg disabled:opacity-30"
         >
           Next &rarr;
         </button>
@@ -126,7 +124,7 @@ export function CardDeck({
             key={c.med_id}
             onClick={() => setI(n)}
             aria-label={`Go to ${c.name}`}
-            className="h-3 flex-1 min-w-[1.5rem] rounded-full"
+            className="h-1.5 flex-1 min-w-[1.5rem] rounded-full"
             style={{
               background: n === i ? "var(--accent)" : c.warning ? "var(--high)" : "var(--line)",
               opacity: n === i ? 1 : 0.55,

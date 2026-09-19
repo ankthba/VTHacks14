@@ -72,8 +72,8 @@ export function CanITake({
   const tone = res?.verdict ? VERDICT[res.verdict] : null;
 
   return (
-    <section className="rounded-2xl border-2 border-[color:var(--accent)] bg-[color:var(--surface)] p-5">
-      <h2 className="text-2xl font-bold">Can I take something else?</h2>
+    <section className="card p-6">
+      <h2 className="display-sm text-3xl">Can I take something else?</h2>
       <p className="text-[color:var(--muted)] mt-1 text-[15px]">
         About to buy a cold or pain medicine? Check it against what you already
         take &mdash; before you buy it, not after.
@@ -96,7 +96,7 @@ export function CanITake({
         <button
           type="submit"
           disabled={busy || !query.trim()}
-          className="rounded-lg bg-[color:var(--accent)] px-5 py-2.5 font-bold text-white disabled:opacity-50"
+          className="btn btn-primary disabled:opacity-50"
         >
           {busy ? "Checking..." : "Check it"}
         </button>
@@ -111,7 +111,7 @@ export function CanITake({
               run(c);
             }}
             disabled={busy}
-            className="rounded-full border border-[color:var(--line)] px-3 py-1 text-sm hover:border-[color:var(--accent)] disabled:opacity-50"
+            className="chip disabled:opacity-50"
           >
             {c}
           </button>
@@ -170,7 +170,7 @@ export function CanITake({
             style={{ background: tone.bg, borderColor: tone.fg }}
           >
             <span
-              className="text-xs font-bold uppercase tracking-wide px-2 py-1 rounded"
+              className="text-xs font-bold uppercase tracking-[0.08em] px-2.5 py-1 rounded-full"
               style={{ background: tone.fg, color: "#fff" }}
             >
               {tone.word}

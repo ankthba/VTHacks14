@@ -123,8 +123,8 @@ export default function Home() {
   return (
     <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-8">
       <header className="mb-8 no-print">
-        <h1 className="text-4xl font-black tracking-tight">PillPile</h1>
-        <p className="text-lg text-[color:var(--muted)] mt-1">
+        <h1 className="display text-6xl">PillPile</h1>
+        <p className="text-lg text-[color:var(--muted)] mt-3">
           Photograph the bottles on the kitchen table. Get back questions worth
           asking your pharmacist.
         </p>
@@ -142,7 +142,7 @@ export default function Home() {
       )}
 
       {busy && (
-        <div className="no-print mb-6 rounded-xl border border-[color:var(--line)] bg-[color:var(--surface)] p-4">
+        <div className="no-print mb-6 card p-4">
           <p className="font-semibold">{busy}</p>
           <div className="mt-2 h-1.5 w-full overflow-hidden rounded bg-[color:var(--line)]">
             <div className="h-full w-1/3 animate-pulse rounded bg-[color:var(--accent)]" />
@@ -162,7 +162,7 @@ export default function Home() {
 
       {stage === "review" && (
         <section className="no-print">
-          <h2 className="text-2xl font-bold mb-1">Check what we read</h2>
+          <h2 className="display-sm text-3xl mb-2">Check what we read</h2>
           <p className="text-[color:var(--muted)] mb-5">
             Everything below came off the labels. Fix anything that is wrong
             before we check it &mdash; a wrong name here would make every check
@@ -197,7 +197,7 @@ export default function Home() {
             <button
               onClick={() => analyze()}
               disabled={!!busy || bottles.length === 0}
-              className="rounded-lg bg-[color:var(--accent)] px-6 py-3 text-lg font-bold text-white disabled:opacity-50"
+              className="btn btn-primary text-lg disabled:opacity-50"
             >
               Check these {bottles.length} medicines
             </button>
@@ -240,9 +240,9 @@ function StartScreen({
 }) {
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border-2 border-dashed border-[color:var(--line)] bg-[color:var(--surface)] p-8 text-center">
-        <h2 className="text-2xl font-bold">Take a photo of your bottles</h2>
-        <p className="text-[color:var(--muted)] mt-2 max-w-xl mx-auto">
+      <section className="float-card p-8">
+        <h2 className="display-sm text-3xl">Take a photo of your bottles</h2>
+        <p className="text-[color:var(--muted)] mt-2 max-w-xl">
           One photo of the whole pile, or several photos. We read the printed
           label &mdash; never the pills themselves.
         </p>
@@ -257,18 +257,18 @@ function StartScreen({
         <button
           onClick={() => fileRef.current?.click()}
           disabled={disabled}
-          className="mt-5 rounded-lg bg-[color:var(--accent)] px-6 py-3 text-lg font-bold text-white disabled:opacity-50"
+          className="btn btn-primary mt-6 text-lg disabled:opacity-50"
         >
           Choose photos
         </button>
         <p className="text-sm text-[color:var(--muted)] mt-4">
-          Photos are read in memory and never stored. Nothing is saved after you
-          close this page.
+          Photos are read in memory and <strong className="font-semibold">never stored</strong>. Nothing is saved after
+          you close this page.
         </p>
       </section>
 
-      <section className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface)] p-6">
-        <h2 className="text-xl font-bold">
+      <section className="pt-8 border-t border-[color:var(--line-soft)]">
+        <h2 className="display-sm text-2xl">
           Optional: add your discharge paperwork
         </h2>
         <p className="text-[color:var(--muted)] mt-1 text-[15px]">
@@ -287,27 +287,30 @@ function StartScreen({
         <button
           onClick={() => dischargeRef.current?.click()}
           disabled={disabled}
-          className="mt-4 rounded-lg border-2 border-[color:var(--accent)] px-5 py-2.5 font-semibold text-[color:var(--accent)] disabled:opacity-50"
+          className="btn btn-secondary mt-5 disabled:opacity-50"
         >
           Add discharge paperwork
         </button>
       </section>
 
       <section>
-        <h2 className="text-xl font-bold mb-1">Or try a prepared example</h2>
+        <h2 className="display-sm text-2xl mb-1">Or try a prepared example</h2>
         <p className="text-[color:var(--muted)] text-sm mb-4">
           These use synthetic labels and need no camera or API key.
         </p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {SCENARIOS.map((s) => (
+        <div className="list-hairline border-t border-[color:var(--line-soft)]">
+          {SCENARIOS.map((s, i) => (
             <button
               key={s.id}
               onClick={() => onPick(s.id)}
               disabled={disabled}
-              className="text-left rounded-xl border border-[color:var(--line)] bg-[color:var(--surface)] p-4 hover:border-[color:var(--accent)] disabled:opacity-50"
+              className="row w-full text-left hover:opacity-70 disabled:opacity-40"
             >
-              <span className="font-bold block">{s.title}</span>
-              <span className="text-sm text-[color:var(--muted)]">{s.blurb}</span>
+              <span className="icon-box">{["\u25CE", "\u25D0", "\u25C8", "\u25A3", "\u25B3"][i % 5]}</span>
+              <span>
+                <span className="font-semibold block">{s.title}</span>
+                <span className="text-[15px] text-[color:var(--muted)]">{s.blurb}</span>
+              </span>
             </button>
           ))}
         </div>
@@ -340,15 +343,15 @@ function Results({
     <div className="space-y-10">
       {/* The simple view opens first. Someone who cannot read a medicine label
           cannot read a findings list either, so the detailed page is secondary. */}
-      <div className="no-print flex rounded-xl border-2 border-[color:var(--foreground)] overflow-hidden">
+      <div className="no-print flex rounded-full border border-[color:var(--line)] overflow-hidden bg-[color:var(--surface-warm)] p-1 gap-1">
         {(["cards", "details"] as View[]).map((v) => (
           <button
             key={v}
             onClick={() => setView(v)}
-            className="flex-1 px-4 py-3 text-lg font-bold"
+            className="flex-1 px-4 py-2.5 text-base font-semibold rounded-full transition-colors"
             style={{
-              background: view === v ? "var(--foreground)" : "transparent",
-              color: view === v ? "#fff" : "var(--foreground)",
+              background: view === v ? "var(--accent)" : "transparent",
+              color: view === v ? "var(--accent-ink)" : "var(--foreground)",
             }}
           >
             {v === "cards" ? "One at a time" : "All the details"}
@@ -358,7 +361,7 @@ function Results({
       <section className="no-print flex flex-wrap items-center gap-3">
         <button
           onClick={() => window.print()}
-          className="rounded-lg border-2 border-[color:var(--foreground)] px-4 py-2 font-semibold"
+          className="btn btn-secondary"
         >
           Print / save as PDF
         </button>
@@ -368,7 +371,7 @@ function Results({
           <select
             value={language}
             onChange={(e) => onLanguage(e.target.value)}
-            className="rounded-lg border border-[color:var(--line)] bg-white px-3 py-2"
+            className="chip bg-white"
           >
             {LANGUAGES.map((l) => (
               <option key={l}>{l}</option>
@@ -386,7 +389,7 @@ function Results({
 
       {view === "details" && result.reconciliation && (
         <section>
-          <h2 className="text-2xl font-bold mb-1">
+          <h2 className="display-sm text-3xl mb-2">
             Discharge list vs what is on the table
           </h2>
           <p className="text-[color:var(--muted)] mb-4 text-[15px]">
@@ -411,12 +414,12 @@ function Results({
 
       {view === "details" && (
       <section>
-        <h2 className="text-2xl font-bold mb-1">Your medications</h2>
+        <h2 className="display-sm text-3xl mb-2">Your medications</h2>
         <p className="text-[color:var(--muted)] mb-4 text-[15px]">
           Each bottle matched to its official drug record and broken down into
           active ingredients.
         </p>
-        <div className="space-y-3">
+        <div className="list-hairline border-t border-[color:var(--line-soft)]">
           {result.meds.map((m) => (
             <MedRow key={m.id} med={m} summary={result.summaries.find((s) => s.med_id === m.id)} />
           ))}
@@ -426,7 +429,7 @@ function Results({
 
       {view === "details" && (
       <section>
-        <h2 className="text-2xl font-bold mb-1">
+        <h2 className="display-sm text-3xl mb-2">
           Things to ask your pharmacist about
         </h2>
         <p className="text-[color:var(--muted)] mb-4 text-[15px]">
@@ -444,14 +447,14 @@ function Results({
 
       {view === "details" && (
       <section>
-        <h2 className="text-2xl font-bold mb-4">Your daily schedule</h2>
+        <h2 className="display-sm text-3xl mb-4">Your daily schedule</h2>
         <ScheduleGrid schedule={result.schedule} />
       </section>
       )}
 
       {view === "details" && (
       <section className="print-sheet">
-        <h2 className="text-2xl font-bold mb-1">The one-pager</h2>
+        <h2 className="display-sm text-3xl mb-2">The one-pager</h2>
         <p className="no-print text-[color:var(--muted)] mb-4 text-[15px]">
           {result.onePagerGenerated
             ? `Written in plain ${language} from the findings above. The model rewrote them - it did not add to them.`
@@ -475,18 +478,23 @@ function MedRow({
 }) {
   if (med.unresolved) {
     return (
-      <div className="rounded-xl border p-4" style={{ background: "var(--moderate-bg)", borderColor: "var(--moderate)" }}>
-        <p className="font-bold">{med.input_text}</p>
-        <p className="text-[15px] mt-1">
-          We could not match this to a drug record, so it was left out of every
-          check. Check the spelling, or ask your pharmacist directly.
-        </p>
+      <div className="row">
+        <span className="icon-box" style={{ color: "var(--moderate)" }}>?</span>
+        <div>
+          <p className="font-semibold">{med.input_text}</p>
+          <p className="text-[15px] mt-1 text-[color:var(--muted)]">
+            We could not match this to a drug record, so it was left out of every
+            check. Check the spelling, or ask your pharmacist directly.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-[color:var(--line)] bg-[color:var(--surface)] p-4">
+    <div className="row">
+      <span className="icon-box">&#9679;</span>
+      <div>
       {/*
         This single line is the product: the bottle said "Norco", the ingredients
         are hydrocodone AND acetaminophen. Everything else follows from it.
@@ -522,6 +530,7 @@ function MedRow({
           )}
         </p>
       )}
+      </div>
     </div>
   );
 }
