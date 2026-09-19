@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Diagram } from "@/components/Diagram";
 import { asset } from "@/lib/staticMode";
 import { SPOT_SRC } from "@/lib/anatomy/art";
+import { InkImage } from "@/components/InkImage";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 
 /**
@@ -70,7 +71,7 @@ export function Figure({ region, body, spot = true, searching = false }: { regio
   const size = 0.34 * p.s * 100;
   return (
     <div className="relative h-full" style={{ aspectRatio: `${art.w} / ${art.h}` }}>
-      <img src={art.src} alt={body === "female" ? "A woman's body" : "A man's body"} className="block h-full w-full" draggable={false} />
+      <InkImage src={art.src} alt={body === "female" ? "A woman's body" : "A man's body"} className="block h-full w-full" />
       {searching && (
         <img src={SPOT_SRC} alt="" aria-hidden draggable={false} className="spot-search absolute" style={{ width: `${0.34 * 100}%` }} />
       )}

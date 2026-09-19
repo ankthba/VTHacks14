@@ -309,7 +309,7 @@ export default function Home() {
   // ---- The turned screen ----
   if (patientView && card) {
     return (
-      <div className={`flex-1 flex flex-col ${flip ? `turn ${flip}` : ""}`}>
+      <div className={`ink-green flex-1 flex flex-col ${flip ? `turn ${flip}` : ""}`}>
         <PatientStory
           slides={card.slides}
           diagram={card.diagram}
@@ -330,7 +330,7 @@ export default function Home() {
   const canTurn = hasContent && !busy;
 
   return (
-    <div className={`flex-1 w-full ${flip ? `turn ${flip}` : ""}`}>
+    <div className={`ink-green flex-1 w-full ${flip ? `turn ${flip}` : ""}`}>
       <div className="max-w-6xl mx-auto px-5">
         <nav className="nav rise">
           <a href={IS_STATIC ? "./" : "/"} className="wordmark flex items-center gap-2">
@@ -380,7 +380,7 @@ export default function Home() {
                 onChange={(e) => setNoteText(e.target.value)}
                 rows={7}
                 placeholder={"Discharge Diagnosis: Distal radius fracture, left\n\nDischarge Medications:\n1. Ibuprofen 600 mg PO TID with food x 7 days\n\nFollow-up:\n- Orthopedics in 2 weeks for repeat X-ray"}
-                className="field text-[15px] leading-relaxed"
+                className="field note text-[15px] leading-relaxed"
               />
               <input ref={noteFileRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => ingestNote(e.target.files)} />
               <div className="flex flex-wrap items-center gap-4 mt-3">

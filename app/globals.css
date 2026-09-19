@@ -521,3 +521,26 @@ html { scroll-behavior: smooth; }
   transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
 }
 .row:hover .ink-radio { transform: scale(1.1); }
+
+/* The drawings are masks over the page's ink, so a page can choose its colour. */
+.ink-img {
+  background-color: var(--ink);
+  -webkit-mask: var(--src) center / contain no-repeat;
+  mask: var(--src) center / contain no-repeat;
+}
+/* The homepage draws in deep green; the library stays black. */
+.ink-green { --ink: #1d3b2c; }
+
+/* The note: a pad of slightly darker paper, no box, grows with what you paste. */
+.field.note {
+  border: 0;
+  background: var(--surface-warm);
+  border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px;
+  padding: 18px 22px;
+  min-height: 12.5em;
+  resize: none;
+  field-sizing: content;
+  line-height: 1.6;
+}
+.field.note:focus { box-shadow: inset 0 0 0 2px var(--accent); }
+.field.note::placeholder { color: #a39889; }

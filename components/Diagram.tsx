@@ -1,5 +1,6 @@
 import type { DiagramId } from "@/lib/anatomy/conditions";
 import { ART, SPOT_SRC, SPOT_WIDTH, spotsFor } from "@/lib/anatomy/art";
+import { InkImage } from "@/components/InkImage";
 
 /**
  * Anatomically modeled diagrams for the exam room.
@@ -62,7 +63,7 @@ export function Diagram({
   if (art) {
     return (
       <div className={className} role="img" aria-label={art.label} style={{ position: "relative", aspectRatio: `${art.w} / ${art.h}`, ...sizing }}>
-        <img src={art.src} alt="" className="block w-full h-full" draggable={false} />
+        <InkImage src={art.src} className="block w-full h-full" />
         {marks.flatMap((m) => spotsFor(art, m).map((p, i) => ({ key: `${m}-${i}`, p }))).map(({ key, p }) => {
           return (
             <img
