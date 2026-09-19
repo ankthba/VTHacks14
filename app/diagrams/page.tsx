@@ -21,10 +21,10 @@ export default function DiagramsPage() {
         sits on the real structure.
       </p>
       <h2 className="display-sm text-3xl mt-10 mb-4">The views</h2>
-      <div className="grid gap-4 grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
+      <div className="grid gap-x-10 gap-y-12 grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
         {uniqueViews().map((id) => (
           <div key={id} className="card">
-            <div className="aspect-square w-full flex items-center justify-center">
+            <div className="aspect-square w-full flex items-center justify-center p-[14%]">
               <Diagram id={id} fit />
             </div>
             <p className="text-sm font-semibold mt-3 capitalize">{id}</p>
@@ -36,10 +36,10 @@ export default function DiagramsPage() {
         <section key={r}>
           <h2 className="display-sm text-3xl mt-14 mb-1">{r}</h2>
           <p className="text-sm text-[color:var(--muted)] mb-5">{CONDITIONS.filter((c) => c.region === r).length} conditions</p>
-          <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {CONDITIONS.filter((c) => c.region === r).map((c) => (
               <div key={c.id} className="card">
-                <div className="aspect-square w-full max-w-[200px] mx-auto flex items-center justify-center">
+                <div className="aspect-square w-full max-w-[200px] mx-auto flex items-center justify-center p-[10%]">
                   <Diagram id={c.diagram} marks={c.marks} fit />
                 </div>
                 <p className="font-semibold mt-3">{c.label}</p>
