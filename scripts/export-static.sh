@@ -20,7 +20,7 @@ for d in api clinician pillpile explain; do
 done
 
 sh scripts/declutter.sh
-rm -rf out .next
+rm -rf out .next .next.nosync
 NEXT_PUBLIC_STATIC=1 NEXT_PUBLIC_BASE_PATH=/aperta npx next build
 echo
 echo "static site in ./out  ($(find out -type f | wc -l | tr -d ' ') files)"

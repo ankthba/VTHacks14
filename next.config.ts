@@ -13,6 +13,10 @@ const isStatic = process.env.NEXT_PUBLIC_STATIC === "1";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 const nextConfig: NextConfig = {
+  // ~/Documents is iCloud-synced on the dev Mac. iCloud kept dropping
+  // "name 2" duplicates into Turbopack's persistence directory until it
+  // refused to open. Anything named *.nosync is left alone by iCloud.
+  distDir: ".next.nosync",
   output: isStatic ? "export" : undefined,
   basePath: isStatic ? basePath : undefined,
   trailingSlash: isStatic,
