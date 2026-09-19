@@ -160,6 +160,21 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       hernia: { x: 0.15, y: 0.83, s: 0.8 },                                  // the groin
     },
   },
+  // Whole body: her and him side by side, the same figures the locator uses.
+  // Every whole-body mark is spotted on both.
+  body: {
+    src: asset("/anatomy/bodies.png"),
+    w: 902,
+    h: 1149,
+    label: "The body",
+    spots: {
+      core: [{ x: 0.229, y: 0.42, s: 1.4 }, { x: 0.796, y: 0.42, s: 1.4 }],       // the trunk
+      pelvis: [{ x: 0.229, y: 0.56, s: 0.95 }, { x: 0.796, y: 0.56, s: 0.95 }],   // the pelvis
+      blood: [{ x: 0.229, y: 0.32, s: 1.3 }, { x: 0.796, y: 0.321, s: 1.3 }],     // the chest, where the blood is pumped
+      bones: [{ x: 0.184, y: 0.66, s: 0.8 }, { x: 0.755, y: 0.659, s: 0.8 }],     // a long bone, the thigh
+      joints: [{ x: 0.092, y: 0.2, s: 0.6 }, { x: 0.686, y: 0.202, s: 0.6 }, { x: 0.184, y: 0.745, s: 0.6 }, { x: 0.755, y: 0.744, s: 0.6 }], // shoulders and knees
+    },
+  },
 };
 
 /** Every spot for a mark, whether the drawing has one view or two. */
