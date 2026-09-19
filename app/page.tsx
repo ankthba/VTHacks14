@@ -366,7 +366,7 @@ export default function Home() {
           <div className="doc rise" style={{ animationDelay: "220ms" }}>
             <section>
               <div className="step">
-                <span className={stepClass(!!noteStatus, true)}><InkRing className="ring" draw />1</span>
+                <span className={stepClass(!!noteStatus, true)}><InkRing className="step-ring" draw />1</span>
                 <h2 className="display-sm text-2xl">Start from the note</h2>
               </div>
 
@@ -415,7 +415,7 @@ export default function Home() {
 
             <section>
               <div className="step">
-                <span className={stepClass(false, hasContent)}><InkRing className="ring" draw />2</span>
+                <span className={stepClass(false, hasContent)}><InkRing className="step-ring" draw />2</span>
                 <h2 className="display-sm text-2xl">Check what they will hear</h2>
               </div>
               {!hasContent && (
@@ -567,7 +567,7 @@ export default function Home() {
 
             <section className="lg:hidden">
               <div className="step">
-                <span className={stepClass(false, canTurn)}><InkRing className="ring" draw />3</span>
+                <span className={stepClass(false, canTurn)}><InkRing className="step-ring" draw />3</span>
                 <h2 className="display-sm text-2xl">Turn the screen</h2>
               </div>
               <button onClick={() => build(true)} disabled={!canTurn} className="btn btn-primary btn-turn w-full py-4 text-lg disabled:opacity-50">{primaryLabel}</button>

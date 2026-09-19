@@ -310,8 +310,8 @@ select.chip { appearance: none; padding-right: 18px; background-image: url("data
   transform: translateY(7px);
 }
 /* A hand-drawn ring around the step you are on. */
-.step-n .ring { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--accent); }
-.step-n.done .ring, .step-n.todo .ring { display: none; }
+.step-n .step-ring { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--accent); }
+.step-n.done .step-ring, .step-n.todo .step-ring { display: none; }
 .step-n.done { color: var(--accent-text); }
 .step-n.todo { color: var(--line); }
 
@@ -446,8 +446,9 @@ input.field:focus { background-image: var(--wave-fg) !important; }
   gap: 40px;
   height: 104px;
   overflow: hidden;
+  --ink: #a9c58a;
   color: var(--ink);
-  opacity: 0.9;
+  opacity: 0.95;
   mask-image: linear-gradient(to right, black 82%, transparent);
   -webkit-mask-image: linear-gradient(to right, black 82%, transparent);
 }
@@ -644,7 +645,7 @@ html { scroll-behavior: smooth; }
   --wave-accent-text: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23d9cdb0%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
   --wave-muted: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23b9ad98%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
 }
-:root[data-theme="dark"] .ink-green { --ink: #cfe0c0; }
+:root[data-theme="dark"] .ink-green, :root[data-theme="dark"] .ink-row { --ink: #cfe0c0; }
 :root[data-theme="dark"] body::before { opacity: 0.05; filter: invert(1); }
 :root[data-theme="dark"] .field::placeholder, :root[data-theme="dark"] .field.note::placeholder { color: #7f8f80; }
 :root[data-theme="dark"] .menu-item.active, :root[data-theme="dark"] .menu-item:hover { background: #21382c; }
