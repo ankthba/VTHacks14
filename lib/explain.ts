@@ -2,6 +2,8 @@ import { normalizeAll } from "./normalize";
 import { plainPurpose, plainSig } from "./plainPurpose";
 import { displayName } from "./display";
 import { byId } from "./anatomy/conditions";
+import { translateStrings, LANGUAGES } from "./translate";
+import { howToById, type HowToArt } from "./howto";
 import type { BottleRecord } from "./schemas";
 
 /**
@@ -27,6 +29,21 @@ export interface MedExplain {
   curated: boolean;
 }
 
+/**
+ * One screen of the patient story. The turned screen shows exactly one of
+ * these at a time, reads it aloud, and moves on when the audio ends.
+ */
+export interface Slide {
+  kind: "picture" | "medicine" | "todo" | "howto" | "end";
+  title: string;
+  lines: string[];
+  /** What the voice says for this slide. */
+  spoken: string;
+  /** For how-to steps: which picture, and "step 2 of 6". */
+  art?: HowToArt;
+  step?: { n: number; of: number };
+}
+
 export interface ExplainCard {
   headline: string;
   diagram: string | null;
@@ -35,6 +52,80 @@ export interface ExplainCard {
   instructions: string[];
   /** The whole card as one paragraph, for read-aloud. */
   spoken: string;
+  /** Language the text is in, and its BCP-47 tag for speech. */
+  language: string;
+  langTag: string;
+  rtl: boolean;
+  slides: Slide[];
+}
+
+/** Fixed phrases the story needs, translated with everything else. */
+const PHRASES = {
+  yourMedicines: "Your medicines",
+  whatToDo: "What to do next",
+  thatsAll: "That is everything.",
+  askUs: "If anything is unclear, ask us before you leave.",
+};
+
+export interface HowToSlideInput {
+  title: string;
+  why: string;
+  steps: string[];
+  art: HowToArt;
+}
+
+export function buildSlides(
+  headline: string,
+  meds: MedExplain[],
+  instructions: string[],
+  howtos: HowToSlideInput[],
+  phrases: typeof PHRASES,
+): Slide[] {
+  const slides: Slide[] = [
+    { kind: "picture", title: headline, lines: [], spoken: headline },
+  ];
+  for (const m of meds) {
+    slides.push({
+      kind: "medicine",
+      title: m.name,
+      lines: [m.purpose, m.howToTake],
+      spoken: `${m.name}. ${m.purpose} ${m.howToTake}`,
+    });
+  }
+  if (instructions.length) {
+    slides.push({
+      kind: "todo",
+      title: phrases.whatToDo,
+      lines: instructions,
+      spoken: `${phrases.whatToDo}. ${instructions.join(" ")}`,
+    });
+  }
+  for (const h of howtos) {
+    slides.push({
+      kind: "howto",
+      title: h.title,
+      lines: [h.why],
+      spoken: `${h.title}. ${h.why}`,
+      art: h.art,
+    });
+    h.steps.forEach((step, k) => {
+      slides.push({
+        kind: "howto",
+        title: step,
+        lines: [],
+        spoken: step,
+        art: h.art,
+        step: { n: k + 1, of: h.steps.length },
+      });
+    });
+  }
+  slides.push({
+    kind: "end",
+    title: phrases.thatsAll,
+    lines: [phrases.askUs],
+    spoken: `${phrases.thatsAll} ${phrases.askUs}`,
+  });
+  return slides;
 }
 
 export async function buildExplainCard(input: {
@@ -42,7 +133,9 @@ export async function buildExplainCard(input: {
   customHeadline?: string | null;
   meds: BottleRecord[];
   instructions: string[];
-}): Promise<ExplainCard> {
+  howtoIds?: string[];
+  language?: string;
+}): Promise<{ card: ExplainCard; translation: { provider: string; untranslated: number } }> {
   const condition = input.conditionId ? byId(input.conditionId) : null;
   const headline =
     input.customHeadline?.trim() ||
@@ -64,54 +157,65 @@ export async function buildExplainCard(input: {
     };
   });
 
-  const instructions = input.instructions.map((i) => i.trim()).filter(Boolean);
+  let instructions = input.instructions.map((i) => i.trim()).filter(Boolean);
+  let howtos: HowToSlideInput[] = (input.howtoIds ?? [])
+    .map(howToById)
+    .filter((h): h is NonNullable<typeof h> => h !== null)
+    .map((h) => ({ title: h.title, why: h.why, steps: [...h.steps], art: h.art }));
 
-  const spoken = [
-    headline,
-    meds.length ? "Here are your medicines." : "",
-    ...meds.map((m) => `${m.name}. ${m.purpose} ${m.howToTake}`),
-    instructions.length ? "Here is what to do next." : "",
-    ...instructions,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  // Translate everything the patient reads, in one batch, except drug names -
+  // those must match the printed bottle. The library decided what each line
+  // says; the translator only changes the language it says it in.
+  const language = input.language && LANGUAGES[input.language] ? input.language : "English";
+  const lang = LANGUAGES[language];
+  let phrases = { ...PHRASES };
+  let translation = { provider: "none", untranslated: 0 };
+  let finalHeadline = headline;
+
+  if (language !== "English") {
+    const batch = [
+      headline,
+      ...meds.flatMap((m) => [m.shortLabel, m.purpose, m.howToTake]),
+      ...instructions,
+      ...howtos.flatMap((h) => [h.title, h.why, ...h.steps]),
+      ...Object.values(PHRASES),
+    ];
+    const t = await translateStrings(batch, language);
+    translation = { provider: t.provider, untranslated: t.untranslated };
+    let i = 0;
+    finalHeadline = t.out[i++];
+    for (const m of meds) {
+      m.shortLabel = t.out[i++];
+      m.purpose = t.out[i++];
+      m.howToTake = t.out[i++];
+    }
+    instructions = instructions.map(() => t.out[i++]);
+    howtos = howtos.map((h) => ({
+      ...h,
+      title: t.out[i++],
+      why: t.out[i++],
+      steps: h.steps.map(() => t.out[i++]),
+    }));
+    const keys = Object.keys(PHRASES) as (keyof typeof PHRASES)[];
+    for (const k of keys) phrases[k] = t.out[i++];
+  }
+
+  const slides = buildSlides(finalHeadline, meds, instructions, howtos, phrases);
+  const spoken = slides.map((sl) => sl.spoken).join(" ");
 
   return {
-    headline,
-    diagram: condition?.diagram ?? null,
-    marks: condition?.marks ?? [],
-    meds,
-    instructions,
-    spoken,
+    card: {
+      headline: finalHeadline,
+      diagram: condition?.diagram ?? null,
+      marks: condition?.marks ?? [],
+      meds,
+      instructions,
+      spoken,
+      language,
+      langTag: lang.tag,
+      rtl: lang.mymemory === "ar",
+      slides,
+    },
+    translation,
   };
-}
-
-/**
- * Translation prompt.
- *
- * The model translates; it does not decide anything clinical. Drug names are
- * held back deliberately - the patient has to match them against a printed
- * bottle, so translating them would break the one thing the card is for.
- */
-export function explainTranslationPrompt(card: ExplainCard, language: string) {
-  const payload = {
-    headline: card.headline,
-    meds: card.meds.map((m) => ({
-      shortLabel: m.shortLabel,
-      purpose: m.purpose,
-      howToTake: m.howToTake,
-    })),
-    instructions: card.instructions,
-  };
-
-  return `Translate this patient explanation into ${language}.
-
-RULES
-- 6th-grade reading level. Short sentences, common words.
-- Translate ONLY. Do not add, remove, soften or reinterpret any medical statement.
-- Do NOT translate medication names - they are not included below for that reason.
-- Keep the same JSON shape and the same array lengths.
-
-Return ONLY the JSON:
-${JSON.stringify(payload, null, 1)}`;
 }

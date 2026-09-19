@@ -114,30 +114,42 @@ export function plainPurpose(
  */
 export function plainSig(sig: string | null): { text: string; parsed: boolean } {
   if (!sig?.trim()) {
-    return { text: "The directions were not readable. Ask your pharmacist.", parsed: false };
+    // Never tell a patient their directions were "not readable". The clinician
+    // sees this flagged in the composer and fixes it; the patient sees a
+    // sentence that is true and calm.
+    return { text: "Take it the way your doctor told you.", parsed: false };
   }
 
   const { unitsPerDose, dosesPerDay, asNeeded } = parseSigQuantities(sig);
   if (dosesPerDay === null && !asNeeded) return { text: sig, parsed: false };
 
-  const words = ["", "One", "Two", "Three", "Four"];
-  const count = words[unitsPerDose] ?? String(unitsPerDose);
-  const pill = unitsPerDose === 1 ? "pill" : "pills";
+  const words = ["", "One", "Two", "Three", "Four", "Five", "Six"];
+  const count = unitsPerDose === 0.5 ? "Half a" : (words[unitsPerDose] ?? String(unitsPerDose));
+  const pill = unitsPerDose === 1 || unitsPerDose === 0.5 ? "pill" : "pills";
 
   const s = sig.toLowerCase();
   let when = "";
-  if (/bedtime|nightly|at night|qhs/.test(s)) when = "at bedtime";
+  if (/bedtime|nightly|at night|qhs|qpm|every evening|every night/.test(s)) when = "at bedtime";
+  else if (/qam|every morning|in the morning/.test(s)) when = "in the morning";
   else if (dosesPerDay === 1) when = "once a day";
   else if (dosesPerDay === 2) when = "twice a day";
   else if (dosesPerDay === 3) when = "three times a day";
+  else if (dosesPerDay === 0.5) when = "every other day";
+  else if (dosesPerDay !== null && dosesPerDay < 0.5) when = "once a week";
   else if (dosesPerDay && dosesPerDay >= 4) when = `up to ${dosesPerDay} times a day`;
 
   let text = `${count} ${pill}${when ? `, ${when}` : ""}.`;
   if (asNeeded) text += " Only when you need it.";
 
-  // Keep a genuinely important qualifier that the summary would otherwise lose.
-  if (/with food|with a meal/.test(s)) text += " Take it with food.";
+  // Keep the qualifiers that change what the patient should do.
+  if (/with food|with a meal|with meals/.test(s)) text += " Take it with food.";
   if (/empty stomach/.test(s)) text += " Take it on an empty stomach.";
+  // "x 7 days", "for 7 days", or a bare trailing "7 days" from an EHR field -
+  // but not "every 2 days", which is a frequency.
+  const days = s.match(/(?<!every\s)(?<!q)(?:x|for)?\s*(\d+)\s*(?:days?|d\b)(?!\s*(?:a|per)\b)/);
+  if (days) text += ` For ${days[1]} days.`;
+  const months = s.match(/(?:x|for)\s*(\d+)\s*months?/);
+  if (months) text += ` For ${months[1]} months.`;
 
   return { text, parsed: true };
 }

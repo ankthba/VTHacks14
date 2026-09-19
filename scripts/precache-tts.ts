@@ -38,34 +38,44 @@ async function tts(label: string, text: string) {
   return r.ok;
 }
 
-(async () => {
-  console.log("\n===== pre-generating demo audio =====\n");
+const WISDOM_NOTE = `Post-op instructions after wisdom tooth extraction
+Dx: impacted third molars s/p extraction
+Rx: ibuprofen 600 mg q6h prn pain
+Instructions:
+- Starting day 3, irrigate the sockets with the syringe after meals and at bedtime
+- Ice 20 min on / 20 off for 48 hours
+- Soft foods for one week. No straws, no smoking.
+Follow-up: return in 1 week for check; call if fever or severe pain`;
 
-  // The explain tool's demo: the note goes in, the card comes out, it is read.
-  const parsed = await fetch(`${BASE}/api/parse-note`, {
-    method: "POST",
-    body: (() => { const f = new FormData(); f.append("text", DEMO_NOTE); return f; })(),
-  }).then((r) => r.json());
-
-  const card = await fetch(`${BASE}/api/explain`, {
+async function warmStory(label: string, note: string, language: string) {
+  const fd = new FormData();
+  fd.append("text", note);
+  const parsed = await fetch(`${BASE}/api/parse-note`, { method: "POST", body: fd }).then((r) => r.json());
+  const { card } = await fetch(`${BASE}/api/explain`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
       conditionId: parsed.conditionId,
       medNames: parsed.medications,
       instructions: [...(parsed.instructions ?? []), ...(parsed.followUp ?? [])],
-      language: "English",
+      howtoIds: parsed.howtoIds ?? [],
+      language,
     }),
   }).then((r) => r.json());
-  await tts("explain: wrist fracture card", card.card.spoken);
+  console.log(`\n${label} (${language}) - ${card.slides.length} slides`);
+  let chars = 0;
+  for (const sl of card.slides) {
+    await tts(`  ${sl.kind}: ${sl.title.slice(0, 26)}`, sl.spoken);
+    chars += sl.spoken.length;
+  }
+  console.log(`  total ${chars} chars`);
+}
 
-  // The original medication checker, in case it is shown too.
-  const dup = await fetch(`${BASE}/api/analyze`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ demo: "duplicate" }),
-  }).then((r) => r.json());
-  for (const c of dup.cards ?? []) await tts(`pillpile: ${c.name}`, c.spoken);
-
-  console.log("\nReplays of these are now free and offline. Commit .cache/tts.\n");
+(async () => {
+  console.log("\n===== pre-generating demo audio, one clip per slide =====");
+  for (const lang of ["English", "Spanish"]) {
+    await warmStory("wrist fracture", DEMO_NOTE, lang);
+    await warmStory("wisdom teeth", WISDOM_NOTE, lang);
+  }
+  console.log("\nReplays are now free and offline. Commit .cache/tts and .cache/translate.\n");
 })();

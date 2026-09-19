@@ -385,6 +385,43 @@ export function Diagram({
     );
   }
 
+  // ---- Lower jaw - viewed from above, teeth in an arch ----------------------
+  if (id === "mouth") {
+    return (
+      <svg {...common} aria-label="The lower jaw and teeth, seen from above">
+        <g {...base}>
+          {/* The jaw bone as a horseshoe. */}
+          <path d="M40 320 Q30 150 150 110 Q270 150 260 320" />
+          <path d="M70 320 Q64 180 150 150 Q236 180 230 320" />
+          {/* Teeth along the arch: incisors at the front, molars at the back. */}
+          {[
+            [150, 130, 10, 12], [130, 134, 10, 12], [170, 134, 10, 12],
+            [112, 142, 11, 13], [188, 142, 11, 13],
+            [96, 156, 12, 14], [204, 156, 12, 14],
+            [84, 176, 13, 15], [216, 176, 13, 15],
+            [74, 200, 15, 17], [226, 200, 15, 17],
+            [66, 228, 16, 18], [234, 228, 16, 18],
+            [60, 258, 17, 19], [240, 258, 17, 19],
+          ].map(([x, y, rx, ry], i) => (
+            <ellipse key={i} cx={x} cy={y} rx={rx} ry={ry} />
+          ))}
+          {/* Tongue, faintly. */}
+          <path d="M110 200 Q150 170 190 200 Q190 280 150 300 Q110 280 110 200 Z" {...thin} />
+        </g>
+        {/* The empty sockets at the very back, where the wisdom teeth sat. */}
+        <Mark on={on("socket")}>
+          <ellipse cx="56" cy="292" rx="17" ry="20" />
+          <ellipse cx="244" cy="292" rx="17" ry="20" />
+        </Mark>
+        {/* An infected root under one molar. */}
+        <Mark on={on("root")} hideWhenOff>
+          <path d="M226 218 L230 246 L222 246 Z" />
+          <circle cx="226" cy="252" r="12" />
+        </Mark>
+      </svg>
+    );
+  }
+
   // ---- Whole body - for systemic conditions ---------------------------------
   return (
     <svg {...common} aria-label="The body">

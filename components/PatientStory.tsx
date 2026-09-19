@@ -1,0 +1,237 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Diagram } from "@/components/Diagram";
+import { BodyLocator } from "@/components/BodyLocator";
+import { HowToArt } from "@/components/HowToArt";
+import { Anatomy3D } from "@/components/Anatomy3D";
+import type { DiagramId } from "@/lib/anatomy/conditions";
+import type { Slide } from "@/lib/explain";
+
+interface Props {
+  slides: Slide[];
+  diagram: DiagramId | null;
+  marks: string[];
+  langTag: string;
+  rtl: boolean;
+  onBack: () => void;
+}
+
+/**
+ * The turned screen, as a paced story.
+ *
+ * One idea per screen in the largest type the viewport allows, read aloud,
+ * advancing when the voice finishes. A patient who cannot read the label cannot
+ * skim a page either; pacing is the accessibility feature, not a flourish.
+ *
+ * Audio is fetched per slide from /api/tts (cached on disk, so a demo replay
+ * costs nothing) with the browser voice as fallback. The next slide's audio is
+ * prefetched while the current one plays, so there is no gap.
+ */
+export function PatientStory({ slides, diagram, marks, langTag, rtl, onBack }: Props) {
+  const [i, setI] = useState(0);
+  const [playing, setPlaying] = useState(true);
+  const [voice, setVoice] = useState<"elevenlabs" | "browser" | null>(null);
+  const [show3d, setShow3d] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const cache = useRef<Map<number, Promise<string | null>>>(new Map());
+  const slide = slides[Math.min(i, slides.length - 1)];
+  const last = i >= slides.length - 1;
+
+  const fetchAudio = useCallback(
+    (n: number): Promise<string | null> => {
+      if (n < 0 || n >= slides.length) return Promise.resolve(null);
+      const hit = cache.current.get(n);
+      if (hit) return hit;
+      const p = fetch("/api/tts", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ text: slides[n].spoken }),
+      })
+        .then(async (r) => (r.ok ? URL.createObjectURL(await r.blob()) : null))
+        .catch(() => null);
+      cache.current.set(n, p);
+      return p;
+    },
+    [slides],
+  );
+
+  const stopAll = useCallback(() => {
+    audioRef.current?.pause();
+    audioRef.current = null;
+    if (typeof window !== "undefined") window.speechSynthesis?.cancel();
+  }, []);
+
+  const advance = useCallback(() => {
+    setI((n) => (n < slides.length - 1 ? n + 1 : n));
+  }, [slides.length]);
+
+  // Play the current slide; advance when it ends.
+  useEffect(() => {
+    if (!playing) return;
+    let cancelled = false;
+    stopAll();
+    fetchAudio(i + 1); // prefetch
+
+    (async () => {
+      const url = await fetchAudio(i);
+      if (cancelled) return;
+      if (url) {
+        setVoice("elevenlabs");
+        const a = new Audio(url);
+        audioRef.current = a;
+        a.onended = () => {
+          if (!cancelled && i < slides.length - 1) advance();
+          else if (!cancelled) setPlaying(false);
+        };
+        a.play().catch(() => {
+          // Autoplay blocked until a gesture: leave the slide up, wait for a tap.
+          setPlaying(false);
+        });
+        return;
+      }
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        setVoice("browser");
+        const u = new SpeechSynthesisUtterance(slide.spoken);
+        u.lang = langTag;
+        u.rate = 0.9;
+        u.onend = () => {
+          if (!cancelled && i < slides.length - 1) advance();
+          else if (!cancelled) setPlaying(false);
+        };
+        window.speechSynthesis.speak(u);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      stopAll();
+    };
+  }, [i, playing, slide.spoken, langTag, slides.length, fetchAudio, stopAll, advance]);
+
+  // Keyboard: space pauses, arrows move.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === " ") { e.preventDefault(); setPlaying((p) => !p); }
+      if (e.key === "ArrowRight") { setI((n) => Math.min(slides.length - 1, n + 1)); setPlaying(true); }
+      if (e.key === "ArrowLeft") { setI((n) => Math.max(0, n - 1)); setPlaying(true); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [slides.length]);
+
+  return (
+    <main
+      dir={rtl ? "rtl" : "ltr"}
+      lang={langTag}
+      className="flex-1 w-full flex flex-col"
+      style={{ minHeight: "calc(100vh - 40px)" }}
+      onClick={() => setPlaying((p) => !p)}
+    >
+      {/* Progress: one segment per slide. Also the only navigation on screen. */}
+      <div className="no-print flex gap-1.5 px-6 pt-5" onClick={(e) => e.stopPropagation()}>
+        {slides.map((s, n) => (
+          <button
+            key={n}
+            aria-label={`Go to ${s.title}`}
+            onClick={() => { setI(n); setPlaying(true); }}
+            className="h-1.5 flex-1 rounded-full transition-colors"
+            style={{ background: n <= i ? "var(--accent)" : "var(--line)" }}
+          />
+        ))}
+      </div>
+
+      <section className="flex-1 flex flex-col justify-center px-6 sm:px-12 py-8 max-w-5xl w-full mx-auto">
+        {slide.kind === "picture" && diagram && (
+          <div className="mx-auto w-full max-w-[440px] mb-8" onClick={(e) => e.stopPropagation()}>
+            {show3d ? <Anatomy3D view={diagram} className="no-print" /> : <BodyLocator view={diagram} marks={marks} />}
+            {diagram !== "body" && (
+              <button onClick={() => setShow3d((v) => !v)} className="chip no-print mt-3">
+                {show3d ? "Back to the drawing" : "See it in 3D"}
+              </button>
+            )}
+          </div>
+        )}
+
+        {slide.kind === "howto" && slide.art && (
+          <div className="flex items-end gap-6 mb-6">
+            <div className="w-40 sm:w-56 float-card p-4">
+              <HowToArt id={slide.art} />
+            </div>
+            {slide.step && (
+              <p className="text-sm font-semibold uppercase tracking-[0.1em] text-[color:var(--muted)] mb-2">
+                Step {slide.step.n} of {slide.step.of}
+              </p>
+            )}
+          </div>
+        )}
+
+        {slide.kind === "medicine" && (
+          <p className="text-sm font-semibold uppercase tracking-[0.1em] text-[color:var(--muted)] mb-3">
+            {slides.slice(0, i + 1).filter((s) => s.kind === "medicine").length} /{" "}
+            {slides.filter((s) => s.kind === "medicine").length}
+          </p>
+        )}
+
+        <h1
+          className="display leading-[0.98]"
+          style={{ fontSize: slide.kind === "picture" ? "clamp(2rem, 5.5vw, 4.5rem)" : "clamp(2.6rem, 8vw, 6.5rem)" }}
+        >
+          {slide.title}
+        </h1>
+
+        {slide.lines.length > 0 && (
+          <div className="mt-8 space-y-5">
+            {slide.lines.map((l, n) => (
+              <p
+                key={n}
+                className={slide.kind === "todo" ? "flex gap-4 items-start" : ""}
+                style={{ fontSize: "clamp(1.4rem, 3.2vw, 2.4rem)", lineHeight: 1.3 }}
+              >
+                {slide.kind === "todo" && <span style={{ color: "var(--accent)" }}>&#10003;</span>}
+                <span className={n === 1 && slide.kind === "medicine" ? "font-semibold" : ""}>{l}</span>
+              </p>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <footer
+        className="no-print flex flex-wrap items-center gap-3 px-6 pb-6 text-sm text-[color:var(--muted)]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button onClick={() => setPlaying((p) => !p)} className="btn btn-secondary">
+          {playing ? "Pause" : last ? "Replay" : "Play"}
+        </button>
+        <button onClick={() => { setI((n) => Math.max(0, n - 1)); setPlaying(true); }} disabled={i === 0} className="btn btn-secondary disabled:opacity-40">
+          &larr;
+        </button>
+        <button onClick={() => { setI((n) => Math.min(slides.length - 1, n + 1)); setPlaying(true); }} disabled={last} className="btn btn-secondary disabled:opacity-40">
+          &rarr;
+        </button>
+        {last && (
+          <button onClick={() => window.print()} className="btn btn-primary">
+            Print this
+          </button>
+        )}
+        <span className="ml-auto">
+          {voice === "browser" ? "Built-in voice" : voice === "elevenlabs" ? "" : ""}
+        </span>
+        <button onClick={onBack} className="underline">
+          Back to the clinician view
+        </button>
+      </footer>
+
+      {/* Paper gets everything on one sheet. */}
+      <div className="hidden print:block px-6">
+        {diagram && <div className="max-w-xs"><Diagram id={diagram} marks={marks} /></div>}
+        {slides.map((s, n) => (
+          <div key={n} className="finding-card py-3 border-b">
+            <p className="text-xl font-bold">{s.title}</p>
+            {s.lines.map((l, k) => <p key={k} className="text-lg">{l}</p>)}
+          </div>
+        ))}
+      </div>
+    </main>
+  );
+}

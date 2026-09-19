@@ -4,8 +4,8 @@ import { useMemo, useRef, useState } from "react";
 import { CONDITIONS, REGIONS } from "@/lib/anatomy/conditions";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 import { Diagram } from "@/components/Diagram";
-import { Anatomy3D } from "@/components/Anatomy3D";
-import { ReadAloud } from "@/components/ReadAloud";
+import { PatientStory } from "@/components/PatientStory";
+import { HOWTOS } from "@/lib/howto";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 
 interface MedExplain {
@@ -22,16 +22,13 @@ interface Card {
   meds: MedExplain[];
   instructions: string[];
   spoken: string;
+  language: string;
+  langTag: string;
+  rtl: boolean;
+  slides: import("@/lib/explain").Slide[];
 }
 
 const LANGUAGES = ["English", "Spanish", "Vietnamese", "Chinese (Simplified)", "Arabic"];
-const LANG_TAG: Record<string, string> = {
-  English: "en-US",
-  Spanish: "es-ES",
-  Vietnamese: "vi-VN",
-  "Chinese (Simplified)": "zh-CN",
-  Arabic: "ar-SA",
-};
 
 const COMMON_INSTRUCTIONS = [
   "Keep the splint dry.",
@@ -52,8 +49,9 @@ export default function ExplainPage() {
   const [region, setRegion] = useState(REGIONS[0]);
   const [conditionId, setConditionId] = useState<string | null>(null);
   const [customHeadline, setCustomHeadline] = useState("");
-  const [meds, setMeds] = useState([{ name: "", sig: "" }]);
+  const [meds, setMeds] = useState<{ name: string; strength?: string | null; sig: string }[]>([{ name: "", sig: "" }]);
   const [instructions, setInstructions] = useState<string[]>([]);
+  const [howtoIds, setHowtoIds] = useState<string[]>([]);
   const [freeInstruction, setFreeInstruction] = useState("");
   const [language, setLanguage] = useState("English");
 
@@ -101,15 +99,17 @@ export default function ExplainPage() {
         }
       }
       if (json.medications?.length) {
-        setMeds(json.medications.map((m: { name: string; sig: string | null }) => ({ name: m.name, sig: m.sig ?? "" })));
+        setMeds(json.medications.map((m: { name: string; strength?: string | null; sig: string | null }) => ({ name: m.name, strength: m.strength ?? null, sig: m.sig ?? "" })));
       }
       const instr = [...(json.instructions ?? []), ...(json.followUp ?? [])];
       if (instr.length) setInstructions(instr);
+      if (json.howtoIds?.length) setHowtoIds(json.howtoIds);
 
       const bits = [
         json.conditionLabel ? `matched "${json.conditionLabel}"` : "no diagnosis in the library",
         `${json.medications?.length ?? 0} medicine(s)`,
         `${instr.length} instruction(s)`,
+        ...(json.howtoIds?.length ? [`${json.howtoIds.length} how-to walkthrough(s) attached`] : []),
       ];
       setNoteStatus(`Read the note (${json.method}): ${bits.join(", ")}. Review below, then turn the screen.`);
     } catch (e) {
@@ -128,8 +128,9 @@ export default function ExplainPage() {
         body: JSON.stringify({
           conditionId,
           customHeadline: customHeadline || null,
-          medNames: meds.filter((m) => m.name.trim()),
+          medNames: meds.filter((m) => m.name.trim()).map((m) => ({ name: m.name, strength: m.strength ?? null, sig: m.sig })),
           instructions,
+          howtoIds,
           language,
         }),
       });
@@ -145,70 +146,14 @@ export default function ExplainPage() {
   // ---- Patient view: the screen has been turned around. ----
   if (patientView && card) {
     return (
-      <main className="flex-1 w-full max-w-3xl mx-auto px-5 py-8">
-        <button
-          onClick={() => setPatientView(false)}
-          className="chip no-print mb-6"
-        >
-          &larr; Back to the clinician view
-        </button>
-
-        {card.diagram && (
-          /* Real anatomy to recognise, and a marked diagram to point at. Only
-             the diagram prints - an iframe does not, and the sheet still has to
-             go home on paper. */
-          <div className="grid gap-6 md:grid-cols-[1.4fr_1fr] items-start mb-8">
-            <Anatomy3D view={card.diagram} className="no-print" />
-            <div className="float-card p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[color:var(--muted)] mb-2">
-                Where exactly
-              </p>
-              <Diagram id={card.diagram} marks={card.marks} />
-            </div>
-          </div>
-        )}
-
-        <h1 className="display text-5xl sm:text-6xl">{card.headline}</h1>
-
-        {card.meds.length > 0 && (
-          <section className="mt-10">
-            <h2 className="display-sm text-3xl mb-4">Your medicines</h2>
-            <div className="list-hairline border-t border-[color:var(--line-soft)]">
-              {card.meds.map((m, i) => (
-                <div key={i} className="row">
-                  <span className="icon-box">&#9679;</span>
-                  <div>
-                    <p className="text-2xl font-semibold">{m.name}</p>
-                    <p className="text-xl mt-1">{m.purpose}</p>
-                    <p className="text-xl font-semibold mt-1">{m.howToTake}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {card.instructions.length > 0 && (
-          <section className="mt-10">
-            <h2 className="display-sm text-3xl mb-4">What to do</h2>
-            <ul className="space-y-3">
-              {card.instructions.map((t, i) => (
-                <li key={i} className="flex gap-3 text-2xl leading-snug">
-                  <span className="text-[color:var(--accent)]">&#10003;</span>
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        <div className="mt-10 flex flex-wrap gap-3 no-print">
-          <ReadAloud text={card.spoken} lang={LANG_TAG[language] ?? "en-US"} />
-          <button onClick={() => window.print()} className="btn btn-secondary">
-            Print this
-          </button>
-        </div>
-      </main>
+      <PatientStory
+        slides={card.slides}
+        diagram={card.diagram}
+        marks={card.marks}
+        langTag={card.langTag}
+        rtl={card.rtl}
+        onBack={() => setPatientView(false)}
+      />
     );
   }
 
@@ -444,6 +389,35 @@ export default function ExplainPage() {
                 ))}
               </ul>
             )}
+          </section>
+
+          <section className="float-card p-6">
+            <h2 className="display-sm text-2xl">How to do it</h2>
+            <p className="text-[15px] text-[color:var(--muted)] mt-1 mb-3">
+              Step-by-step walkthroughs, one step per screen. The ones the note
+              calls for are already on; add any others.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {HOWTOS.map((h) => {
+                const on = howtoIds.includes(h.id);
+                return (
+                  <button
+                    key={h.id}
+                    onClick={() =>
+                      setHowtoIds((p) => (on ? p.filter((x) => x !== h.id) : [...p, h.id]))
+                    }
+                    className="chip"
+                    style={
+                      on
+                        ? { background: "var(--accent)", color: "var(--accent-ink)", borderColor: "var(--accent)" }
+                        : undefined
+                    }
+                  >
+                    {on ? "\u2713 " : ""}{h.title}
+                  </button>
+                );
+              })}
+            </div>
           </section>
         </div>
 
