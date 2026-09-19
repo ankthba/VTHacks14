@@ -5,6 +5,8 @@ export interface Scenario {
   title: string;
   blurb: string;
   bottles: BottleRecord[];
+  /** Optional discharge-paperwork list, for the reconciliation demo. */
+  discharge?: BottleRecord[];
 }
 
 const b = (
@@ -84,6 +86,34 @@ export const SCENARIOS: Scenario[] = [
     ],
   },
 ];
+
+
+/**
+ * The reconciliation scenario. The discharge list and the pile disagree in
+ * three different ways at once, which is the realistic case:
+ *   - metoprolol was prescribed but never filled        -> omission
+ *   - lisinopril strength was changed on discharge      -> dose mismatch
+ *   - an old Vicodin bottle is still in the cabinet     -> unreconciled, and
+ *     it collides with the Tylenol for a hidden acetaminophen total
+ */
+SCENARIOS.push({
+  id: "reconcile",
+  title: "Discharge list vs the pile",
+  blurb:
+    "What the hospital sent you home on, against what is actually on the table.",
+  discharge: [
+    b("Lisinopril", "20 mg", "Take 1 tablet by mouth once daily", 0.97),
+    b("Metoprolol succinate ER", "25 mg", "Take 1 tablet by mouth once daily", 0.95),
+    b("Atorvastatin", "40 mg", "Take 1 tablet by mouth at bedtime", 0.96),
+    b("Tylenol", "500 mg", "Take 2 tablets by mouth every 6 hours as needed", 0.9),
+  ],
+  bottles: [
+    b("Lisinopril", "10 mg", "Take 1 tablet by mouth once daily", 0.94),
+    b("Atorvastatin", "40 mg", "Take 1 tablet by mouth at bedtime", 0.95),
+    b("Tylenol Extra Strength", "500 mg", "Take 2 tablets by mouth every 6 hours as needed", 0.91),
+    b("Vicodin", "5-300 mg", "Take 1 tablet by mouth every 6 hours as needed for pain", 0.86),
+  ],
+});
 
 export const getScenario = (id: string | null) =>
   SCENARIOS.find((s) => s.id === id) ?? SCENARIOS[0];

@@ -27,7 +27,39 @@ RULES
 - Set confidence below 0.7 for anything blurry, angled, or partially hidden.
 - Return ONLY the JSON array. No prose, no code fence.`;
 
-export async function extractFromImages(images: ImagePart[]): Promise<BottleRecord[]> {
+/**
+ * Discharge paperwork is a printed list, not a set of bottles: no quantities,
+ * no fill dates, and the medication names are often generic where the bottle
+ * carries a brand. Same output shape so both lists reconcile against each other.
+ */
+const DISCHARGE_PROMPT = `You are reading a hospital discharge summary or printed medication list.
+
+Return a JSON array. One object per medication listed.
+
+Each object has exactly these fields:
+  "drug_text"   - the medication name exactly as printed
+  "strength"    - e.g. "10 mg", "5-325 mg"
+  "sig"         - the directions as printed
+  "quantity"    - null unless a quantity is printed
+  "prescriber"  - the prescribing clinician if printed
+  "fill_date"   - null unless a date is printed against that medication
+  "confidence"  - your confidence this line was read correctly, 0.0 to 1.0
+
+RULES
+- Include only medications the patient is told to TAKE. Skip anything listed as
+  stopped, discontinued, held, or as an allergy.
+- Use null for any field not printed.
+- Do NOT guess a drug name from partial text.
+- Return ONLY the JSON array. No prose, no code fence.`;
+
+export async function extractFromImages(
+  images: ImagePart[],
+  kind: "bottles" | "discharge" = "bottles",
+): Promise<BottleRecord[]> {
   if (images.length === 0) return [];
-  return generateJson(PROMPT, ExtractionSchema, images);
+  return generateJson(
+    kind === "discharge" ? DISCHARGE_PROMPT : PROMPT,
+    ExtractionSchema,
+    images,
+  );
 }

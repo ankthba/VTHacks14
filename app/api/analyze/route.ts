@@ -5,6 +5,7 @@ import { labelInteractions } from "@/lib/interactions";
 import { renderOnePagerLLM, summarizeMeds } from "@/lib/onepager";
 import { BottleRecordSchema } from "@/lib/schemas";
 import { getScenario } from "@/lib/fixtures";
+import { reconcile } from "@/lib/reconcile";
 import { activeProvider } from "@/lib/llm";
 import { z } from "zod";
 
@@ -13,6 +14,7 @@ export const maxDuration = 60;
 
 const BodySchema = z.object({
   bottles: z.array(BottleRecordSchema).optional(),
+  discharge: z.array(BottleRecordSchema).optional(),
   demo: z.string().nullable().optional(),
   language: z.string().default("English"),
   skipInteractions: z.boolean().default(false),
@@ -29,9 +31,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const bottles = body.demo
-    ? getScenario(body.demo).bottles
-    : (body.bottles ?? []);
+  const scenario = body.demo ? getScenario(body.demo) : null;
+  const bottles = scenario ? scenario.bottles : (body.bottles ?? []);
+  const dischargeRecs = scenario ? (scenario.discharge ?? []) : (body.discharge ?? []);
 
   if (bottles.length === 0) {
     return NextResponse.json({ error: "No medications to analyze." }, { status: 400 });
@@ -40,7 +42,14 @@ export async function POST(req: NextRequest) {
   const warnings: string[] = [];
 
   try {
-    const meds = await normalizeAll(bottles);
+    const [meds, dischargeMeds] = await Promise.all([
+      normalizeAll(bottles),
+      normalizeAll(dischargeRecs),
+    ]);
+
+    // Reconciliation runs only when a discharge list was supplied. It is
+    // deterministic set comparison, same as the duplicate checks.
+    const rec = dischargeRecs.length ? reconcile(dischargeMeds, meds) : null;
 
     for (const m of meds) {
       if (m.unresolved) {
@@ -51,7 +60,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Deterministic first: these are the findings we are willing to stand behind.
-    const computed = deterministicFindings(meds);
+    const computed = [
+      ...deterministicFindings(meds),
+      ...(rec?.findings ?? []),
+    ];
 
     let retrieved: Awaited<ReturnType<typeof labelInteractions>> = [];
     if (!body.skipInteractions) {
@@ -77,13 +89,20 @@ export async function POST(req: NextRequest) {
 
     const result = {
       meds,
+      dischargeMeds,
+      reconciliation: rec?.rows ?? null,
       findings: sortFindings([...computed, ...extra]),
       schedule: buildSchedule(meds),
       warnings,
     };
 
     const summaries = await summarizeMeds(meds);
-    const onePager = await renderOnePagerLLM(result, summaries, body.language);
+    const onePager = await renderOnePagerLLM(
+      result,
+      summaries,
+      body.language,
+      rec?.rows ?? null,
+    );
 
     return NextResponse.json({
       ...result,

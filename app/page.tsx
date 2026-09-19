@@ -4,15 +4,18 @@ import { useCallback, useRef, useState } from "react";
 import { BottleReview } from "@/components/BottleReview";
 import { FindingCard } from "@/components/FindingCard";
 import { ScheduleGrid } from "@/components/ScheduleGrid";
+import { ReconcileTable } from "@/components/ReconcileTable";
 import { ReadAloud } from "@/components/ReadAloud";
 import { SCENARIOS } from "@/lib/fixtures";
 import type { BottleRecord } from "@/lib/schemas";
-import type { AnalysisResult, NormalizedMed } from "@/lib/types";
+import type { AnalysisResult, NormalizedMed, ReconcileRow } from "@/lib/types";
 import { displayName } from "@/lib/display";
 
 type Stage = "start" | "review" | "results";
 
 interface ApiResult extends AnalysisResult {
+  dischargeMeds: NormalizedMed[];
+  reconciliation: ReconcileRow[] | null;
   summaries: { med_id: string; name: string; what_its_for: string; source_url: string | null }[];
   onePager: string;
   onePagerGenerated: boolean;
@@ -31,11 +34,13 @@ const LANG_TAG: Record<string, string> = {
 export default function Home() {
   const [stage, setStage] = useState<Stage>("start");
   const [bottles, setBottles] = useState<BottleRecord[]>([]);
+  const [discharge, setDischarge] = useState<BottleRecord[]>([]);
   const [result, setResult] = useState<ApiResult | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [language, setLanguage] = useState("English");
   const fileRef = useRef<HTMLInputElement>(null);
+  const dischargeRef = useRef<HTMLInputElement>(null);
 
   const loadScenario = useCallback(async (id: string) => {
     setError(null);
@@ -45,6 +50,7 @@ export default function Home() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed");
       setBottles(json.bottles);
+      setDischarge(json.discharge ?? []);
       setStage("review");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -53,24 +59,37 @@ export default function Home() {
     }
   }, []);
 
-  const upload = useCallback(async (files: FileList) => {
-    setError(null);
-    setBusy("Reading the labels...");
-    try {
-      const fd = new FormData();
-      Array.from(files).forEach((f) => fd.append("images", f));
-      const res = await fetch("/api/extract", { method: "POST", body: fd });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.detail ?? json.error ?? "Failed");
-      if (!json.bottles?.length) throw new Error("No medication labels were found in those photos.");
-      setBottles(json.bottles);
-      setStage("review");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy(null);
-    }
-  }, []);
+  const upload = useCallback(
+    async (files: FileList, kind: "bottles" | "discharge" = "bottles") => {
+      setError(null);
+      setBusy(kind === "discharge" ? "Reading the paperwork..." : "Reading the labels...");
+      try {
+        const fd = new FormData();
+        Array.from(files).forEach((f) => fd.append("images", f));
+        const res = await fetch(`/api/extract?kind=${kind}`, { method: "POST", body: fd });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.detail ?? json.error ?? "Failed");
+
+        if (kind === "discharge") {
+          if (!json.discharge?.length) {
+            throw new Error("No medications were found on that paperwork.");
+          }
+          setDischarge(json.discharge);
+        } else {
+          if (!json.bottles?.length) {
+            throw new Error("No medication labels were found in those photos.");
+          }
+          setBottles(json.bottles);
+        }
+        setStage("review");
+      } catch (e) {
+        setError(e instanceof Error ? e.message : String(e));
+      } finally {
+        setBusy(null);
+      }
+    },
+    [],
+  );
 
   const analyze = useCallback(
     async (lang = language) => {
@@ -80,7 +99,7 @@ export default function Home() {
         const res = await fetch("/api/analyze", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ bottles, language: lang }),
+          body: JSON.stringify({ bottles, discharge, language: lang }),
         });
         const json = await res.json();
         if (!res.ok) throw new Error(json.detail ?? json.error ?? "Failed");
@@ -92,7 +111,7 @@ export default function Home() {
         setBusy(null);
       }
     },
-    [bottles, language],
+    [bottles, discharge, language],
   );
 
   return (
@@ -130,6 +149,7 @@ export default function Home() {
           onPick={loadScenario}
           onUpload={upload}
           fileRef={fileRef}
+          dischargeRef={dischargeRef}
           disabled={!!busy}
         />
       )}
@@ -149,6 +169,24 @@ export default function Home() {
             }
             onRemove={(i) => setBottles((prev) => prev.filter((_, j) => j !== i))}
           />
+          {discharge.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-xl font-bold mb-1">
+                From the discharge paperwork
+              </h3>
+              <p className="text-[color:var(--muted)] mb-3 text-[15px]">
+                These will be compared against the bottles above.
+              </p>
+              <BottleReview
+                bottles={discharge}
+                onChange={(i, patch) =>
+                  setDischarge((prev) => prev.map((b, j) => (j === i ? { ...b, ...patch, confidence: 1 } : b)))
+                }
+                onRemove={(i) => setDischarge((prev) => prev.filter((_, j) => j !== i))}
+              />
+            </div>
+          )}
+
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <button
               onClick={() => analyze()}
@@ -158,7 +196,7 @@ export default function Home() {
               Check these {bottles.length} medicines
             </button>
             <button
-              onClick={() => { setStage("start"); setBottles([]); }}
+              onClick={() => { setStage("start"); setBottles([]); setDischarge([]); }}
               className="underline text-[color:var(--muted)]"
             >
               Start over
@@ -172,7 +210,7 @@ export default function Home() {
           result={result}
           language={language}
           onLanguage={(l) => { setLanguage(l); analyze(l); }}
-          onRestart={() => { setStage("start"); setBottles([]); setResult(null); }}
+          onRestart={() => { setStage("start"); setBottles([]); setDischarge([]); setResult(null); }}
         />
       )}
     </main>
@@ -183,11 +221,13 @@ function StartScreen({
   onPick,
   onUpload,
   fileRef,
+  dischargeRef,
   disabled,
 }: {
   onPick: (id: string) => void;
-  onUpload: (f: FileList) => void;
+  onUpload: (f: FileList, kind?: "bottles" | "discharge") => void;
   fileRef: React.RefObject<HTMLInputElement | null>;
+  dischargeRef: React.RefObject<HTMLInputElement | null>;
   disabled: boolean;
 }) {
   return (
@@ -217,6 +257,32 @@ function StartScreen({
           Photos are read in memory and never stored. Nothing is saved after you
           close this page.
         </p>
+      </section>
+
+      <section className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface)] p-6">
+        <h2 className="text-xl font-bold">
+          Optional: add your discharge paperwork
+        </h2>
+        <p className="text-[color:var(--muted)] mt-1 text-[15px]">
+          Photograph the medication list the hospital sent you home with, and we
+          will compare it against your bottles &mdash; what is missing, what is
+          extra, and where the strengths disagree.
+        </p>
+        <input
+          ref={dischargeRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={(e) => e.target.files && onUpload(e.target.files, "discharge")}
+        />
+        <button
+          onClick={() => dischargeRef.current?.click()}
+          disabled={disabled}
+          className="mt-4 rounded-lg border-2 border-[color:var(--accent)] px-5 py-2.5 font-semibold text-[color:var(--accent)] disabled:opacity-50"
+        >
+          Add discharge paperwork
+        </button>
       </section>
 
       <section>
@@ -281,6 +347,20 @@ function Results({
           Start over
         </button>
       </section>
+
+      {result.reconciliation && (
+        <section>
+          <h2 className="text-2xl font-bold mb-1">
+            Discharge list vs what is on the table
+          </h2>
+          <p className="text-[color:var(--muted)] mb-4 text-[15px]">
+            Matched by active ingredient, so &ldquo;Norco&rdquo; on paperwork and
+            &ldquo;hydrocodone/acetaminophen&rdquo; on a bottle count as the same
+            medicine.
+          </p>
+          <ReconcileTable rows={result.reconciliation} />
+        </section>
+      )}
 
       {result.warnings.length > 0 && (
         <section className="rounded-xl border p-4" style={{ background: "var(--moderate-bg)", borderColor: "var(--moderate)" }}>

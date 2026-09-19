@@ -38,7 +38,14 @@ export interface Citation {
 
 export interface Finding {
   id: string;
-  kind: "duplicate_ingredient" | "duplicate_class" | "cumulative_dose" | "label_interaction";
+  kind:
+    | "duplicate_ingredient"
+    | "duplicate_class"
+    | "cumulative_dose"
+    | "label_interaction"
+    | "omission"
+    | "unreconciled"
+    | "dose_mismatch";
   severity: Severity;
   /** true when produced by set arithmetic rather than a language model. */
   computed: boolean;
@@ -61,4 +68,14 @@ export interface AnalysisResult {
   findings: Finding[];
   schedule: ScheduleSlot[];
   warnings: string[];
+}
+
+/** One line of the discharge-list vs bottles comparison. */
+export type ReconcileStatus = "matched" | "omission" | "extra" | "dose_mismatch";
+
+export interface ReconcileRow {
+  status: ReconcileStatus;
+  discharge: NormalizedMed | null;
+  bottle: NormalizedMed | null;
+  note: string;
 }

@@ -13,7 +13,12 @@ export async function POST(req: NextRequest) {
   const url = new URL(req.url);
   const demo = url.searchParams.get("demo");
   if (demo) {
-    return NextResponse.json({ bottles: getScenario(demo).bottles, demo: true });
+    const s = getScenario(demo);
+    return NextResponse.json({
+      bottles: s.bottles,
+      discharge: s.discharge ?? [],
+      demo: true,
+    });
   }
 
   if (activeProvider() === "none") {
@@ -63,9 +68,13 @@ export async function POST(req: NextRequest) {
     images.push({ mimeType: f.type, data: buf.toString("base64") });
   }
 
+  const kind = url.searchParams.get("kind") === "discharge" ? "discharge" : "bottles";
+
   try {
-    const bottles = await extractFromImages(images);
-    return NextResponse.json({ bottles });
+    const records = await extractFromImages(images, kind);
+    return NextResponse.json(
+      kind === "discharge" ? { discharge: records } : { bottles: records },
+    );
   } catch (e) {
     return NextResponse.json(
       { error: "Could not read the labels.", detail: e instanceof Error ? e.message : String(e) },

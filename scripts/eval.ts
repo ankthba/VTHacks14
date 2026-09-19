@@ -7,6 +7,9 @@
  * something we can hold a fixed ground truth over.
  */
 import { CASES, type Expect } from "../eval/cases";
+import { RECONCILE_CASES } from "../eval/reconcile-cases";
+import { reconcile } from "../lib/reconcile";
+import type { ReconcileStatus } from "../lib/types";
 import { normalizeAll } from "../lib/normalize";
 import { deterministicFindings } from "../lib/analyze";
 import type { Finding } from "../lib/types";
@@ -85,5 +88,48 @@ interface Row {
     console.log("\n  No failures.\n");
   }
 
-  process.exitCode = failures.length > 0 ? 1 : 0;
+  // ---- Reconciliation ------------------------------------------------------
+  console.log("\n---- discharge-list reconciliation ----\n");
+  let recFail = 0;
+
+  for (const rc of RECONCILE_CASES) {
+    const mk = (xs: { text: string; strength?: string }[]) =>
+      xs.map((x) => ({
+        drug_text: x.text,
+        strength: x.strength ?? null,
+        sig: "Take 1 tablet by mouth once daily",
+        quantity: null,
+        prescriber: null,
+        fill_date: null,
+        confidence: 1,
+      }));
+
+    const [dis, bot] = await Promise.all([
+      normalizeAll(mk(rc.discharge)),
+      normalizeAll(mk(rc.bottles)),
+    ]);
+    const { rows } = reconcile(dis, bot);
+
+    const counts: Record<string, number> = {};
+    for (const r of rows) counts[r.status] = (counts[r.status] ?? 0) + 1;
+
+    const statuses: ReconcileStatus[] = ["matched", "omission", "extra", "dose_mismatch"];
+    const ok = statuses.every((st) => (counts[st] ?? 0) === (rc.expect[st] ?? 0));
+    if (!ok) {
+      recFail++;
+      console.log(`  ${rc.id}  FAIL`);
+      console.log(`     expected ${JSON.stringify(rc.expect)}`);
+      console.log(`     got      ${JSON.stringify(counts)}`);
+      console.log(`     ${rc.why}\n`);
+    }
+  }
+
+  const recTotal = RECONCILE_CASES.length;
+  console.log(
+    `  ${recTotal - recFail}/${recTotal} correct  (${(((recTotal - recFail) / recTotal) * 100).toFixed(1)}%)` +
+      (recFail === 0 ? "  - no failures" : ""),
+  );
+
+  console.log("");
+  process.exitCode = failures.length + recFail > 0 ? 1 : 0;
 })();

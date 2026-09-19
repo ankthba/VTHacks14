@@ -1,7 +1,7 @@
 import { activeProvider, generate } from "./llm";
 import { displayName } from "./display";
 import { fetchLabel, firstSentence, dailyMedUrl } from "./openfda";
-import type { AnalysisResult, NormalizedMed } from "./types";
+import type { AnalysisResult, NormalizedMed, ReconcileRow } from "./types";
 
 export interface MedSummary {
   med_id: string;
@@ -39,8 +39,29 @@ const DISCLAIMER =
 export function renderOnePagerPlain(
   result: AnalysisResult,
   summaries: MedSummary[],
+  reconciliation?: ReconcileRow[] | null,
 ): string {
   const lines: string[] = [];
+
+  if (reconciliation?.length) {
+    lines.push("YOUR DISCHARGE LIST COMPARED TO YOUR BOTTLES");
+    lines.push("");
+    const label: Record<string, string> = {
+      omission: "MISSING - on your list, no bottle",
+      dose_mismatch: "CONFLICT - the strengths do not match",
+      extra: "EXTRA - a bottle that is not on your list",
+      matched: "OK",
+    };
+    for (const r of reconciliation) {
+      const d = r.discharge ? displayName(r.discharge) : "-";
+      const b = r.bottle ? displayName(r.bottle) : "-";
+      lines.push(`- ${label[r.status]}`);
+      lines.push(`    your list: ${d}`);
+      lines.push(`    your bottle: ${b}`);
+    }
+    lines.push("");
+  }
+
   lines.push("YOUR MEDICATIONS");
   lines.push("");
   for (const m of result.meds) {
@@ -88,8 +109,9 @@ export async function renderOnePagerLLM(
   result: AnalysisResult,
   summaries: MedSummary[],
   language: string,
+  reconciliation?: ReconcileRow[] | null,
 ): Promise<{ text: string; generated: boolean }> {
-  const plain = renderOnePagerPlain(result, summaries);
+  const plain = renderOnePagerPlain(result, summaries, reconciliation);
   if (activeProvider() === "none") return { text: plain, generated: false };
 
   const prompt = `Rewrite the medication summary below so a patient can read it.
@@ -102,7 +124,7 @@ RULES
 - Never tell the reader to stop, start or change a medicine. Everything in the
   middle section is phrased as a question to ask their pharmacist.
 - Keep every source URL exactly as written, on its own line.
-- Keep the three section headings, translated.
+- Keep every section heading, translated.
 - End with this line, translated: "${DISCLAIMER}"
 - Return plain text only. No markdown, no code fences.
 
