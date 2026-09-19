@@ -340,9 +340,16 @@ export default function Home() {
             <img src={asset("/anatomy/spot.png")} alt="" width={18} height={17} draggable={false} />
             {APP_NAME}
           </a>
-          <a href={IS_STATIC ? "./diagrams/" : "/diagrams"}>Anatomy library</a>
-          <ThemeToggle className="ml-auto" />
-          <a href="https://github.com/ankthba/VTHacks14" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <div className="nav-links">
+            <a href={IS_STATIC ? "./" : "/"} className="nav-link on" aria-current="page">Explain a note</a>
+            <a href={IS_STATIC ? "./diagrams/" : "/diagrams"} className="nav-link">Anatomy library</a>
+          </div>
+          <div className="nav-right">
+            <ThemeToggle />
+            <a href="https://github.com/ankthba/VTHacks14" className="nav-link" target="_blank" rel="noopener noreferrer">
+              GitHub<span className="nav-ext" aria-hidden>&#8599;</span>
+            </a>
+          </div>
         </nav>
 
         <header className="pt-12 pb-10 rise" style={{ animationDelay: "60ms" }}>

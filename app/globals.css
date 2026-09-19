@@ -280,12 +280,30 @@ select.chip { appearance: none; padding-right: 18px; background-image: url("data
   color: var(--foreground);
   text-decoration: none;
 }
-.nav a:not(.wordmark) {
-  font-size: 14px;
+.nav-links { display: flex; align-items: center; gap: 22px; margin-left: 8px; }
+.nav-right { display: flex; align-items: center; gap: 18px; margin-left: auto; }
+.nav-link {
+  font-size: 15px;
   color: var(--muted);
   text-decoration: none;
+  white-space: nowrap;
+  padding: 4px 0 6px;
+  background-image: var(--wave-accent);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 4px;
+  transition: color 120ms ease, background-size 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.nav a:not(.wordmark):hover { color: var(--foreground); }
+.nav-link:hover { color: var(--foreground); background-size: 100% 4px; }
+.nav-link.on { color: var(--foreground); font-weight: 600; background-size: 100% 4px; }
+.nav-ext { font-size: 12px; margin-left: 3px; opacity: 0.7; }
+.nav .theme-toggle { background-image: none; padding: 4px 0 6px; font-size: 15px; }
+.nav .theme-toggle:hover { color: var(--foreground); }
+@media (max-width: 640px) {
+  .nav { gap: 16px; flex-wrap: wrap; }
+  .nav-links { gap: 16px; margin-left: 0; }
+  .nav-right { gap: 14px; }
+}
 
 /* A numbered step: a serif numeral in the margin, then the heading. */
 .step {

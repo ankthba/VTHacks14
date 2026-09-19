@@ -34,10 +34,18 @@ export default function DiagramsPage() {
           <img src={asset("/anatomy/spot.png")} alt="" width={18} height={17} draggable={false} />
           {APP_NAME}
         </a>
-        <a href={IS_STATIC ? "../" : "/"} className="flex items-center gap-2">
-          <InkArrow className="inline-block -scale-x-100" /> Back
-        </a>
-        <ThemeToggle className="ml-auto" />
+        <div className="nav-links">
+          <a href={IS_STATIC ? "../" : "/"} className="nav-link flex items-center gap-2">
+            <InkArrow className="inline-block -scale-x-100" /> Explain a note
+          </a>
+          <a href="#top" className="nav-link on" aria-current="page">Anatomy library</a>
+        </div>
+        <div className="nav-right">
+          <ThemeToggle />
+          <a href="https://github.com/ankthba/VTHacks14" className="nav-link" target="_blank" rel="noopener noreferrer">
+            GitHub<span className="nav-ext" aria-hidden>&#8599;</span>
+          </a>
+        </div>
       </nav>
       <h1 className="display text-5xl mt-12">Anatomy library</h1>
       <p className="text-lg text-[color:var(--muted)] mt-3 max-w-2xl">
