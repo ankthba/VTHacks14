@@ -1,6 +1,7 @@
 import { CONDITIONS, REGIONS, type DiagramId } from "@/lib/anatomy/conditions";
 import { Diagram } from "@/components/Diagram";
 import { InkArrow } from "@/components/Ink";
+import { UpButton } from "@/components/UpButton";
 import { IS_STATIC, asset } from "@/lib/staticMode";
 
 /** Every view once, drawn plain: the red belongs to a diagnosis, not a catalogue. */
@@ -24,7 +25,8 @@ export const metadata = { title: `${APP_NAME} - anatomy library` };
 /** Every condition in the library, with its structure marked. */
 export default function DiagramsPage() {
   return (
-    <main className="flex-1 w-full max-w-6xl mx-auto px-5 pb-16">
+    <main id="top" className="flex-1 w-full max-w-6xl mx-auto px-5 pb-16">
+      <UpButton />
       <nav className="nav">
         <a href={IS_STATIC ? "../" : "/"} className="wordmark flex items-center gap-2">
           <img src={asset("/anatomy/spot.png")} alt="" width={18} height={17} draggable={false} />

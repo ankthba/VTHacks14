@@ -130,6 +130,12 @@ export default function Home() {
   }, [query]);
   const listed = query.trim() ? found : inRegion;
   const hovered = hoverId ? CONDITIONS.find((c) => c.id === hoverId) ?? null : null;
+  /** The drawing a category is mostly about, for the preview before anything is chosen. */
+  const regionView = useMemo(() => {
+    const counts = new Map<DiagramId, number>();
+    for (const c of inRegion) counts.set(c.diagram, (counts.get(c.diagram) ?? 0) + 1);
+    return [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "body";
+  }, [inRegion]);
   const hasContent = !!selected || meds.length > 0 || instructions.length > 0;
 
   type Snapshot = {
@@ -303,7 +309,7 @@ export default function Home() {
   // ---- The turned screen ----
   if (patientView && card) {
     return (
-      <div className={`flex-1 flex flex-col turn ${flip}`}>
+      <div className={`flex-1 flex flex-col ${flip ? `turn ${flip}` : ""}`}>
         <PatientStory
           slides={card.slides}
           diagram={card.diagram}
@@ -324,7 +330,7 @@ export default function Home() {
   const canTurn = hasContent && !busy;
 
   return (
-    <div className={`flex-1 w-full turn ${flip}`}>
+    <div className={`flex-1 w-full ${flip ? `turn ${flip}` : ""}`}>
       <div className="max-w-6xl mx-auto px-5">
         <nav className="nav rise">
           <a href={IS_STATIC ? "./" : "/"} className="wordmark flex items-center gap-2">
@@ -587,6 +593,8 @@ export default function Home() {
 
               {(hovered ?? selected) ? (
                 <div key={(hovered ?? selected)!.id} className="mx-auto max-w-[220px] mb-5 fade"><Diagram id={(hovered ?? selected)!.diagram} marks={(hovered ?? selected)!.marks} /></div>
+              ) : !noteBusy && regionView !== "body" ? (
+                <div key={regionView} className="mx-auto max-w-[220px] mb-5 fade" aria-hidden><Diagram id={regionView} /></div>
               ) : (
                 <div className="mx-auto h-44 mb-5 flex items-end justify-center gap-6 transition-opacity duration-500" aria-hidden style={{ opacity: noteBusy ? 1 : 0.3 }}>
                   <div className="h-full"><Figure region="body" body="female" spot={false} searching={noteBusy} /></div>

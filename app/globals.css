@@ -484,3 +484,27 @@ html { scroll-behavior: smooth; }
   .btn-turn:hover:not(:disabled) { transform: none; }
   .speaking path { animation: none; opacity: 1; }
 }
+
+/* The way back up, once you are far enough down to want it. */
+.up-link {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity 200ms ease, transform 200ms ease, background-color 120ms ease;
+}
+.up-link.show { opacity: 1; transform: none; pointer-events: auto; }
+.up-link:hover { background: var(--accent-hover); }
