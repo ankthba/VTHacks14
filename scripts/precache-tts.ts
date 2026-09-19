@@ -13,19 +13,10 @@ loadEnvLocal();
  *
  * Requires the dev server on :3000.
  */
+import { DEMO_NOTES } from "../lib/demoNotes";
+
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 
-const DEMO_NOTE = `DISCHARGE SUMMARY
-Discharge Diagnosis: Distal radius fracture, left, nondisplaced
-Discharge Medications:
-1. Ibuprofen 600 mg PO TID with food x 7 days
-2. Acetaminophen 500 mg 1-2 tabs PO q6h PRN pain
-Discharge Instructions:
-- Keep splint clean and dry
-- Elevate arm above heart when possible
-Follow-up:
-- Orthopedics clinic in 2 weeks for repeat X-ray
-- Return to ED for numbness, blue fingers, or uncontrolled pain`;
 
 async function tts(label: string, text: string) {
   const r = await fetch(`${BASE}/api/tts`, {
@@ -38,14 +29,6 @@ async function tts(label: string, text: string) {
   return r.ok;
 }
 
-const WISDOM_NOTE = `Post-op instructions after wisdom tooth extraction
-Dx: impacted third molars s/p extraction
-Rx: ibuprofen 600 mg q6h prn pain
-Instructions:
-- Starting day 3, irrigate the sockets with the syringe after meals and at bedtime
-- Ice 20 min on / 20 off for 48 hours
-- Soft foods for one week. No straws, no smoking.
-Follow-up: return in 1 week for check; call if fever or severe pain`;
 
 async function warmStory(label: string, note: string, language: string) {
   const fd = new FormData();
@@ -74,8 +57,7 @@ async function warmStory(label: string, note: string, language: string) {
 (async () => {
   console.log("\n===== pre-generating demo audio, one clip per slide =====");
   for (const lang of ["English", "Spanish"]) {
-    await warmStory("wrist fracture", DEMO_NOTE, lang);
-    await warmStory("wisdom teeth", WISDOM_NOTE, lang);
+    for (const d of DEMO_NOTES) await warmStory(d.title, d.note, lang);
   }
   console.log("\nReplays are now free and offline. Commit .cache/tts and .cache/translate.\n");
 })();

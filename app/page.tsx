@@ -6,6 +6,7 @@ import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 import { Diagram } from "@/components/Diagram";
 import { PatientStory } from "@/components/PatientStory";
 import { HOWTOS } from "@/lib/howto";
+import { DEMO_NOTES } from "@/lib/demoNotes";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 
 interface MedExplain {
@@ -219,6 +220,13 @@ export default function ExplainPage() {
               Paste the discharge summary or visit note, or photograph the page.
               Everything below fills in for you to check.
             </p>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {DEMO_NOTES.map((d) => (
+                <button key={d.id} onClick={() => setNoteText(d.note)} className="chip">
+                  {d.title}
+                </button>
+              ))}
+            </div>
             <textarea
               value={noteText}
               onChange={(e) => setNoteText(e.target.value)}
