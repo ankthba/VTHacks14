@@ -117,18 +117,19 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       sinus: [{ x: 0.19, y: 0.5, s: 0.8 }, { x: 0.24, y: 0.32, s: 0.6 }],   // cheek and brow sinuses
     },
   },
+  // The open mouth: upper teeth above, tongue and throat, lower teeth below.
   mouth: {
-    src: asset("/anatomy/skull.png"),
-    w: 750,
-    h: 1040,
-    label: "The skull, jaw open",
+    src: asset("/anatomy/mouth.png"),
+    w: 725,
+    h: 1158,
+    label: "The mouth, open",
     spots: {
-      socket: [{ x: 0.45, y: 0.67, s: 0.6 }, { x: 0.52, y: 0.75, s: 0.6 }], // the back teeth, upper and lower
-      root: { x: 0.39, y: 0.65, s: 0.7 },                                    // a molar root
-      tooth: { x: 0.28, y: 0.69, s: 0.6 },                                   // a front tooth
-      gum: { x: 0.24, y: 0.82, s: 0.9 },                                     // along the lower teeth
-      tongue: { x: 0.22, y: 0.76, s: 0.8 },                                  // inside the open mouth
-      joint: { x: 0.71, y: 0.56, s: 0.7 },                                   // the jaw hinge
+      socket: [{ x: 0.12, y: 0.6, s: 0.5 }, { x: 0.85, y: 0.6, s: 0.5 }, { x: 0.12, y: 0.39, s: 0.5 }, { x: 0.83, y: 0.39, s: 0.5 }], // the back teeth
+      root: { x: 0.15, y: 0.33, s: 0.6 },                                    // a molar root
+      tooth: { x: 0.49, y: 0.19, s: 0.6 },                                   // a front tooth
+      gum: { x: 0.49, y: 0.73, s: 1 },                                       // the gum line
+      tongue: { x: 0.49, y: 0.635, s: 1.2 },                                 // the tongue
+      joint: [{ x: 0.09, y: 0.5, s: 0.7 }, { x: 0.91, y: 0.5, s: 0.7 }],     // the jaw hinges, either side
     },
   },
   // The lungs from the front, windpipe above.

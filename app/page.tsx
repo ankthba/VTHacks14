@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { InkArrow, InkCheck, InkRing, InkUnderline } from "@/components/Ink";
 import { CONDITIONS, REGIONS } from "@/lib/anatomy/conditions";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 import { Diagram } from "@/components/Diagram";
@@ -121,6 +122,7 @@ export default function Home() {
     setNoteBusy(true);
     setNoteError(null);
     setNoteStatus(null);
+    const started = Date.now();
     try {
       let json: {
         conditionId: string | null;
@@ -150,6 +152,10 @@ export default function Home() {
         json = await r.json();
         if (!r.ok) throw new Error((json as { detail?: string; error?: string }).detail ?? (json as { error?: string }).error ?? "Could not read the note.");
       }
+
+      // Reading takes a beat even when the answer is instant: the spot is
+      // searching the body in the preview, and it should be seen to land.
+      await new Promise((r) => setTimeout(r, Math.max(0, 1400 - (Date.now() - started))));
 
       const c = json.conditionId ? CONDITIONS.find((x) => x.id === json.conditionId) : undefined;
       if (c) {
@@ -288,7 +294,9 @@ export default function Home() {
   }
 
   const stepClass = (done: boolean, active: boolean) => `step-n ${done ? "done" : active ? "" : "todo"}`;
-  const primaryLabel = busy ? "Preparing\u2026" : "Turn the screen around \u2192";
+  const primaryLabel: ReactNode = busy ? "Getting it ready\u2026" : <>Turn the screen around <InkArrow className="arrow inline-block ml-1 align-[-2px]" /></>;
+  const taglineWords = APP_TAGLINE.split(" ");
+  const taglineLast = taglineWords.pop();
   const canTurn = hasContent && !busy;
 
   return (
@@ -306,14 +314,17 @@ export default function Home() {
         </nav>
 
         <header className="pt-12 pb-10">
-          <h1 className="display" style={{ fontSize: "clamp(2.4rem, 5vw, 4rem)" }}>{APP_TAGLINE}</h1>
+          <h1 className="display" style={{ fontSize: "clamp(2.4rem, 5vw, 4rem)" }}>
+            {taglineWords.join(" ")}{" "}
+            <span className="ink-under">{taglineLast}<InkUnderline className="ink-under-svg" /></span>
+          </h1>
           <p className="text-lg text-[color:var(--muted)] mt-4 max-w-xl">
             Paste the note you already wrote. Check what the patient will hear. Turn the screen.
           </p>
           {/* The masthead: the anatomy, in our own ink, before a word of UI. */}
           <div className="ink-row mt-10" aria-hidden>
-            {(["head", "heart", "lung", "wrist", "abdomen", "spine", "knee", "shoulder"] as DiagramId[]).map((id) => (
-              <div key={id} className="h-full flex-none"><Diagram id={id} fit /></div>
+            {(["head", "heart", "lung", "wrist", "abdomen", "spine", "knee", "shoulder"] as DiagramId[]).map((id, n) => (
+              <div key={id} className="h-full flex-none rise" style={{ animationDelay: `${120 + n * 70}ms` }}><Diagram id={id} fit /></div>
             ))}
           </div>
         </header>
@@ -323,7 +334,7 @@ export default function Home() {
           <div className="doc">
             <section>
               <div className="step">
-                <span className={stepClass(!!noteStatus, true)}>1</span>
+                <span className={stepClass(!!noteStatus, true)}><InkRing className="ring" />1</span>
                 <h2 className="display-sm text-2xl">Start from the note</h2>
               </div>
 
@@ -344,7 +355,7 @@ export default function Home() {
               <input ref={noteFileRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => ingestNote(e.target.files)} />
               <div className="flex flex-wrap items-center gap-4 mt-3">
                 <button onClick={() => ingestNote()} disabled={noteBusy || !noteText.trim()} className="btn btn-primary disabled:opacity-50">
-                  {noteBusy ? "Reading\u2026" : "Read the note"}
+                  {noteBusy ? "Reading the note\u2026" : "Read the note"}
                 </button>
                 {!IS_STATIC && (
                   <button onClick={() => noteFileRef.current?.click()} disabled={noteBusy} className="link-action">
@@ -372,7 +383,7 @@ export default function Home() {
 
             <section>
               <div className="step">
-                <span className={stepClass(false, hasContent)}>2</span>
+                <span className={stepClass(false, hasContent)}><InkRing className="ring" />2</span>
                 <h2 className="display-sm text-2xl">Check what they will hear</h2>
               </div>
               {!hasContent && (
@@ -444,7 +455,7 @@ export default function Home() {
                   <span className="field-label">Medicines</span>
                   <button onClick={() => setMeds((p) => [...p, { name: "", sig: "" }])} className="link-action">+ Add</button>
                 </div>
-                {meds.length === 0 && <p className="text-[15px] text-[color:var(--muted)]">None yet.</p>}
+                {meds.length === 0 && <p className="text-[15px] text-[color:var(--muted)]">No medicines yet. Reading a note fills these in.</p>}
                 <div className="space-y-4">
                   {meds.map((m, i) => (
                     <div key={i} className="pt-3 border-t border-[color:var(--line-soft)] first:border-0 first:pt-0">
@@ -472,7 +483,7 @@ export default function Home() {
                   <ul className="mb-3 space-y-1.5">
                     {instructions.map((t) => (
                       <li key={t} className="flex justify-between gap-3 text-[15px]">
-                        <span><span style={{ color: "var(--accent-text)" }}>&#10003;</span> {t}</span>
+                        <span className="flex items-start gap-2"><InkCheck className="flex-none mt-[3px] text-[color:var(--accent-text)]" size={16} />{t}</span>
                         <button onClick={() => setInstructions((p) => p.filter((x) => x !== t))} className="link-action">remove</button>
                       </li>
                     ))}
@@ -523,7 +534,7 @@ export default function Home() {
 
             <section className="lg:hidden">
               <div className="step">
-                <span className={stepClass(false, canTurn)}>3</span>
+                <span className={stepClass(false, canTurn)}><InkRing className="ring" />3</span>
                 <h2 className="display-sm text-2xl">Turn the screen</h2>
               </div>
               <button onClick={() => build(true)} disabled={!canTurn} className="btn btn-primary w-full py-4 text-lg disabled:opacity-50">{primaryLabel}</button>
@@ -549,9 +560,9 @@ export default function Home() {
               {selected ? (
                 <div className="mx-auto max-w-[220px] mb-5"><Diagram id={selected.diagram} marks={selected.marks} /></div>
               ) : (
-                <div className="mx-auto h-44 mb-5 flex items-end justify-center gap-6" aria-hidden style={{ opacity: 0.3 }}>
-                  <div className="h-full"><Figure region="body" body="female" spot={false} /></div>
-                  <div className="h-full"><Figure region="body" body="male" spot={false} /></div>
+                <div className="mx-auto h-44 mb-5 flex items-end justify-center gap-6 transition-opacity duration-500" aria-hidden style={{ opacity: noteBusy ? 1 : 0.3 }}>
+                  <div className="h-full"><Figure region="body" body="female" spot={false} searching={noteBusy} /></div>
+                  <div className="h-full"><Figure region="body" body="male" spot={false} searching={noteBusy} /></div>
                 </div>
               )}
               {(customHeadline || selected?.plain) && (

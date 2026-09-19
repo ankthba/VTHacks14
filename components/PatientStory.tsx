@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Diagram } from "@/components/Diagram";
 import { BodyLocator, type BodyType } from "@/components/BodyLocator";
+import { InkCheck, InkStroke } from "@/components/Ink";
 import { HowToArt } from "@/components/HowToArt";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 import type { Slide } from "@/lib/explain";
@@ -165,9 +166,11 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
               aria-selected={n === i}
               aria-label={`Go to ${s.title}`}
               onClick={() => { setI(n); setPlaying(true); }}
-              className="h-1.5 flex-1 transition-colors"
-              style={{ background: n <= i ? "var(--accent)" : "var(--line)" }}
-            />
+              className="h-3 flex-1 transition-colors"
+              style={{ color: n <= i ? "var(--accent)" : "var(--line)" }}
+            >
+              <InkStroke className="block w-full h-full" />
+            </button>
           ))}
         </div>
         <p className="meta-chip mt-3" aria-live="polite">{i + 1} of {slides.length}</p>
@@ -240,7 +243,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
                 className={slide.kind === "todo" ? "flex gap-4 items-start" : ""}
                 style={{ fontSize: slide.kind === "howto" ? "clamp(1.1rem, 2vw, 1.5rem)" : "clamp(1.4rem, 3.2vw, 2.4rem)", lineHeight: 1.3, color: slide.kind === "howto" ? "var(--muted)" : undefined }}
               >
-                {slide.kind === "todo" && <span style={{ color: "var(--accent-text)" }}>&#10003;</span>}
+                {slide.kind === "todo" && <InkCheck className="flex-none mt-2 text-[color:var(--accent-text)]" size={30} />}
                 <span className={n === 1 && slide.kind === "medicine" ? "font-semibold" : ""}>{l}</span>
               </p>
             ))}
@@ -278,6 +281,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
 
       {/* Paper gets everything on one sheet. */}
       <div className="hidden print:block px-6">
+        <p className="text-sm text-[color:var(--muted)] mb-4">Aperta. Printed for you to keep. Educational demo. Not medical advice.</p>
         {diagram && <div className="max-w-xs"><Diagram id={diagram} marks={marks} /></div>}
         {slides.map((s, n) => (
           <div key={n} className="finding-card py-3 border-b">

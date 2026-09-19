@@ -71,8 +71,14 @@ body {
   font-size: 17px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  font-feature-settings: "kern", "liga", "calt";
+  font-variant-numeric: tabular-nums;
+  text-rendering: optimizeLegibility;
   position: relative;
 }
+/* Typesetting details: balanced headings, hung punctuation, no widows. */
+.display, .display-sm { text-wrap: balance; hanging-punctuation: first; }
+p { text-wrap: pretty; }
 
 /* A faint paper grain, so the page is a surface rather than a flat colour. */
 body::before {
@@ -113,8 +119,11 @@ body > * { position: relative; z-index: 1; }
   border-radius: var(--radius);
   padding: 11px 22px;
   font-weight: 600;
-  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease, transform 80ms ease;
 }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn .arrow { transition: transform 160ms ease; }
+.btn:hover:not(:disabled) .arrow { transform: translateX(4px); }
 
 .btn-primary {
   background: var(--accent);
@@ -273,14 +282,23 @@ select.chip { appearance: none; padding-right: 18px; background-image: url("data
   margin-bottom: 16px;
 }
 .step-n {
+  position: relative;
   flex: none;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-display), Georgia, serif;
   font-style: italic;
-  font-size: 24px;
+  font-size: 21px;
   line-height: 1;
   color: var(--accent-text);
-  min-width: 22px;
+  transform: translateY(7px);
 }
+/* A hand-drawn ring around the step you are on. */
+.step-n .ring { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--accent); }
+.step-n.done .ring, .step-n.todo .ring { display: none; }
 .step-n.done { color: var(--accent-text); }
 .step-n.todo { color: var(--line); }
 
@@ -340,8 +358,27 @@ input.field {
   0%, 100% { transform: translate(-50%, -50%) scale(1); }
   50% { transform: translate(-50%, -50%) scale(1.12); }
 }
-.spot { animation: spot-breathe 1.8s ease-in-out infinite; }
-@media (prefers-reduced-motion: reduce) { .spot { animation: none; } }
+/* It lands with a little overshoot, then breathes. */
+.spot {
+  animation:
+    spot-land 520ms cubic-bezier(0.2, 0.8, 0.2, 1.25) both,
+    spot-breathe 1.8s ease-in-out 520ms infinite;
+}
+@keyframes spot-land {
+  from { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+/* While the note is being read, the spot searches the body. */
+.spot-search { transform: translate(-50%, -50%); animation: spot-search 2.6s ease-in-out infinite; }
+@keyframes spot-search {
+  0% { left: 50%; top: 7%; }
+  22% { left: 57%; top: 28%; }
+  44% { left: 50%; top: 44%; }
+  64% { left: 33%; top: 54%; }
+  82% { left: 40%; top: 74%; }
+  100% { left: 50%; top: 7%; }
+}
+@media (prefers-reduced-motion: reduce) { .spot, .spot-search { animation: none; } }
 
 /*
  * The turn. "Turn the screen around" is the product, so the screen turns:
@@ -393,3 +430,14 @@ input.field {
   -webkit-mask-image: linear-gradient(to right, black 82%, transparent);
 }
 @media (max-width: 640px) { .ink-row { height: 80px; gap: 26px; } }
+
+/* The underline under the last word of the headline, drawn by hand. */
+.ink-under { position: relative; white-space: nowrap; }
+.ink-under-svg {
+  position: absolute;
+  left: -1%;
+  bottom: -0.16em;
+  width: 102%;
+  height: 0.24em;
+  color: var(--accent);
+}

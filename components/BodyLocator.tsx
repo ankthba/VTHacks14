@@ -63,7 +63,7 @@ function spotFor(region: DiagramId, body: BodyType): Spot {
 }
 
 /** The figure with the spot over the place. Sized by its container's height. */
-export function Figure({ region, body, spot = true }: { region: DiagramId; body: BodyType; spot?: boolean }) {
+export function Figure({ region, body, spot = true, searching = false }: { region: DiagramId; body: BodyType; spot?: boolean; searching?: boolean }) {
   const art = ART[body];
   const p = spotFor(region, body);
   // The default spot is a hand's width: about a third of the figure's width.
@@ -71,6 +71,9 @@ export function Figure({ region, body, spot = true }: { region: DiagramId; body:
   return (
     <div className="relative h-full" style={{ aspectRatio: `${art.w} / ${art.h}` }}>
       <img src={art.src} alt={body === "female" ? "A woman's body" : "A man's body"} className="block h-full w-full" draggable={false} />
+      {searching && (
+        <img src={SPOT_SRC} alt="" aria-hidden draggable={false} className="spot-search absolute" style={{ width: `${0.34 * 100}%` }} />
+      )}
       {spot && (
         <img
           src={SPOT_SRC}
@@ -126,7 +129,7 @@ export function BodyLocator({
           opacity: zoomed ? 0 : 1,
         }}
       >
-        <div className="h-full flex items-center justify-center">
+        <div key={body} className="h-full flex items-center justify-center rise">
           <Figure region={view} body={body} />
         </div>
       </div>
