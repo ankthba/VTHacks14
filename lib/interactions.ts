@@ -162,9 +162,12 @@ function quoteWindow(sentence: string, term: string, width = 280): string {
   return `${start > 0 ? "..." : ""}${sentence.slice(start, end).trim()}${end < sentence.length ? "..." : ""}`;
 }
 
+export type Audience = "patient" | "clinician";
+
 async function checkDirection(
   subject: NormalizedMed,
   other: NormalizedMed,
+  audience: Audience = "patient",
 ): Promise<Finding | null> {
   const label = await fetchLabel(subject, { requireInteractions: true });
   const text = interactionsText(label);
@@ -177,11 +180,18 @@ async function checkDirection(
 
   const quote = quoteWindow(hit.sentence, hit.term);
 
-  let plain = `The FDA label for ${displayName(subject)} talks about taking it together with ${displayName(other)}. Ask your pharmacist whether that applies to you.`;
+  // Register matters: the same finding is phrased as a question for a patient
+  // and as a label citation for a prescriber, who does not need to be told to
+  // consult anyone.
+  let plain =
+    audience === "clinician"
+      ? `The ${displayName(subject)} label addresses concomitant ${displayName(other)}. Quoted below.`
+      : `The FDA label for ${displayName(subject)} talks about taking it together with ${displayName(other)}. Ask your pharmacist whether that applies to you.`;
   let severity = severityFromText(hit.sentence);
 
   // Stage 2: optional phrasing pass over the quote we already extracted.
-  if (activeProvider() !== "none") {
+  // Only for patients - a clinician is better served by the label's own words.
+  if (audience === "patient" && activeProvider() !== "none") {
     try {
       const v = await generateJson(
         buildPrompt(subject, other, quote),
@@ -214,14 +224,17 @@ async function checkDirection(
   };
 }
 
-export async function labelInteractions(meds: NormalizedMed[]): Promise<Finding[]> {
+export async function labelInteractions(
+  meds: NormalizedMed[],
+  audience: Audience = "patient",
+): Promise<Finding[]> {
   const resolved = meds.filter((m) => m.rxcui && m.ingredients.length > 0);
   const jobs: Promise<Finding | null>[] = [];
 
   for (let i = 0; i < resolved.length; i++) {
     for (let j = i + 1; j < resolved.length; j++) {
-      jobs.push(checkDirection(resolved[i], resolved[j]));
-      jobs.push(checkDirection(resolved[j], resolved[i]));
+      jobs.push(checkDirection(resolved[i], resolved[j], audience));
+      jobs.push(checkDirection(resolved[j], resolved[i], audience));
     }
   }
 

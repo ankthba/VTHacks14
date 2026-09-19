@@ -1,12 +1,24 @@
 import type { Finding } from "@/lib/types";
 
 const TONE = {
-  high: { bg: "var(--high-bg)", fg: "var(--high)", word: "Ask about this first" },
-  moderate: { bg: "var(--moderate-bg)", fg: "var(--moderate)", word: "Worth asking" },
-  low: { bg: "var(--ok-bg)", fg: "var(--ok)", word: "Minor" },
+  high: { bg: "var(--high-bg)", fg: "var(--high)" },
+  moderate: { bg: "var(--moderate-bg)", fg: "var(--moderate)" },
+  low: { bg: "var(--ok-bg)", fg: "var(--ok)" },
 } as const;
 
-export function FindingCard({ finding }: { finding: Finding }) {
+/** A patient is being told what to ask; a prescriber is being told what to weigh. */
+const WORD = {
+  patient: { high: "Ask about this first", moderate: "Worth asking", low: "Minor" },
+  clinician: { high: "Review before prescribing", moderate: "Consider", low: "Minor" },
+} as const;
+
+export function FindingCard({
+  finding,
+  audience = "patient",
+}: {
+  finding: Finding;
+  audience?: "patient" | "clinician";
+}) {
   const tone = TONE[finding.severity];
   const isArithmetic = finding.kind !== "label_interaction";
 
@@ -20,7 +32,7 @@ export function FindingCard({ finding }: { finding: Finding }) {
           className="text-xs font-bold uppercase tracking-[0.08em] px-2.5 py-1 rounded-full"
           style={{ background: tone.fg, color: "#fff" }}
         >
-          {tone.word}
+          {WORD[audience][finding.severity]}
         </span>
         {/*
           The provenance badge is the whole thesis of the project, so it is on

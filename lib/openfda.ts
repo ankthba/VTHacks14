@@ -15,6 +15,9 @@ export interface LabelDoc {
   contraindications?: string[];
   indications_and_usage?: string[];
   dosage_and_administration?: string[];
+  dosage_forms_and_strengths?: string[];
+  use_in_specific_populations?: string[];
+  warnings_and_cautions?: string[];
   openfda?: {
     rxcui?: string[];
     generic_name?: string[];

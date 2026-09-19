@@ -93,6 +93,32 @@ will identify it for free, and you do not need an appointment.*
 
 ---
 
+## The clinician view — `/clinician`
+
+The same engine, pointed at the prescriber's ten seconds before committing to a
+drug for a particular patient. Enter the drug under consideration and the
+patient's current list, and get back, on one screen:
+
+- **Boxed warning** first, never abbreviated away
+- **Duplicate ingredient / duplicate class / labelled interaction** against the
+  current list — the same deterministic checks, phrased for a clinician rather
+  than as questions for a pharmacist
+- **Use in specific populations**, split back into renal, hepatic, geriatric,
+  pregnancy and lactation rather than dumped as one 7 KB block
+- **Dosing** and **contraindications**, verbatim
+- **Access**, counted from the FDA NDC directory
+
+On access, the honest part: `lisinopril` shows **360 marketed generics**,
+`apixaban` shows **4** against 16 brand products. That is a real, citable proxy
+for how hard something is to get filled. Plan-specific formulary and
+prior-authorisation status are **not** in any free dataset, so the app says so
+rather than inventing them.
+
+Everything on this screen is lifted from the label with a link back to it. A
+clinician can dismiss a generated summary; they cannot dismiss the label.
+
+---
+
 ## "Can I take this?"
 
 The app was one-shot: scan, read, close. But the question people actually have

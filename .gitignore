@@ -46,8 +46,8 @@ next-env.d.ts
 !.env.example
 
 # macOS/iCloud conflict copies
-*[[:space:]]2.json
-*[[:space:]]2.ts
+* 2.*
+* 3.*
 
 # iOS build output
 ios/build/

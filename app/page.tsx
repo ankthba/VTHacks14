@@ -128,6 +128,12 @@ export default function Home() {
           Photograph the bottles on the kitchen table. Get back questions worth
           asking your pharmacist.
         </p>
+        <a
+          href="/clinician"
+          className="meta-chip mt-4 hover:border-[color:var(--accent)]"
+        >
+          Prescribing? Open the clinician view &rarr;
+        </a>
       </header>
 
       {error && (
