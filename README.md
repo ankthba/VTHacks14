@@ -1,319 +1,99 @@
-# PillPile
+# Bedside
 
-**Photograph the pile of pill bottles on the kitchen table. Get back a plain-language,
-read-aloud, translated one-pager that flags duplicate medications, dangerous
-combinations and dosing problems — with every flag traced to an FDA label.**
+**Explain it once, properly.**
 
-Built at VTHacks 14, September 2026.
+A clinician pastes the discharge summary. The tool turns it into what the
+patient still understands at home: where on their body, one plain sentence,
+each medicine and how to take it, what to do next, and how to actually do it —
+in their language, read aloud, one idea per screen, printed for the fridge.
+
+Built at VTHacks 14, September 2026, for the Impiricus track: *build the next
+HCP engagement tool.*
 
 ---
 
 ## Educational demo. Not medical advice.
 
-Read this part first.
-
-- **This is not a medical device and not a clinical decision support system.**
-  Every screen and every printout carries the line: *Educational demo. Not medical
-  advice. Always confirm with your pharmacist or physician.*
-- **The output is a list of questions to ask a pharmacist.** It never says "stop
-  taking X" or "your dose is wrong", because it is not in a position to know.
-- **No real patient data.** The demo runs on synthetic labels. Do not photograph
-  another person's prescriptions to try it.
-- **Nothing is stored.** No accounts, no database, no medication histories.
-  Uploaded photos are read in memory during a single request and never written to
-  disk. Session state lives in React and dies with the tab.
-- **Silence is a real answer.** When no FDA label mentions a pair, PillPile
-  reports nothing rather than letting a model fill the gap. "Nothing was flagged"
-  is shown as *"that is not the same as everything is fine"*.
+Every screen and printout carries that line. Nothing is stored — the note lives
+for one request. No real patient data was used; the demo notes are synthetic.
+The clinician is the author: every generated sentence is shown to them and is
+editable before the screen is turned toward the patient.
 
 ---
 
-## The problem
+## Why this is an HCP engagement tool
 
-A patient goes home with **Norco** for pain. Norco is hydrocodone **plus
-acetaminophen**. They keep taking **Tylenol** for breakthrough pain, because
-nothing on either bottle says these are the same drug.
+The most valuable screen in medicine is the one the doctor turns toward the
+patient, and nobody owns it. A rep can never be in that room. Patient education
+is core approved-content territory, adherence is the shared interest, and
+being genuinely useful in that moment is *"be the answer, not the ad."*
 
-Neither label contains the sentence "you are now taking acetaminophen twice."
-
-At the doses printed on those two bottles, that is **5,300 mg of acetaminophen a
-day** against a labelled ceiling of 3,000–4,000 mg. The people most exposed to
-this are the ones least equipped to catch it: elderly patients, patients with
-limited English, patients discharged without a pharmacist consult.
-
-PillPile computes that number and shows the arithmetic.
+Underneath is a real problem: patients forget most of what they are told in a
+visit and misremember much of the rest. The evidence-based fix is teach-back,
+which a fifteen-minute slot does not allow. So the explanation becomes an
+artifact instead — built in the seconds the clinician already spends explaining,
+from the note they already wrote.
 
 ---
 
-## Who this is for, and what opens first
-
-Someone holding a bottle they cannot read — because the print is small, because
-English is not their first language, because reading is hard, or because there
-are nine bottles and no one ever explained any of them.
-
-That reframes the output. A person who cannot read a medicine label cannot read
-a dense findings page either, so **the first thing the app shows is one bottle
-at a time**: the name in the largest type on the page, one sentence saying what
-it does, one sentence saying how to take it, and a button to hear all of it in
-their language. The detailed findings view is behind a toggle, for the person
-helping them.
+## The flow
 
 ```
-  STRONG PAIN
-
-  Norco
-  This is a strong pain medicine.
-
-  HOW TO TAKE IT
-  One pill, up to 4 times a day. Only when you need it.
-
-  ASK YOUR PHARMACIST
-  Both contain acetaminophen
-```
-
-**The plain language is curated and deterministic**, keyed on ATC and EPC class
-identifiers in `lib/plainPurpose.ts` — not generated per request. "An
-angiotensin converting enzyme inhibitor indicated for the treatment of
-hypertension" becomes "This lowers your blood pressure" the same way every time,
-with no API key, and the short strings survive translation intact. When a drug
-falls outside the curated list the card says so and shows the label text rather
-than inventing a simpler version.
-
-Translation only ever *translates* these strings. The model still never
-originates a clinical claim.
-
-### What it will not do
-
-It will not identify a loose, unlabelled pill. We checked: the NLM's RxImage and
-Pillbox APIs are both retired and unreachable, and reverse-searching openFDA by
-imprint code worked for 1 of 4 real codes we tried — failing on both opioid
-imprints. A confidently wrong answer about an opioid is worse than no answer, so
-an unidentified item gets an honest card instead: *take it to any pharmacy, they
-will identify it for free, and you do not need an appointment.*
-
----
-
-## The clinician view — `/clinician`
-
-The same engine, pointed at the prescriber's ten seconds before committing to a
-drug for a particular patient. Enter the drug under consideration and the
-patient's current list, and get back, on one screen:
-
-- **Boxed warning** first, never abbreviated away
-- **Duplicate ingredient / duplicate class / labelled interaction** against the
-  current list — the same deterministic checks, phrased for a clinician rather
-  than as questions for a pharmacist
-- **Use in specific populations**, split back into renal, hepatic, geriatric,
-  pregnancy and lactation rather than dumped as one 7 KB block
-- **Dosing** and **contraindications**, verbatim
-- **Access**, counted from the FDA NDC directory
-
-On access, the honest part: `lisinopril` shows **360 marketed generics**,
-`apixaban` shows **4** against 16 brand products. That is a real, citable proxy
-for how hard something is to get filled. Plan-specific formulary and
-prior-authorisation status are **not** in any free dataset, so the app says so
-rather than inventing them.
-
-Everything on this screen is lifted from the label with a link back to it. A
-clinician can dismiss a generated summary; they cannot dismiss the label.
-
----
-
-## "Can I take this?"
-
-The app was one-shot: scan, read, close. But the question people actually have
-arrives later, standing in an aisle at 11pm holding a box of cold medicine.
-
-So the results page carries a check: type or tap a product and it runs the same
-deterministic checks against the medicines already on your table, *before* you
-buy it.
-
-**The interesting part is that it refuses to guess.** An OTC brand name is not a
-product. Measured: "NyQuil" covers at least four marketed formulations, and
-three contain acetaminophen while NyQuil Kids Allergy does not. Worse, RxNorm's
-fuzzy matcher resolves these silently and wrongly in the *unsafe* direction —
-"DayQuil" matched "DayQuil Cough" (dextromethorphan only, hiding the
-acetaminophen), and "Advil PM" matched plain "Advil", dropping the
-diphenhydramine. A user on Norco would have been told they were fine.
-
-So formulations are enumerated from openFDA and **the user is asked which box
-they are holding**, with the acetaminophen-containing ones marked. If nothing
-resolves, the app says so and points at the Drug Facts panel rather than
-answering. `npm run eval:otc` guards this path specifically.
-
----
-
-## Reconciliation means comparing two lists
-
-Analysing the bottles on the table is useful, but it is not what
-*reconciliation* means. Clinically, reconciliation is comparing what a patient
-was discharged on against what they actually have — and the dominant error in
-that comparison is not duplication. It is **omission**: a drug on the discharge
-list that never made it into the patient's hands, so nobody notices it is gone.
-
-Photograph the discharge paperwork as well as the bottles and PillPile produces
-a side-by-side comparison:
-
-| Status | Meaning |
-|---|---|
-| **MISSING** | On the discharge list, no bottle for it |
-| **CONFLICT** | Same medicine, and the two strengths disagree |
-| **EXTRA** | A bottle that is not on the discharge list |
-| **OK** | On the list and in the pile |
-
-Matching is by **RxNorm ingredient set**, not by name, so "Hydrocodone
-bitartrate and acetaminophen" on the paperwork and "Norco" on the bottle are
-recognised as the same medicine. A string comparison would report that as an
-omission *and* an extra — two false alarms for zero real problems. `rec-05`
-through `rec-07` in the eval set exist to keep that honest.
-
----
-
-## The architecture claim: the dangerous finding is computed, not generated
-
-```
-photo(s)
+paste the note (or photograph it)
   │
-  ├─► [1] EXTRACT     vision model → structured bottle records
-  │                   {drug_text, strength, sig, qty, prescriber, fill_date}
-  │                   ↓ human-in-the-loop correction UI
+  ├─► PARSE       diagnoses, medications + directions, instructions, follow-up
+  │               deterministic first (headers, ICD-10, dose patterns, prose);
+  │               a model fills gaps only if one is configured
   │
-  ├─► [2] NORMALIZE   RxNorm → RxCUI + ingredient set + drug classes
-  │                   deterministic, no model
+  ├─► MATCH       diagnosis → curated library (40 conditions, 12 anatomical views)
+  │               ICD-10 code outranks any phrase; longest synonym wins
   │
-  ├─► [3] ANALYZE     a. duplicate ingredient   ← set intersection
-  │                   b. duplicate class        ← curated ATC/EPC grouping
-  │                   c. cumulative dose        ← arithmetic
-  │                   d. pairwise interaction   ← string search over FDA label
-  │                   e. reconciliation         ← ingredient-set comparison
-  │                                               against the discharge list
+  ├─► EXPLAIN     one plain sentence per medicine, from a curated class map
+  │               (~90 classes) + a visit-context layer; directions rewritten
+  │               ("PO TID x 7d" → "One pill, three times a day. For 7 days.")
   │
-  ├─► [4] EXPLAIN     plain language written FROM the findings above only
+  ├─► HOW-TO      instructions that name a procedure attach a walkthrough
+  │               (socket irrigation, inhaler + spacer, crutches, eye drops…)
   │
-  └─► [5] DELIVER     one-pager → translation → read-aloud → print
+  ├─► TRANSLATE   Spanish, Vietnamese, Chinese, Arabic — free, key-less, cached
+  │
+  └─► TURN THE SCREEN
+                  whole body → region glows → zoom into the marked drawing;
+                  one screen per idea; read aloud; advances when the voice
+                  finishes; prints on one sheet
 ```
 
-**Checks (a), (b) and (c) are pure set operations and arithmetic over RxNorm
-identifiers.** They cannot hallucinate a finding and cannot miss one for
-stylistic reasons. The acetaminophen result — the strongest moment in the demo —
-is `{161} ∩ {161, 5489} ≠ ∅` followed by `325×1×4 + 500×2×4 = 5300`.
+## What it refuses to do
 
-**Check (d) splits detection from phrasing.** Detection is a deterministic string
-search over the FDA label text we retrieved, and the quote shown to the user is
-lifted verbatim from it. A model, if configured, only rewrites that quote into
-plain language. It can change the wording; it cannot change whether a finding
-exists.
+This is the part we would put on a poster.
 
-Each finding card in the UI carries a badge saying which of the two it is.
+- **It never invents a medication.** A line under *Medications* is a drug only
+  if it reads as a drug order. A note with `Headache (QOD)` in that section
+  once became an aspirin/caffeine headache powder — RxNorm's fuzzy matcher will
+  resolve almost anything to *something*. A resolution is now trusted only if
+  the printed name shares a word with the canonical one or carried a dose.
+  Everything else is handed to the clinician as **Not used**, and the screen
+  does not turn until they have seen it.
+- **It never says "ask your pharmacist."** The doctor is in the room. Ninety
+  drug classes have a curated sentence; a visit-context layer wins where the
+  class is misleading (topiramate for a migraine patient is *"taken every day to
+  make migraines happen less often"*, not *"prevents seizures"*); the label's
+  own indication is the next fallback; and the clinician can reword anything.
+- **It never translates a drug name.** The patient has to match it to the
+  bottle.
+- **It never shows a specimen.** The default picture is a whole-body locator
+  zooming into a marked line drawing — it answers *"where on me"*, which a
+  third-party 3D model cannot, and it prints. 3D is opt-in.
+- **The model, when present, only translates or fills parsing gaps.** Which
+  diagram and which plain sentence a diagnosis becomes is decided by the
+  library. Nothing clinical is generated.
 
-**Consequence: the app produces every finding with no API keys at all.** A model
-is needed to read a photo and to translate. It is never the source of a claim.
+## The story is short on purpose
 
----
-
-## The wall we hit, and what it forced
-
-The obvious way to build this is `rxnav.nlm.nih.gov/REST/interaction/`. That API
-was **discontinued on 2 January 2024**, with no replacement and no migration
-path. DrugBank retired its free interaction checker in March 2026. Most tutorials
-— and most language models' training data — still recommend the NLM endpoint.
-
-We confirmed it rather than trusting the docs:
-
-```
-$ curl -o /dev/null -w "%{http_code}" \
-    "https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=341248"
-404
-```
-
-With no interaction database available, the choice was to ask a model from memory
-— which is exactly the failure mode a health app cannot afford — or to retrieve
-primary source text and reason only over that. We retrieved. That constraint is
-the reason the citation UI exists, and it made the project better.
-
----
-
-## Measured accuracy
-
-The checks are scored against a ground-truth set rather than asserted to work.
-
-```
-$ npm run eval
-
-  ingredient  n=10  precision 100.0%  recall 100.0%  F1 100.0%
-  class       n=10  precision 100.0%  recall 100.0%  F1 100.0%
-  none        n=12  precision 100.0%  recall 100.0%  F1 100.0%
-  overall  32/32 correct  (100.0%)
-
-  ---- discharge-list reconciliation ----
-  8/8 correct  (100.0%)
-```
-
-**Read that number with the right amount of suspicion.** We wrote both the code
-and the labels, the set is 40 cases, and it is not clinically adjudicated. What
-it is good for is regression and honesty: the set is weighted toward **hard
-negatives** — lisinopril + amlodipine, lisinopril + hydrochlorothiazide,
-acetaminophen + ibuprofen, omeprazole + amoxicillin — pairs that are commonly
-and *intentionally* co-prescribed. A checker that flags those is worse than
-useless, because it teaches the patient to ignore it.
-
-The harness started at **84.4%** and found five real defects, described below.
-
----
-
-## Five bugs the spike test and the eval set found
-
-Nothing here was predictable from the documentation.
-
-**1. `approximateTerm` returns retired concepts.** "Metformin 500 mg" scores
-RxCUI `316256` highest. That concept is obsolete: `/properties` returns `{}` and
-`/related` returns empty groups, so the drug silently vanished from every check.
-Resolution now walks the candidate list until one actually yields ingredients
-(landing on `861007`, metformin hydrochloride). Candidates from the GS and MMSL
-vocabularies also carry no `name` field at all, so the canonical name is always
-read from `/properties`.
-
-**2. Intersecting raw ATC sets fails in both directions.** Lisinopril is `C09AA`
-and losartan is `C09CA` — an ACE inhibitor stacked on an ARB, which is worth
-asking about, yet they share no ATC code, no EPC and no MOA. They meet only at
-the three-character level, `C09`. Meanwhile RxClass maps classes at the
-ingredient level across every formulation a drug has ever had, so ibuprofen
-carries "cardiac preparations", "vaginal antiinflammatories" and "throat
-preparations" alongside the NSAID code — ibuprofen and naproxen share *three*
-codes, and naive intersection would emit three findings for one issue.
-`lib/classgroups.ts` handles this with curated groups first, then exact EPC, then
-route-filtered ATC, returning at most one match per pair.
-
-**3. `limit=1` on openFDA returns the wrong label.** Searching "ibuprofen"
-returns an OTC monograph with *no* `drug_interactions` section, while the
-prescription label has 3.7 KB of it. Searching "lisinopril" returns
-`LISINOPRIL AND HYDROCHLOROTHIAZIDE` — a different product. Retrieval now
-requests `_exists_:drug_interactions`, fetches five candidates and scores them
-against the ingredient set.
-
-**4. Combination products contaminate every drug's class list.** RxClass maps
-classes at the ingredient level, so a single-ingredient drug inherits the ATC
-code of every combination it has ever appeared in. Amlodipine carries
-`C09XA "Renin-inhibitors"` — from aliskiren/amlodipine — and so looked like
-duplicate therapy beside lisinopril. Acetaminophen carries
-`N02AJ "Opioids in combination with non-opioid analgesics"` and so looked like
-an opioid beside ibuprofen. Four of the five eval failures were this one bug.
-
-The fix is structural rather than a regex over class names: every RxClass record
-carries a `minConcept` saying **which concept the mapping came from**, so
-mappings are kept only when they originate from the drug's own ingredient-level
-concepts. Note this must *exclude* MIN — `related.json?tty=MIN` returns every
-combination *containing* the ingredient, which would re-admit exactly the
-mappings being rejected.
-
-**5. Withdrawn brands did not resolve at all.** Every `approximateTerm`
-candidate for "Vicodin 5-300 mg" is a retired RxCUI: `/properties` and
-`/related` both return empty, so a bottle of hydrocodone/acetaminophen produced
-**no findings whatsoever**. That is exactly this project's user — the old bottle
-at the back of the cabinet. `historystatus` retains the full definition of a
-retired concept, including ingredient RxCUIs, per-ingredient strengths and a
-pointer to the current generic equivalent. Vicodin now resolves, is labelled
-discontinued in the UI, and its acetaminophen counts toward the daily total.
+One picture, one screen per medicine, one screen of what to do, one screen per
+how-to with its steps numbered on it, and an end. A typical visit is six to nine
+screens. An earlier version put every how-to step on its own screen and turned
+one note into 48; nobody sits through that.
 
 ---
 
@@ -321,114 +101,58 @@ discontinued in the UI, and its acetaminophen counts toward the daily total.
 
 ```bash
 npm install
-npm run dev
+npm run dev          # http://localhost:3000
 ```
 
-Open http://localhost:3000 and pick a prepared example — **no API key is needed**
-for the demo scenarios.
+No API key is needed for anything above except photographing a page. Two demo
+notes sit above the note box; their audio is pre-generated in English and
+Spanish and committed, so the demo runs with the wifi unplugged.
 
-To use your own photos, copy `.env.example` to `.env.local` and set
-`GEMINI_API_KEY`. Everything else is optional.
-
-| Script | What it does |
+| Key | Unlocks |
 |---|---|
-| `npm run dev` | Dev server |
-| `npm run eval` | Scores every model-free check against the 40-case ground-truth set and exits non-zero on any regression |
-| `npm run eval:otc` | Checks over-the-counter resolution — that acetaminophen-containing formulations are found, and that ambiguous brands surface every variant instead of picking one |
-| `npm run verify:core` | Runs the demo scenarios plus a negative control through the real pipeline and prints ingredients, findings and schedule |
-| `npm run precache` | Walks every scenario and warms `.cache/` |
-| `npm run verify:offline` | Re-runs with `PILLPILE_OFFLINE=1`, where a cache miss throws — proves the demo needs no network |
+| `ELEVENLABS_API_KEY` | Natural read-aloud. Free tier is 10,000 characters; clips are cached to `.cache/tts` by text hash. Without it, the browser voice reads. |
+| `GEMINI_API_KEY` | Photographing a printed note; one-batch translation; gap-filling on unstructured prose. |
 
-### Demo-day resilience
+```bash
+npm run precache:tts   # generate demo audio through the real pipeline
+npm run eval           # the medication engine's 40-case ground-truth set
+npm run eval:otc       # over-the-counter resolution
+```
 
-`.cache/` is **committed on purpose**. Every RxNorm and openFDA response for the
-demo set is in the repository, and `npm run verify:offline` proves the whole demo
-runs with the network unplugged. Conference wifi fails every year.
+## Surfaces
 
----
-
-## iOS app
-
-`ios/` holds a native SwiftUI client. It is a **thin client**: every check runs
-server-side and comes back as JSON, so there is exactly one implementation of
-the acetaminophen arithmetic and the phone can never disagree with the web app
-about a finding.
-
-What it adds over the browser: the real camera, and **offline read-aloud** via
-`AVSpeechSynthesizer` — no API key, no network, so the accessibility feature
-cannot be taken out by conference wifi. See [ios/README.md](ios/README.md).
-
----
-
-## Stack
-
-Next.js 16 (App Router) · TypeScript · Tailwind v4 · `zod` on every model
-response, with one retry on parse failure · no database.
-
-| Concern | Where |
+| Route | |
 |---|---|
-| RxNorm client | `lib/rxnorm.ts` |
-| openFDA retrieval + scoring | `lib/openfda.ts` |
-| Class grouping | `lib/classgroups.ts` |
-| Deterministic checks | `lib/analyze.ts` |
-| Discharge-list reconciliation | `lib/reconcile.ts` |
-| OTC resolution + "can I take this?" | `lib/otc.ts`, `lib/checkAddition.ts` |
-| Ground-truth eval set | `eval/cases.ts`, `eval/reconcile-cases.ts` |
-| Dose parsing | `lib/strength.ts` |
-| Label-grounded interactions | `lib/interactions.ts` |
-| Model adapters (Gemini / Anthropic) | `lib/llm.ts` |
-| Disk cache + offline guard | `lib/cache.ts` |
+| `/` | The explain tool. Clinician side, then *Turn the screen around* |
+| `/diagrams` | The anatomy library — every condition with its structure marked |
+| `/clinician` | Prescriber check: label-grounded interactions, renal/hepatic sections, access, prior-auth draft |
+| `/pillpile` | The original patient medication checker this grew out of |
+| `/labels` | Printable synthetic bottle labels for props |
 
-### Accessibility
+## Where it came from
 
-Read-aloud uses ElevenLabs when a key is set and falls back to the browser's
-speech synthesis otherwise — the feature never simply disappears. The one-pager
-targets a 6th-grade reading level, translates to Spanish, Vietnamese, Chinese and
-Arabic, and prints to a single sheet for the fridge. The UI is light-only and
-high-contrast by choice: the reader may be elderly or low-vision, and the demo
-runs on a projector.
-
----
+The project began as PillPile, a patient-facing checker that found hidden
+duplicate ingredients (Norco + Tylenol → 5,300 mg of acetaminophen a day) by
+set intersection over RxNorm identifiers, with a 40-case eval that caught five
+real bugs. That engine still powers every medication sentence here. The pivot
+was recognising that the same discipline — computed, cited, refusing to guess —
+mattered more on the screen a doctor turns toward a patient.
 
 ## Limitations
 
-Stated plainly, because a health project that does not name its limits should not
-be trusted.
+- The condition library is 40 conditions. A diagnosis outside it gets the note's
+  own words and a body outline, and the clinician is told so.
+- Plain-language mapping is by drug class, corrected by visit context for the
+  conditions we cover. It can still be wrong for an off-label use; that is why
+  the sentence is editable and shown before the screen turns.
+- Free-tier translation (MyMemory) is sentence-at-a-time machine translation.
+  Good enough for six-word sentences; not clinically validated.
+- Parsing is deterministic and tuned on four note formats. It will miss things
+  in unusual layouts, and it says what it skipped rather than guessing.
+- Drawings are schematic by design. They show *where*, not surgical detail.
 
-- **Interactions are label-derived only.** If the FDA label does not mention the
-  other drug or its class, PillPile says nothing. This is not a complete
-  interaction database, and real interaction databases are not free.
-- **No pharmacokinetic modelling.** No CYP450 pathways, no renal or hepatic dose
-  adjustment, no age or weight adjustment.
-- **English labels only.** The output translates; the source labels do not.
-- **Dose totals assume the sig is followed at its maximum.** "As needed" is
-  counted at the ceiling, which is the number worth knowing but not necessarily
-  what the patient takes.
-- **Sig parsing is regex-based** and covers common English patterns. An
-  unparseable schedule is reported as unparseable rather than guessed.
-- **Duplicate-class grouping is curated**, so it is accurate on the groups it
-  covers and silent outside them. The list is in `lib/classgroups.ts` and is
-  deliberately short and auditable.
-- **OCR can misread a label.** That is why the correction step exists, and why
-  anything the model was unsure about is flagged for confirmation before use.
-- **A medication that cannot be matched to RxNorm is excluded from every check**,
-  and the UI says so explicitly rather than quietly dropping it.
-- **Reconciliation matches on ingredient set alone.** Two products with the same
-  ingredients but different release profiles — metoprolol tartrate versus
-  metoprolol succinate ER — are not distinguished, and a modified-release
-  mismatch is a real clinical difference we would currently call a match.
-- **"Can I take this?" does not check dose limits for the new product.** Per-dose
-  mg is not reliably parseable from an OTC brand name, so it reports shared
-  ingredients and classes but will not tell you the combined daily total.
-- **It is not yet on iOS.** The feature is web-only for now.
-- **Our reported accuracy is self-scored.** We wrote the code and the labels,
-  and 40 cases is a small set. Treat it as a regression guard, not a validation.
+## Data and assets
 
----
-
-## Data sources
-
-- [RxNorm / RxNav](https://rxnav.nlm.nih.gov/) — U.S. National Library of Medicine
-- [RxClass](https://mor.nlm.nih.gov/RxClass/) — ATC, EPC and MOA drug classes
-- [openFDA drug labels](https://open.fda.gov/apis/drug/label/) — U.S. Food and Drug Administration
-- [DailyMed](https://dailymed.nlm.nih.gov/) — label citations linked from each finding
+RxNorm / RxClass (NLM) · openFDA drug labels · MyMemory translation · ElevenLabs
+· 3D models from Sketchfab under CC BY (attributed in-app) · Instrument Serif /
+Instrument Sans.
