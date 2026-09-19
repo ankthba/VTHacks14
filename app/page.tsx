@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { InkArrow, InkCheck, InkRing, InkUnderline } from "@/components/Ink";
+import { Menu } from "@/components/Menu";
 import { CONDITIONS, REGIONS } from "@/lib/anatomy/conditions";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 import { Diagram } from "@/components/Diagram";
@@ -551,16 +552,11 @@ export default function Home() {
                       </button>
                     ) : null;
                   })}
-                  <select
-                    value=""
-                    onChange={(e) => { if (e.target.value) setHowtoIds((p) => [...p, e.target.value]); }}
-                    className="chip"
-                  >
-                    <option value="">+ Add a walkthrough</option>
-                    {HOWTOS.filter((h) => !howtoIds.includes(h.id)).map((h) => (
-                      <option key={h.id} value={h.id}>{h.title}</option>
-                    ))}
-                  </select>
+                  <Menu
+                    label="+ Add a walkthrough"
+                    items={HOWTOS.filter((h) => !howtoIds.includes(h.id)).map((h) => ({ id: h.id, label: h.title }))}
+                    onPick={(id) => setHowtoIds((p) => [...p, id])}
+                  />
                 </div>
                 <p className="text-[13px] text-[color:var(--muted)] mt-2">One screen each, steps numbered, read aloud.</p>
               </div>
@@ -579,9 +575,11 @@ export default function Home() {
           <aside className="lg:sticky lg:top-6 space-y-4 rise" style={{ animationDelay: "320ms" }}>
             <div className="slide-preview">
               <div className="flex items-center justify-between gap-2 flex-wrap mb-5">
-                <select value={language} onChange={(e) => setLanguage(e.target.value)} className="chip">
-                  {languages.map((l) => <option key={l}>{l}</option>)}
-                </select>
+                <Menu
+                  label={language}
+                  items={languages.map((l) => ({ id: l, label: l, on: l === language }))}
+                  onPick={setLanguage}
+                />
                 <div className="flex gap-1">
                   {(["female", "male"] as BodyType[]).map((b) => (
                     <button key={b} onClick={() => setBodyType(b)} className={`chip ${bodyType === b ? "on" : ""}`}>
