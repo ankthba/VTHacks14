@@ -16,7 +16,9 @@ const nextConfig: NextConfig = {
   // ~/Documents is iCloud-synced on the dev Mac. iCloud kept dropping
   // "name 2" duplicates into Turbopack's persistence directory until it
   // refused to open. Anything named *.nosync is left alone by iCloud.
-  distDir: ".next.nosync",
+  // With output: "export", Next writes the site INTO distDir - so the static
+  // build gets its own directory and dev keeps the cache.
+  distDir: isStatic ? "out" : ".next.nosync",
   output: isStatic ? "export" : undefined,
   basePath: isStatic ? basePath : undefined,
   trailingSlash: isStatic,
