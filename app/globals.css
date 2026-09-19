@@ -112,58 +112,55 @@ body > * { position: relative; z-index: 1; }
   line-height: 1.2;
 }
 
-/* Buttons: a square-cornered block of matcha, or a hairline box. */
+/*
+ * Buttons drawn in ink. The outline is a touch uneven, there is a hard offset
+ * behind it like a sticker, hovering lifts it, pressing flattens it.
+ */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border-radius: var(--radius);
   padding: 11px 22px;
   font-weight: 600;
-  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease, transform 80ms ease;
+  border: 2px solid var(--ink);
+  border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px;
+  box-shadow: 2px 2px 0 var(--ink);
+  transition: transform 90ms ease, box-shadow 90ms ease, background-color 120ms ease, color 120ms ease, border-color 120ms ease;
 }
-.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:hover:not(:disabled) { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+.btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+.btn:disabled { box-shadow: none; border-color: var(--line); cursor: not-allowed; }
 .btn .arrow { transition: transform 160ms ease; }
 .btn:hover:not(:disabled) .arrow { transform: translateX(4px); }
 
-.btn-primary {
-  background: var(--accent);
-  color: var(--accent-ink);
-}
-.btn-primary:hover:not(:disabled) {
-  background: var(--accent-hover);
-}
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
 
-.btn-secondary {
-  background: transparent;
-  color: var(--foreground);
-  border: 1px solid var(--line);
-}
-.btn-secondary:hover:not(:disabled) {
-  border-color: var(--foreground);
-}
+.btn-secondary { background: var(--surface); color: var(--foreground); }
+.btn-secondary:hover:not(:disabled) { background: #fff; }
 
-/* Small choices: plain text with a hairline under it. The chosen one is inked. */
+/* Small choices: plain text, an underline that draws itself when you arrive. */
 .chip {
   border: 0;
   border-bottom: 1px solid var(--line);
   border-radius: 0;
-  background: transparent;
-  padding: 4px 2px;
+  background-color: transparent;
+  padding: 4px 2px 5px;
   font-size: 14px;
   color: var(--muted);
   cursor: pointer;
+  transition: color 120ms ease, background-size 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.chip:hover:not(:disabled) {
-  color: var(--foreground);
-  border-bottom-color: var(--foreground);
+.chip:not(select) {
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
 }
-.chip.on {
-  color: var(--accent-text);
-  border-bottom: 2px solid var(--accent);
-  font-weight: 600;
-}
+.chip:hover:not(:disabled) { color: var(--foreground); }
+.chip:not(select):hover:not(:disabled), .chip.on { background-size: 100% 2px; border-bottom-color: transparent; }
+.chip.on { color: var(--accent-text); font-weight: 600; }
 select.chip { appearance: none; padding-right: 18px; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23675d51' stroke-width='1.5'/></svg>"); background-repeat: no-repeat; background-position: right 2px center; }
 
 /* Category tabs: a run of words, the current one underlined in matcha. */
@@ -175,18 +172,22 @@ select.chip { appearance: none; padding-right: 18px; background-image: url("data
   padding-bottom: 8px;
 }
 .tab {
-  background: none;
   border: 0;
-  padding: 4px 0;
+  padding: 4px 0 6px;
   font-size: 13px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--muted);
-  border-bottom: 2px solid transparent;
   cursor: pointer;
+  background-color: transparent;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  transition: color 120ms ease, background-size 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.tab:hover { color: var(--foreground); }
-.tab.on { color: var(--foreground); border-bottom-color: var(--accent); font-weight: 600; }
+.tab:hover { color: var(--foreground); background-size: 100% 2px; }
+.tab.on { color: var(--foreground); background-size: 100% 2px; font-weight: 600; }
 
 /* A card is a hairline above a block. Nothing more. */
 .card {
@@ -338,16 +339,20 @@ input.field {
 
 /* Quiet text action - the alternative to a second button. */
 .link-action {
-  background: none;
   border: 0;
-  padding: 0;
+  padding: 0 0 1px;
   font: inherit;
   font-size: 14px;
   color: var(--accent-text);
-  text-decoration: underline;
-  text-underline-offset: 3px;
   cursor: pointer;
+  background-color: transparent;
+  background-image: linear-gradient(var(--accent-text), var(--accent-text));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 1px;
+  transition: background-size 160ms ease;
 }
+.link-action:hover { background-size: 100% 2px; }
 
 /* The preview: a rule across the top, like a column in a paper. */
 .slide-preview {
@@ -470,8 +475,8 @@ html { scroll-behavior: smooth; }
 
 /* The turn button leans into the turn. */
 .btn-turn { transform-origin: 8% 50%; transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 120ms ease; }
-.btn-turn:hover:not(:disabled) { transform: perspective(700px) rotateY(-10deg); }
-.btn-turn:active:not(:disabled) { transform: perspective(700px) rotateY(-16deg) translateY(1px); }
+.btn-turn:hover:not(:disabled) { transform: perspective(700px) rotateY(-10deg) translate(-1px, -1px); }
+.btn-turn:active:not(:disabled) { transform: perspective(700px) rotateY(-16deg) translate(2px, 2px); }
 
 /* The voice is speaking: the arcs ripple outward. */
 .speaking path { animation: speak 900ms ease-in-out infinite; }
@@ -495,7 +500,9 @@ html { scroll-behavior: smooth; }
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  border-radius: var(--radius);
+  border: 2px solid var(--ink);
+  border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px;
+  box-shadow: 2px 2px 0 var(--ink);
   background: var(--accent);
   color: var(--accent-ink);
   font-weight: 600;
@@ -504,7 +511,15 @@ html { scroll-behavior: smooth; }
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none;
-  transition: opacity 200ms ease, transform 200ms ease, background-color 120ms ease;
+  transition: opacity 200ms ease, transform 120ms ease, box-shadow 90ms ease, background-color 120ms ease;
 }
 .up-link.show { opacity: 1; transform: none; pointer-events: auto; }
-.up-link:hover { background: var(--accent-hover); }
+.up-link:hover { background: var(--accent-hover); transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+.up-link:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+
+/* The radio ring beside a condition, drawn rather than stamped. */
+.ink-radio {
+  border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%;
+  transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+.row:hover .ink-radio { transform: scale(1.1); }

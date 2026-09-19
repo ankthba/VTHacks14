@@ -466,8 +466,8 @@ export default function Home() {
                           className="row w-full text-left py-3 hover:opacity-75"
                         >
                           <span
-                            className="flex-none w-5 h-5 mt-1 rounded-full border-2"
-                            style={{ borderColor: c.id === conditionId ? "var(--accent)" : "var(--line)", background: c.id === conditionId ? "var(--accent)" : "transparent" }}
+                            className="ink-radio flex-none w-5 h-5 mt-1 border-2"
+                            style={{ borderColor: c.id === conditionId ? "var(--accent-text)" : "var(--ink)", background: c.id === conditionId ? "var(--accent)" : "transparent" }}
                           />
                           <span>
                             <span className="font-semibold block">
