@@ -617,29 +617,29 @@ html { scroll-behavior: smooth; }
  */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --background: #0f1f17;
-  --surface: #14271e;
-  --surface-warm: #1a3126;
+  --background: #06110c;
+  --surface: #0a1810;
+  --surface-warm: #0f2016;
   --foreground: #efe7d6;
   --foreground-deep: #efe7d6;
   --muted: #b9ad98;
-  --line: #33513f;
-  --line-soft: #27402f;
+  --line: #24392d;
+  --line-soft: #182a1f;
   --ink: #efe7d6;
   --accent: #e9dfc8;
   --accent-hover: #f6efdd;
-  --accent-ink: #14271e;
+  --accent-ink: #0a1810;
   --accent-text: #d9cdb0;
   --lime: #d9cdb0;
-  --on-dark: #0f1f17;
+  --on-dark: #06110c;
   --high: #f0a08f;
-  --high-bg: #3a1f1a;
+  --high-bg: #2a1512;
   --moderate: #e8c97a;
-  --moderate-bg: #3a3118;
+  --moderate-bg: #2a2410;
   --ok: #b9d8a1;
-  --ok-bg: #1e3524;
-  --wave-line: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%2333513f%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
-  --wave-soft: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%2327402f%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+  --ok-bg: #12261a;
+  --wave-line: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%2324392d%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+  --wave-soft: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23182a1f%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
   --wave-fg: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23efe7d6%27%20stroke-width%3D%272.2%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
   --wave-accent: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23e9dfc8%27%20stroke-width%3D%272.4%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
   --wave-accent-text: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23d9cdb0%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
@@ -649,7 +649,7 @@ html { scroll-behavior: smooth; }
 :root[data-theme="dark"] .ink-row { --ink: #efe7d6; }
 :root[data-theme="dark"] body::before { opacity: 0.05; filter: invert(1); }
 :root[data-theme="dark"] .field::placeholder, :root[data-theme="dark"] .field.note::placeholder { color: #7f8f80; }
-:root[data-theme="dark"] .menu-item.active, :root[data-theme="dark"] .menu-item:hover { background: #21382c; }
+:root[data-theme="dark"] .menu-item.active, :root[data-theme="dark"] .menu-item:hover { background: #142a1d; }
 .theme-toggle { display: inline-flex; align-items: center; }
 
 /* Paper is paper: printing always uses the light tokens. */
