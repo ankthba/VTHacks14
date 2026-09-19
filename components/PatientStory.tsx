@@ -173,9 +173,10 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
         <p className="meta-chip mt-3" aria-live="polite">{i + 1} of {slides.length}</p>
       </div>
 
-      <section key={i} className="rise flex-1 flex flex-col justify-center px-6 sm:px-12 py-8 max-w-5xl w-full mx-auto">
+      <section key={i} className="rise flex-1 flex flex-col justify-center px-6 sm:px-12 py-8 max-w-6xl w-full mx-auto">
+       <div className={slide.kind === "picture" && diagram ? "lg:grid lg:grid-cols-[minmax(0,460px)_minmax(0,1fr)] lg:gap-16 lg:items-center" : ""}>
         {slide.kind === "picture" && diagram && (
-          <div className="mx-auto w-full max-w-[440px] mb-8" onClick={(e) => e.stopPropagation()}>
+          <div className="mx-auto w-full max-w-[440px] mb-8 lg:mb-0" onClick={(e) => e.stopPropagation()}>
             <BodyLocator view={diagram} marks={marks} body={body} />
             <div className="flex flex-wrap gap-2 mt-3 no-print">
               {(["female", "male"] as BodyType[]).map((b) => (
@@ -191,6 +192,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
           </div>
         )}
 
+       <div>
         {slide.kind === "howto" && slide.art && (
           <div className="flex items-end gap-6 mb-6">
             <div className="w-40 sm:w-56 p-4">
@@ -244,6 +246,8 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
             ))}
           </div>
         )}
+       </div>
+       </div>
       </section>
 
       <footer

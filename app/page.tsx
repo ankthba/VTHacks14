@@ -9,7 +9,7 @@ import { Figure, type BodyType } from "@/components/BodyLocator";
 import { HOWTOS } from "@/lib/howto";
 import { DEMO_NOTES } from "@/lib/demoNotes";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
-import { IS_STATIC, loadDemoBundle } from "@/lib/staticMode";
+import { IS_STATIC, asset, loadDemoBundle } from "@/lib/staticMode";
 import type { Slide } from "@/lib/explain";
 
 interface MedRow {
@@ -295,7 +295,10 @@ export default function Home() {
     <div className={`flex-1 w-full turn ${flip}`}>
       <div className="max-w-6xl mx-auto px-5">
         <nav className="nav">
-          <a href={IS_STATIC ? "./" : "/"} className="wordmark">{APP_NAME}</a>
+          <a href={IS_STATIC ? "./" : "/"} className="wordmark flex items-center gap-2">
+            <img src={asset("/anatomy/spot.png")} alt="" width={18} height={17} draggable={false} />
+            {APP_NAME}
+          </a>
           <a href={IS_STATIC ? "./diagrams/" : "/diagrams"}>Anatomy library</a>
           {!IS_STATIC && <a href="/clinician">Prescriber check</a>}
           {!IS_STATIC && <a href="/pillpile">Medication checker</a>}
@@ -307,6 +310,12 @@ export default function Home() {
           <p className="text-lg text-[color:var(--muted)] mt-4 max-w-xl">
             Paste the note you already wrote. Check what the patient will hear. Turn the screen.
           </p>
+          {/* The masthead: the anatomy, in our own ink, before a word of UI. */}
+          <div className="ink-row mt-10" aria-hidden>
+            {(["head", "heart", "lung", "wrist", "abdomen", "spine", "knee", "shoulder"] as DiagramId[]).map((id) => (
+              <div key={id} className="h-full flex-none"><Diagram id={id} fit /></div>
+            ))}
+          </div>
         </header>
 
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_400px] items-start pb-16">
@@ -330,7 +339,7 @@ export default function Home() {
                 onChange={(e) => setNoteText(e.target.value)}
                 rows={7}
                 placeholder={"Discharge Diagnosis: Distal radius fracture, left\n\nDischarge Medications:\n1. Ibuprofen 600 mg PO TID with food x 7 days\n\nFollow-up:\n- Orthopedics in 2 weeks for repeat X-ray"}
-                className="field font-mono text-[14px] leading-relaxed"
+                className="field text-[15px] leading-relaxed"
               />
               <input ref={noteFileRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => ingestNote(e.target.files)} />
               <div className="flex flex-wrap items-center gap-4 mt-3">
@@ -545,7 +554,9 @@ export default function Home() {
                   <div className="h-full"><Figure region="body" body="male" spot={false} /></div>
                 </div>
               )}
-              <p className="display-sm" style={{ fontSize: "1.6rem" }}>{customHeadline || selected?.plain || "\u2026"}</p>
+              {(customHeadline || selected?.plain) && (
+                <p className="display-sm" style={{ fontSize: "1.6rem" }}>{customHeadline || selected?.plain}</p>
+              )}
 
               {meds.filter((m) => m.name.trim()).length > 0 && (
                 <div className="mt-5 pt-4 border-t border-[color:var(--line-soft)] space-y-2">

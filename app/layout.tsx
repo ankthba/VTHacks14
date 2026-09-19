@@ -35,8 +35,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         */}
         <div
           role="note"
-          className="w-full text-center px-4 py-2 text-sm font-medium"
-          style={{ background: "var(--foreground-deep)", color: "var(--on-dark)" }}
+          className="w-full text-center px-4 py-1.5 text-[12px] tracking-wide"
+          style={{ background: "var(--surface-warm)", color: "var(--muted)", borderBottom: "1px solid var(--line-soft)" }}
         >
           Educational demo. Not medical advice. Always confirm with your
           pharmacist or physician.

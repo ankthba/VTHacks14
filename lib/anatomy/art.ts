@@ -189,6 +189,20 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       wax: { x: 0.66, y: 0.61, s: 0.6 },                                     // near the opening
     },
   },
+  // The eye in section: cornea and lens at left, retina and optic nerve at right.
+  eye: {
+    src: asset("/anatomy/eye.png"),
+    w: 1015,
+    h: 991,
+    label: "The eye, in cross-section",
+    spots: {
+      cornea: { x: 0.07, y: 0.52, s: 0.7 },                                  // the clear window at the front
+      lens: { x: 0.2, y: 0.51, s: 0.7 },                                     // just behind the iris
+      retina: { x: 0.64, y: 0.47, s: 1.5 },                                  // the back wall with its vessels
+      conjunctiva: [{ x: 0.135, y: 0.31, s: 0.6 }, { x: 0.146, y: 0.725, s: 0.6 }], // the surface over the white
+      lid: { x: 0.12, y: 0.25, s: 0.7 },                                     // the lid edge
+    },
+  },
 };
 
 /** Every spot for a mark, whether the drawing has one view or two. */

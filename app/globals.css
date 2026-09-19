@@ -167,7 +167,9 @@ select.chip { appearance: none; padding-right: 18px; background-image: url("data
   background: none;
   border: 0;
   padding: 4px 0;
-  font-size: 15px;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: var(--muted);
   border-bottom: 2px solid transparent;
   cursor: pointer;
@@ -377,3 +379,17 @@ input.field {
   .turn.out, .turn.in, .rise { animation: none; }
   * { transition-duration: 0.01ms !important; }
 }
+
+/* The masthead row of drawings: one height, ink on paper, trimmed at the edge. */
+.ink-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 40px;
+  height: 104px;
+  overflow: hidden;
+  color: var(--foreground);
+  opacity: 0.85;
+  mask-image: linear-gradient(to right, black 82%, transparent);
+  -webkit-mask-image: linear-gradient(to right, black 82%, transparent);
+}
+@media (max-width: 640px) { .ink-row { height: 80px; gap: 26px; } }
