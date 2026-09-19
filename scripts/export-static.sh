@@ -21,6 +21,8 @@ done
 
 sh scripts/declutter.sh
 rm -rf out .next .next.nosync
-NEXT_PUBLIC_STATIC=1 NEXT_PUBLIC_BASE_PATH=/aperta npx next build
+# VOICE=browser (the default for now) reads every screen with the browser's
+# own voice. Build with VOICE=elevenlabs to ship the recorded clips again.
+NEXT_PUBLIC_VOICE="${VOICE:-browser}" NEXT_PUBLIC_STATIC=1 NEXT_PUBLIC_BASE_PATH=/aperta npx next build
 echo
 echo "static site in ./out  ($(find out -type f | wc -l | tr -d ' ') files)"

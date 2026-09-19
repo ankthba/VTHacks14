@@ -46,8 +46,21 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
   const slide = slides[Math.min(i, slides.length - 1)];
   const last = i >= slides.length - 1;
 
+  // Type is sized to the amount of text on the screen, so a long thought sets
+  // smaller and the whole screen, controls included, fits without scrolling.
+  const chars = slide.title.length + slide.lines.join(" ").length + (slide.steps ?? []).join(" ").length;
+  const shrink = chars <= 50 ? 1 : chars <= 100 ? 0.82 : chars <= 160 ? 0.66 : chars <= 240 ? 0.54 : chars <= 340 ? 0.46 : 0.4;
+  const size = (minRem: number, vw: number, maxRem: number) =>
+    `clamp(${minRem}rem, ${(vw * shrink).toFixed(2)}vw, ${(maxRem * shrink).toFixed(2)}rem)`;
+
+  // NEXT_PUBLIC_VOICE=browser: no recorded or generated audio at all, the
+  // browser's own voice reads every screen. Set in .env.local for the dev
+  // server and by scripts/export-static.sh for the published site.
+  const browserOnly = process.env.NEXT_PUBLIC_VOICE === "browser";
+
   const fetchAudio = useCallback(
     (n: number): Promise<string | null> => {
+      if (browserOnly) return Promise.resolve(null);
       if (n < 0 || n >= slides.length) return Promise.resolve(null);
       const hit = cache.current.get(n);
       if (hit) return hit;
@@ -76,7 +89,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
       cache.current.set(n, p);
       return p;
     },
-    [slides],
+    [slides, browserOnly],
   );
 
   const stopAll = useCallback(() => {
@@ -179,10 +192,10 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
         <p className="meta-chip mt-3" aria-live="polite">{i + 1} of {slides.length}</p>
       </div>
 
-      <section key={i} className="rise flex-1 flex flex-col justify-center px-6 sm:px-12 py-8 max-w-6xl w-full mx-auto">
+      <section key={i} className="rise flex-1 min-h-0 overflow-y-auto flex flex-col justify-center px-6 sm:px-12 py-6 max-w-6xl w-full mx-auto">
        <div className={slide.kind === "picture" && diagram ? "lg:grid lg:grid-cols-[minmax(0,460px)_minmax(0,1fr)] lg:gap-16 lg:items-center" : ""}>
         {slide.kind === "picture" && diagram && (
-          <div className="mx-auto w-full max-w-[440px] mb-8 lg:mb-0" onClick={(e) => e.stopPropagation()}>
+          <div className="mx-auto w-full max-w-[440px] mb-6 lg:mb-0" style={{ maxWidth: "min(440px, 58vh)" }} onClick={(e) => e.stopPropagation()}>
             <BodyLocator view={diagram} marks={marks} body={body} />
             <div className="flex flex-wrap gap-2 mt-3 no-print">
               {(["female", "male"] as BodyType[]).map((b) => (
@@ -217,9 +230,9 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
           className="display leading-[0.98]"
           style={{
             fontSize:
-              slide.kind === "picture" ? "clamp(2rem, 5.5vw, 4.5rem)"
-              : slide.kind === "howto" ? "clamp(1.8rem, 4.5vw, 3.4rem)"
-              : "clamp(2.6rem, 8vw, 6.5rem)",
+              slide.kind === "picture" ? size(1.6, 5.5, 4.5)
+              : slide.kind === "howto" ? size(1.5, 4.5, 3.4)
+              : size(1.8, 8, 6.5),
           }}
         >
           {slide.title}
@@ -228,7 +241,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
         {slide.steps && slide.steps.length > 0 && (
           <ol className="mt-6 space-y-3">
             {slide.steps.map((st, n) => (
-              <li key={n} className="flex gap-4 items-start" style={{ fontSize: "clamp(1.15rem, 2.4vw, 1.8rem)", lineHeight: 1.3 }}>
+              <li key={n} className="flex gap-4 items-start" style={{ fontSize: size(1.05, 2.4, 1.8), lineHeight: 1.3 }}>
                 <span className="flex-none w-8 display-sm italic" style={{ color: "var(--accent-text)" }}>
                   {n + 1}
                 </span>
@@ -244,7 +257,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
               <p
                 key={n}
                 className={slide.kind === "todo" ? "flex gap-4 items-start" : ""}
-                style={{ fontSize: slide.kind === "howto" ? "clamp(1.1rem, 2vw, 1.5rem)" : "clamp(1.4rem, 3.2vw, 2.4rem)", lineHeight: 1.3, color: slide.kind === "howto" ? "var(--muted)" : undefined }}
+                style={{ fontSize: slide.kind === "howto" ? size(1, 2, 1.5) : size(1.2, 3.2, 2.4), lineHeight: 1.3, color: slide.kind === "howto" ? "var(--muted)" : undefined }}
               >
                 {slide.kind === "todo" && <InkCheck className="flex-none mt-2 text-[color:var(--accent-text)]" size={30} draw delay={250 + n * 220} />}
                 <span className={n === 1 && slide.kind === "medicine" ? "font-semibold" : ""}>{l}</span>
