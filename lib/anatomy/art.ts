@@ -103,6 +103,46 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       "chest-wall": { x: 0.48, y: 0.5, s: 1.5 },                            // the chest in front of the heart
     },
   },
+  // The skull, three-quarter view, jaw open. Serves the head and the mouth.
+  head: {
+    src: asset("/anatomy/skull.png"),
+    w: 750,
+    h: 1040,
+    label: "The skull",
+    spots: {
+      brain: { x: 0.5, y: 0.2, s: 2.2 },                                     // the cranium
+      vessel: { x: 0.76, y: 0.28, s: 1 },                                    // the temple, where the middle cerebral artery runs
+      nerve: { x: 0.76, y: 0.52, s: 0.9 },                                   // in front of the ear, where the facial nerve emerges
+      throat: { x: 0.69, y: 0.74, s: 0.9 },                                  // behind the jaw
+      sinus: [{ x: 0.19, y: 0.5, s: 0.8 }, { x: 0.24, y: 0.32, s: 0.6 }],   // cheek and brow sinuses
+    },
+  },
+  mouth: {
+    src: asset("/anatomy/skull.png"),
+    w: 750,
+    h: 1040,
+    label: "The skull, jaw open",
+    spots: {
+      socket: [{ x: 0.45, y: 0.67, s: 0.6 }, { x: 0.52, y: 0.75, s: 0.6 }], // the back teeth, upper and lower
+      root: { x: 0.39, y: 0.65, s: 0.7 },                                    // a molar root
+      tooth: { x: 0.28, y: 0.69, s: 0.6 },                                   // a front tooth
+      gum: { x: 0.24, y: 0.82, s: 0.9 },                                     // along the lower teeth
+      tongue: { x: 0.22, y: 0.76, s: 0.8 },                                  // inside the open mouth
+      joint: { x: 0.71, y: 0.56, s: 0.7 },                                   // the jaw hinge
+    },
+  },
+  // The lungs from the front, windpipe above.
+  lung: {
+    src: asset("/anatomy/lung.png"),
+    w: 761,
+    h: 863,
+    label: "The lungs and airways",
+    spots: {
+      lobe: { x: 0.2, y: 0.79, s: 1.3 },                                     // the lower lobe
+      airway: [{ x: 0.3, y: 0.5, s: 1 }, { x: 0.7, y: 0.5, s: 1 }],         // the main airways into each lung
+      pleura: { x: 0.1, y: 0.65, s: 1.2 },                                   // the lining at the edge of the lung
+    },
+  },
 };
 
 /** Every spot for a mark, whether the drawing has one view or two. */
