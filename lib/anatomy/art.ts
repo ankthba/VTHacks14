@@ -175,6 +175,20 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       joints: [{ x: 0.092, y: 0.2, s: 0.6 }, { x: 0.686, y: 0.202, s: 0.6 }, { x: 0.184, y: 0.745, s: 0.6 }, { x: 0.755, y: 0.744, s: 0.6 }], // shoulders and knees
     },
   },
+  // The ear in section: outer ear at right, canal, eardrum, middle ear, cochlea at left.
+  ear: {
+    src: asset("/anatomy/ear.png"),
+    w: 969,
+    h: 945,
+    label: "The ear, in cross-section",
+    spots: {
+      "inner-ear": { x: 0.19, y: 0.59, s: 1 },                               // the cochlea
+      "middle-ear": { x: 0.45, y: 0.56, s: 0.8 },                            // the space behind the eardrum
+      eardrum: { x: 0.56, y: 0.57, s: 0.6 },                                 // the inner end of the canal
+      canal: { x: 0.62, y: 0.6, s: 0.8 },                                    // the ear canal
+      wax: { x: 0.66, y: 0.61, s: 0.6 },                                     // near the opening
+    },
+  },
 };
 
 /** Every spot for a mark, whether the drawing has one view or two. */

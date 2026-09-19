@@ -5,7 +5,7 @@ import { CONDITIONS, REGIONS } from "@/lib/anatomy/conditions";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 import { Diagram } from "@/components/Diagram";
 import { PatientStory } from "@/components/PatientStory";
-import type { BodyType } from "@/components/BodyLocator";
+import { Figure, type BodyType } from "@/components/BodyLocator";
 import { HOWTOS } from "@/lib/howto";
 import { DEMO_NOTES } from "@/lib/demoNotes";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
@@ -48,6 +48,18 @@ const COMMON_INSTRUCTIONS = [
  */
 export default function Home() {
   const [region, setRegion] = useState(REGIONS[0]);
+  /** The screen turning: the page swings out, the content swaps, it swings in. */
+  const [flip, setFlip] = useState<"" | "out" | "in">("");
+  function turnTo(patient: boolean) {
+    const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) { setPatientView(patient); return; }
+    setFlip("out");
+    window.setTimeout(() => {
+      setPatientView(patient);
+      setFlip("in");
+      window.setTimeout(() => setFlip(""), 400);
+    }, 330);
+  }
   const [query, setQuery] = useState("");
   const [conditionId, setConditionId] = useState<string | null>(null);
   const [choosing, setChoosing] = useState(false);
@@ -250,7 +262,7 @@ export default function Home() {
         setWarnings((w) => [...w, `${dropped.length} line(s) could not be read as medicines and were left out - see "Not used".`]);
         return;
       }
-      if (showPatient && built) setPatientView(true);
+      if (showPatient && built) turnTo(true);
     } catch (e) {
       setWarnings([e instanceof Error ? e.message : String(e)]);
     } finally {
@@ -261,15 +273,17 @@ export default function Home() {
   // ---- The turned screen ----
   if (patientView && card) {
     return (
-      <PatientStory
-        slides={card.slides}
-        diagram={card.diagram}
-        marks={card.marks}
-        langTag={card.langTag}
-        rtl={card.rtl}
-        body={bodyType}
-        onBack={() => setPatientView(false)}
-      />
+      <div className={`flex-1 flex flex-col turn ${flip}`}>
+        <PatientStory
+          slides={card.slides}
+          diagram={card.diagram}
+          marks={card.marks}
+          langTag={card.langTag}
+          rtl={card.rtl}
+          body={bodyType}
+          onBack={() => turnTo(false)}
+        />
+      </div>
     );
   }
 
@@ -278,7 +292,7 @@ export default function Home() {
   const canTurn = hasContent && !busy;
 
   return (
-    <div className="flex-1 w-full">
+    <div className={`flex-1 w-full turn ${flip}`}>
       <div className="max-w-6xl mx-auto px-5">
         <nav className="nav">
           <a href={IS_STATIC ? "./" : "/"} className="wordmark">{APP_NAME}</a>
@@ -526,7 +540,10 @@ export default function Home() {
               {selected ? (
                 <div className="mx-auto max-w-[220px] mb-5"><Diagram id={selected.diagram} marks={selected.marks} /></div>
               ) : (
-                <div className="h-28 mb-5 flex items-center justify-center text-[14px] text-[color:var(--muted)]">The picture appears here.</div>
+                <div className="mx-auto h-44 mb-5 flex items-end justify-center gap-6" aria-hidden style={{ opacity: 0.3 }}>
+                  <div className="h-full"><Figure region="body" body="female" spot={false} /></div>
+                  <div className="h-full"><Figure region="body" body="male" spot={false} /></div>
+                </div>
               )}
               <p className="display-sm" style={{ fontSize: "1.6rem" }}>{customHeadline || selected?.plain || "\u2026"}</p>
 
@@ -552,10 +569,17 @@ export default function Home() {
           </aside>
         </div>
 
-        <footer className="py-8 border-t border-[color:var(--line-soft)] text-[13px] text-[color:var(--muted)] flex flex-wrap gap-x-6 gap-y-2">
-          <span>{APP_NAME}</span>
-          <span>VTHacks 14</span>
-          <span>Educational demo. Not medical advice.</span>
+        <footer className="py-8 border-t border-[color:var(--line-soft)] text-[13px] text-[color:var(--muted)] space-y-2">
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <span>{APP_NAME}</span>
+            <span>VTHacks 14</span>
+            <span>Educational demo. Not medical advice.</span>
+          </div>
+          <p>
+            Accessible by design: every colour pairing clears WCAG AA, the whole flow works from the keyboard,
+            every picture is described for a screen reader, motion honours your reduced-motion setting,
+            Arabic reads right to left, every screen is read aloud, and the story prints on one sheet.
+          </p>
         </footer>
       </div>
     </div>

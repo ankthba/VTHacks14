@@ -63,7 +63,7 @@ function spotFor(region: DiagramId, body: BodyType): Spot {
 }
 
 /** The figure with the spot over the place. Sized by its container's height. */
-export function Figure({ region, body }: { region: DiagramId; body: BodyType }) {
+export function Figure({ region, body, spot = true }: { region: DiagramId; body: BodyType; spot?: boolean }) {
   const art = ART[body];
   const p = spotFor(region, body);
   // The default spot is a hand's width: about a third of the figure's width.
@@ -71,14 +71,16 @@ export function Figure({ region, body }: { region: DiagramId; body: BodyType }) 
   return (
     <div className="relative h-full" style={{ aspectRatio: `${art.w} / ${art.h}` }}>
       <img src={art.src} alt={body === "female" ? "A woman's body" : "A man's body"} className="block h-full w-full" draggable={false} />
-      <img
-        src={SPOT_SRC}
-        alt=""
-        aria-hidden
-        draggable={false}
-        className="spot absolute"
-        style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%`, width: `${size}%`, transform: "translate(-50%, -50%)" }}
-      />
+      {spot && (
+        <img
+          src={SPOT_SRC}
+          alt=""
+          aria-hidden
+          draggable={false}
+          className="spot absolute"
+          style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%`, width: `${size}%`, transform: "translate(-50%, -50%)" }}
+        />
+      )}
     </div>
   );
 }
@@ -117,7 +119,7 @@ export function BodyLocator({
       aria-label={zoomed ? "Show the whole body" : "Zoom in"}
     >
       <div
-        className="absolute inset-0 flex items-center justify-center p-4 transition-all duration-700 ease-out"
+        className="absolute inset-0 flex items-center justify-center p-4 transition-all duration-700 ease-out motion-reduce:transition-none"
         style={{
           transformOrigin: origin,
           transform: zoomed ? "scale(3.2)" : "scale(1)",
@@ -129,7 +131,7 @@ export function BodyLocator({
         </div>
       </div>
       <div
-        className="absolute inset-0 flex items-center justify-center p-6 transition-all duration-700 ease-out"
+        className="absolute inset-0 flex items-center justify-center p-6 transition-all duration-700 ease-out motion-reduce:transition-none"
         style={{ transform: zoomed ? "scale(1)" : "scale(0.6)", opacity: zoomed ? 1 : 0 }}
       >
         <div className="h-full w-full flex items-center justify-center">

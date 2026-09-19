@@ -156,19 +156,24 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
       onClick={() => setPlaying((p) => !p)}
     >
       {/* Progress: one segment per slide. Also the only navigation on screen. */}
-      <div className="no-print flex gap-1.5 px-6 pt-5" onClick={(e) => e.stopPropagation()}>
-        {slides.map((s, n) => (
-          <button
-            key={n}
-            aria-label={`Go to ${s.title}`}
-            onClick={() => { setI(n); setPlaying(true); }}
-            className="h-1.5 flex-1 rounded-full transition-colors"
-            style={{ background: n <= i ? "var(--accent)" : "var(--line)" }}
-          />
-        ))}
+      <div className="no-print px-6 pt-5" onClick={(e) => e.stopPropagation()}>
+        <div className="flex gap-1.5" role="tablist" aria-label="Screens">
+          {slides.map((s, n) => (
+            <button
+              key={n}
+              role="tab"
+              aria-selected={n === i}
+              aria-label={`Go to ${s.title}`}
+              onClick={() => { setI(n); setPlaying(true); }}
+              className="h-1.5 flex-1 transition-colors"
+              style={{ background: n <= i ? "var(--accent)" : "var(--line)" }}
+            />
+          ))}
+        </div>
+        <p className="meta-chip mt-3" aria-live="polite">{i + 1} of {slides.length}</p>
       </div>
 
-      <section className="flex-1 flex flex-col justify-center px-6 sm:px-12 py-8 max-w-5xl w-full mx-auto">
+      <section key={i} className="rise flex-1 flex flex-col justify-center px-6 sm:px-12 py-8 max-w-5xl w-full mx-auto">
         {slide.kind === "picture" && diagram && (
           <div className="mx-auto w-full max-w-[440px] mb-8" onClick={(e) => e.stopPropagation()}>
             <BodyLocator view={diagram} marks={marks} body={body} />

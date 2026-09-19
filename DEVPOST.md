@@ -133,6 +133,31 @@ prior-auth draft) at `/clinician`.
 
 ---
 
+## Design
+
+The whole thing is built for one moment: a laptop turned toward a patient who
+is frightened, may not read well, and may not speak English. Every decision
+follows from that.
+
+- **One idea per screen, paced by the voice.** A screen holds one sentence in
+  words a twelve-year-old knows, big enough to read from a chair. The next one
+  arrives when the reading finishes. The doctor never scrolls.
+- **"Where on me" before "what is it."** The picture opens on a whole body,
+  hers or his, with a red spot on the place, and only then zooms into the part.
+  The drawings are ours, in ink, so nothing looks like a specimen.
+- **A document, not an app.** Warm paper, Lora and Figtree, hairlines instead
+  of boxes, no shadows, no pills. Buttons are square blocks of one colour.
+  Nothing on the page competes with the sentence.
+- **The screen turns.** The clinician's page swings away and the patient's page
+  swings in, because that is what is physically happening in the room.
+- **Accessible as a baseline.** Every colour pairing clears WCAG AA, the flow
+  works from the keyboard, every picture carries a description, motion honours
+  reduced-motion, Arabic renders right to left, every screen is read aloud in
+  the patient's language, and the story prints on one sheet for the fridge.
+- **Refusal is a feature of the interface.** A line the parser could not use is
+  shown to the clinician under *Not used* rather than guessed at. A drug name
+  is never translated, because the patient has to match it to the bottle.
+
 # Impiricus track: five-minute pitch
 
 **Brief:** *Build the next HCP engagement tool.*
