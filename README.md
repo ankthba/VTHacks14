@@ -248,6 +248,19 @@ runs with the network unplugged. Conference wifi fails every year.
 
 ---
 
+## iOS app
+
+`ios/` holds a native SwiftUI client. It is a **thin client**: every check runs
+server-side and comes back as JSON, so there is exactly one implementation of
+the acetaminophen arithmetic and the phone can never disagree with the web app
+about a finding.
+
+What it adds over the browser: the real camera, and **offline read-aloud** via
+`AVSpeechSynthesizer` — no API key, no network, so the accessibility feature
+cannot be taken out by conference wifi. See [ios/README.md](ios/README.md).
+
+---
+
 ## Stack
 
 Next.js 16 (App Router) · TypeScript · Tailwind v4 · `zod` on every model

@@ -48,3 +48,8 @@ next-env.d.ts
 # macOS/iCloud conflict copies
 *[[:space:]]2.json
 *[[:space:]]2.ts
+
+# iOS build output
+ios/build/
+ios/*.xcodeproj/xcuserdata/
+ios/*.xcworkspace/xcuserdata/
