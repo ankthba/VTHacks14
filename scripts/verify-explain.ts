@@ -1,4 +1,5 @@
 import { loadEnvLocal } from "./loadenv";
+import "../lib/cache.node";
 
 loadEnvLocal();
 

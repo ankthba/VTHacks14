@@ -10,9 +10,10 @@ in their language, read aloud, one idea per screen, printed for the fridge.
 Built at VTHacks 14, September 2026, for the Impiricus track: *build the next
 HCP engagement tool.*
 
-**Live demo:** https://aniketh.net/aperta/ shows the two example notes, in English
-and Spanish, with their audio. (Static site; live parsing of any note runs in
-the full app below.)
+**Live demo:** https://aniketh.net/aperta/ reads any note you paste. The
+parser, the card builder and the prescriber check are deterministic code that
+run in the page itself against RxNorm, the FDA label and the translator, so the
+static site needs no server. Photographing a page needs the full app.
 
 ---
 

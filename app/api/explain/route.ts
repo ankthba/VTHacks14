@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import "@/lib/cache.node";
 import { z } from "zod";
 import { buildExplainCard } from "@/lib/explain";
 

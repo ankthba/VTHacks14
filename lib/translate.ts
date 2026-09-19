@@ -1,7 +1,5 @@
-import { createHash } from "crypto";
-import { promises as fs } from "fs";
-import path from "path";
 import { activeProvider, generateJson } from "./llm";
+import { cacheGet, cacheSet } from "./cache";
 import { z } from "zod";
 
 /**
@@ -32,27 +30,14 @@ export const LANGUAGES: Record<string, { mymemory: string; tag: string; native: 
   Arabic: { mymemory: "ar", tag: "ar-SA", native: "العربية" },
 };
 
-const CACHE_DIR = path.join(process.cwd(), ".cache", "translate");
-
-function key(lang: string, text: string) {
-  return createHash("sha256").update(`${lang}|${text}`).digest("hex").slice(0, 32);
-}
+const key = (lang: string, text: string) => `translate|${lang}|${text}`;
 
 async function readCache(k: string): Promise<string | null> {
-  try {
-    return await fs.readFile(path.join(CACHE_DIR, `${k}.txt`), "utf8");
-  } catch {
-    return null;
-  }
+  return cacheGet<string>(k);
 }
 
 async function writeCache(k: string, value: string) {
-  try {
-    await fs.mkdir(CACHE_DIR, { recursive: true });
-    await fs.writeFile(path.join(CACHE_DIR, `${k}.txt`), value, "utf8");
-  } catch {
-    // Read-only filesystem: fine.
-  }
+  await cacheSet(k, value);
 }
 
 async function mymemory(text: string, to: string): Promise<string | null> {

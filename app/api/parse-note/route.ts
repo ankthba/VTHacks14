@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import "@/lib/cache.node";
 import { parseNote } from "@/lib/parseNote";
 import { activeProvider, type ImagePart } from "@/lib/llm";
 import { byId } from "@/lib/anatomy/conditions";

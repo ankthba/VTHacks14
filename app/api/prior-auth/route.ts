@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import "@/lib/cache.node";
 import { z } from "zod";
 import { normalizeAll, normalizeOne } from "@/lib/normalize";
 import { deterministicFindings, sortFindings } from "@/lib/analyze";

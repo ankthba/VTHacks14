@@ -5,6 +5,7 @@ import { FindingCard } from "@/components/FindingCard";
 import { PriorAuth } from "@/components/PriorAuth";
 import { Menu } from "@/components/Menu";
 import { IS_STATIC } from "@/lib/staticMode";
+import { checkPrescription } from "@/lib/prescribeCheck";
 import type { Finding } from "@/lib/types";
 
 interface Brief {
@@ -62,14 +63,19 @@ export function PrescriberCheck({ meds }: { meds: CheckMed[] }) {
     if (!candidate) return;
     setBusy(true); setError(null); setRes(null);
     try {
-      const r = await fetch("/api/prescribe", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ candidate: candidate.name, candidateStrength: candidate.strength ?? null, current: current.map(bottle) }),
-      });
-      const json = await r.json();
-      if (!r.ok) throw new Error(json.detail ?? json.error ?? "The check failed.");
-      setRes(json);
+      if (IS_STATIC) {
+        // No server on the published site: the check runs in the page.
+        setRes((await checkPrescription({ candidate: candidate.name, candidateStrength: candidate.strength ?? null, current: current.map(bottle) })) as Result);
+      } else {
+        const r = await fetch("/api/prescribe", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ candidate: candidate.name, candidateStrength: candidate.strength ?? null, current: current.map(bottle) }),
+        });
+        const json = await r.json();
+        if (!r.ok) throw new Error(json.detail ?? json.error ?? "The check failed.");
+        setRes(json);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -84,9 +90,7 @@ export function PrescriberCheck({ meds }: { meds: CheckMed[] }) {
         Check one medicine against the rest of the list: duplicates, labelled interactions, the boxed warning, who it is not for, and whether a generic exists. Lifted from the FDA label, never summarised by a model.
       </p>
 
-      {IS_STATIC ? (
-        <p className="text-[14px] text-[color:var(--muted)] mt-3">The check runs in the full app against RxNorm and the FDA label; this published demo is a static site.</p>
-      ) : (
+      {(
         <>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3 mt-4">
             <Menu label={label} items={items} onPick={(id) => { setPick(id); setRes(null); }} />
@@ -176,7 +180,7 @@ export function PrescriberCheck({ meds }: { meds: CheckMed[] }) {
                 </section>
               )}
 
-              <PriorAuth candidate={candidate?.name ?? ""} candidateStrength={candidate?.strength ?? ""} current={current.map(bottle)} />
+              {!IS_STATIC && <PriorAuth candidate={candidate?.name ?? ""} candidateStrength={candidate?.strength ?? ""} current={current.map(bottle)} />}
 
               {res.brief.labelUrl && (
                 <a href={res.brief.labelUrl} target="_blank" rel="noopener noreferrer" className="link-action">Full FDA label on DailyMed</a>

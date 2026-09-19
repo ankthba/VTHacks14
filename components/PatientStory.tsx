@@ -192,7 +192,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
         <p className="meta-chip mt-3" aria-live="polite">{i + 1} of {slides.length}</p>
       </div>
 
-      <section key={i} className="rise flex-1 min-h-0 overflow-y-auto flex flex-col justify-center px-6 sm:px-12 py-6 max-w-6xl w-full mx-auto">
+      <section key={i} className="no-print rise flex-1 min-h-0 overflow-y-auto flex flex-col justify-center px-6 sm:px-12 py-6 max-w-6xl w-full mx-auto">
        <div className={slide.kind === "picture" && diagram ? "lg:grid lg:grid-cols-[minmax(0,460px)_minmax(0,1fr)] lg:gap-16 lg:items-center" : ""}>
         {slide.kind === "picture" && diagram && (
           <div className="mx-auto w-full max-w-[440px] mb-6 lg:mb-0" style={{ maxWidth: "min(440px, 58vh)" }} onClick={(e) => e.stopPropagation()}>
@@ -297,17 +297,64 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
         </button>
       </footer>
 
-      {/* Paper gets everything on one sheet. */}
-      <div className="hidden print:block px-6">
-        <p className="text-sm text-[color:var(--muted)] mb-4">Aperta. Printed for you to keep. Educational demo. Not medical advice.</p>
-        {diagram && <div className="max-w-xs"><Diagram id={diagram} marks={marks} /></div>}
-        {slides.map((s, n) => (
-          <div key={n} className="finding-card py-3 border-b">
-            <p className="text-xl font-bold">{s.title}</p>
-            {s.lines.map((l, k) => <p key={k} className="text-lg">{l}</p>)}
-            {s.steps?.map((st, k) => <p key={k} className="text-lg">{k + 1}. {st}</p>)}
-          </div>
-        ))}
+      {/* Paper: one sheet to take home, laid out as a handout, not a transcript. */}
+      <div className="hidden print:block print-sheet">
+        <header>
+          <span className="print-wordmark">Aperta</span>
+          <span>{new Date().toLocaleDateString(langTag, { year: "numeric", month: "long", day: "numeric" })}</span>
+        </header>
+        {(() => {
+          const picture = slides.find((x) => x.kind === "picture");
+          const meds = slides.filter((x) => x.kind === "medicine");
+          const todo = slides.find((x) => x.kind === "todo");
+          const howtos = slides.filter((x) => x.kind === "howto");
+          return (
+            <>
+              {picture && (
+                <section className="print-hero">
+                  {diagram && <div className="print-pic"><Diagram id={diagram} marks={marks} /></div>}
+                  <div>
+                    <p className="print-kicker">{picture.kicker ?? "What happened"}</p>
+                    <h1 className="display">{picture.title}</h1>
+                    {picture.lines.map((l, k) => <p key={k} className="print-lede">{l}</p>)}
+                  </div>
+                </section>
+              )}
+              {meds.length > 0 && (
+                <section>
+                  <p className="print-kicker">{meds[0].kicker ?? "Your medicines"}</p>
+                  {meds.map((m, n) => (
+                    <div key={n} className="print-row">
+                      <p className="print-med">{m.title}</p>
+                      {m.lines.map((l, k) => <p key={k} className={k === 1 ? "print-strong" : ""}>{l}</p>)}
+                    </div>
+                  ))}
+                </section>
+              )}
+              {todo && todo.lines.length > 0 && (
+                <section>
+                  <p className="print-kicker">{todo.kicker ?? "What to do"}</p>
+                  <ul className="print-list">
+                    {todo.lines.map((l, k) => <li key={k}><span className="print-box" aria-hidden />{l}</li>)}
+                  </ul>
+                </section>
+              )}
+              {howtos.map((h, n) => (
+                <section key={n}>
+                  <p className="print-kicker">{h.kicker ?? "How to do it"}</p>
+                  <h2 className="display-sm print-h2">{h.title}</h2>
+                  {h.steps && h.steps.length > 0 && (
+                    <ol className="print-steps">
+                      {h.steps.map((st, k) => <li key={k}><span className="print-n">{k + 1}</span>{st}</li>)}
+                    </ol>
+                  )}
+                  {h.lines.map((l, k) => <p key={k} className="print-lede">{l}</p>)}
+                </section>
+              ))}
+            </>
+          );
+        })()}
+        <footer>Educational demo. Not medical advice. Always confirm with your pharmacist or physician.</footer>
       </div>
     </main>
   );

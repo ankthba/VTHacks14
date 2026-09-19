@@ -688,3 +688,37 @@ html { scroll-behavior: smooth; }
 @keyframes moon-rock { 0%, 100% { transform: rotate(-9deg); } 50% { transform: rotate(9deg); } }
 @keyframes twinkle { from { opacity: 0.3; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .theme-toggle:hover .sun .rays, .theme-toggle:hover .moon, .theme-toggle:hover .moon .star, .theme-toggle:hover .moon .star2 { animation: none; } }
+
+/*
+ * The handout. Printers drop backgrounds, so every rule here is a real border
+ * and every colour is ink on white.
+ */
+@media print {
+  @page { margin: 14mm 16mm; }
+  .print-sheet { display: block !important; color: #111; font-size: 12pt; line-height: 1.45; }
+  .print-sheet header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid #888; padding-bottom: 6pt; margin-bottom: 14pt; font-size: 10pt; color: #444;
+  }
+  .print-wordmark { font-family: var(--font-display), Georgia, serif; font-weight: 600; font-size: 16pt; color: #111; }
+  .print-hero { display: grid; grid-template-columns: 50mm 1fr; gap: 10mm; align-items: center; }
+  .print-pic { width: 50mm; }
+  .print-hero h1 { font-size: 24pt; line-height: 1.15; color: #111; }
+  .print-lede { font-size: 13pt; margin-top: 6pt; }
+  .print-kicker { font-size: 9pt; letter-spacing: 0.08em; text-transform: uppercase; color: #555; margin-bottom: 5pt; }
+  .print-sheet section { break-inside: avoid; margin-top: 14pt; padding-top: 10pt; border-top: 1px solid #bbb; }
+  .print-sheet section.print-hero { border-top: 0; padding-top: 0; margin-top: 0; }
+  .print-row { padding: 6pt 0; border-bottom: 1px dotted #bbb; }
+  .print-row:last-child { border-bottom: 0; }
+  .print-med { font-weight: 700; font-size: 13pt; }
+  .print-strong { font-weight: 600; }
+  .print-list { list-style: none; padding: 0; margin: 0; }
+  .print-list li { display: flex; align-items: flex-start; gap: 7pt; padding: 4pt 0; font-size: 13pt; }
+  .print-box { flex: none; display: inline-block; width: 12pt; height: 12pt; border: 1.3pt solid #222; border-radius: 2pt; margin-top: 3pt; }
+  .print-h2 { font-size: 15pt; margin-bottom: 4pt; }
+  .print-steps { list-style: none; padding: 0; margin: 0; }
+  .print-steps li { display: flex; gap: 8pt; padding: 3pt 0; }
+  .print-n { flex: none; width: 14pt; font-family: var(--font-display), Georgia, serif; font-style: italic; color: #333; }
+  .print-sheet footer { margin-top: 18pt; padding-top: 6pt; border-top: 1px solid #888; font-size: 9pt; color: #555; }
+  .spot { animation: none !important; }
+}

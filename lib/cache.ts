@@ -1,46 +1,40 @@
-import { createHash } from "crypto";
-import { promises as fs } from "fs";
-import path from "path";
-
-const CACHE_DIR = path.join(process.cwd(), ".cache");
-
 /**
- * Demo-day resilience: every external GET is cached to disk and the cache is
- * committed to the repo. With PILLPILE_OFFLINE=1 a cache miss throws instead of
- * hitting the network, which is how we prove the demo set is fully pre-cached.
+ * Every external GET goes through here, with a cache in front of it.
+ *
+ * The cache is a pluggable store. In the browser (the published site parses
+ * and builds in the page itself) it is a Map for the life of the tab. On the
+ * server, lib/cache.node.ts installs a disk store under .cache that is
+ * committed to the repo, so the demo set works with the wifi down. With
+ * PILLPILE_OFFLINE=1 a miss throws instead of hitting the network, which is
+ * how we prove the demo set is fully pre-cached.
  */
+export interface CacheStore {
+  get(key: string): Promise<unknown | null>;
+  set(key: string, value: unknown): Promise<void>;
+}
+
+const memory = new Map<string, unknown>();
+let store: CacheStore = {
+  async get(key) { return memory.has(key) ? (memory.get(key) as unknown) : null; },
+  async set(key, value) { memory.set(key, value); },
+};
+
+export function setCacheStore(s: CacheStore) { store = s; }
+
 export const OFFLINE = process.env.PILLPILE_OFFLINE === "1";
 
-function keyFor(url: string) {
-  return createHash("sha256").update(url).digest("hex").slice(0, 32);
+/** Read any cached value by key. */
+export async function cacheGet<T = unknown>(key: string): Promise<T | null> {
+  return (await store.get(key)) as T | null;
+}
+/** Remember any value by key. */
+export async function cacheSet(key: string, value: unknown): Promise<void> {
+  await store.set(key, value);
 }
 
-async function readCache(key: string): Promise<unknown | null> {
-  try {
-    const raw = await fs.readFile(path.join(CACHE_DIR, `${key}.json`), "utf8");
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
-
-async function writeCache(key: string, value: unknown) {
-  try {
-    await fs.mkdir(CACHE_DIR, { recursive: true });
-    await fs.writeFile(
-      path.join(CACHE_DIR, `${key}.json`),
-      JSON.stringify(value),
-      "utf8",
-    );
-  } catch {
-    // A read-only filesystem (Vercel) is fine - we just lose the write.
-  }
-}
-
-/** GET JSON with a persistent disk cache. Returns null on any failure. */
+/** GET JSON with a cache in front. Returns null on any failure. */
 export async function cachedGet<T = unknown>(url: string): Promise<T | null> {
-  const key = keyFor(url);
-  const hit = await readCache(key);
+  const hit = await store.get(url);
   if (hit !== null) return hit as T;
 
   if (OFFLINE) {
@@ -54,12 +48,12 @@ export async function cachedGet<T = unknown>(url: string): Promise<T | null> {
     });
     // openFDA returns 404 for "no matching label", which is a real answer.
     if (res.status === 404) {
-      await writeCache(key, { __notFound: true });
+      await store.set(url, { __notFound: true });
       return null;
     }
     if (!res.ok) return null;
     const json = (await res.json()) as T;
-    await writeCache(key, json);
+    await store.set(url, json);
     return json;
   } catch {
     return null;

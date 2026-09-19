@@ -14,6 +14,10 @@ import { HOWTOS } from "@/lib/howto";
 import { DEMO_NOTES } from "@/lib/demoNotes";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 import { IS_STATIC, asset, loadDemoBundle } from "@/lib/staticMode";
+import { parseDeterministic } from "@/lib/parseNote";
+import { chooseCondition } from "@/lib/anatomy/conditions";
+import { detectHowTos } from "@/lib/howto";
+import { buildExplainCard } from "@/lib/explain";
 import type { Slide } from "@/lib/explain";
 
 interface MedRow {
@@ -171,12 +175,20 @@ export default function Home() {
       if (IS_STATIC) {
         const bundle = await loadDemoBundle();
         const hit = bundle.notes.find((n) => n.note.trim() === noteText.trim());
-        if (!hit) {
-          throw new Error(
-            "This published demo can only read the two example notes. Live parsing of any note runs in the full app - see the GitHub link below.",
-          );
+        if (hit) {
+          json = hit.parse as unknown as typeof json;
+        } else {
+          // The published site has no server, and needs none: the parser is
+          // deterministic code, so it runs right here in the page.
+          const det = parseDeterministic(noteText);
+          const primary = chooseCondition(det.diagnoses);
+          json = {
+            ...det,
+            conditionId: primary?.condition.id ?? null,
+            howtoIds: detectHowTos([...det.instructions, ...det.followUp, noteText]),
+            method: "deterministic",
+          };
         }
-        json = hit.parse as unknown as typeof json;
       } else {
         const fd = new FormData();
         fd.append("text", noteText);
@@ -256,8 +268,27 @@ export default function Home() {
         const bundle = await loadDemoBundle();
         const hit = bundle.notes.find((n) => n.note.trim() === noteText.trim());
         const prebuilt = hit?.cards[language] as Card | undefined;
-        if (!prebuilt) throw new Error("This published demo shows the two example notes in English and Spanish.");
-        json = { card: prebuilt, warnings: [] };
+        if (prebuilt) {
+          json = { card: prebuilt, warnings: [] };
+        } else {
+          // Built in the page: RxNorm, the FDA label and the translator are
+          // public services the browser can ask directly.
+          const { card, translation } = await buildExplainCard({
+            conditionId: cur.conditionId,
+            customHeadline: cur.customHeadline || null,
+            meds: cur.meds
+              .filter((m) => m.name.trim())
+              .map((m) => ({ drug_text: m.name, strength: m.strength ?? null, sig: m.sig || null, quantity: null, prescriber: null, fill_date: null, confidence: 1 })),
+            medOverrides: Object.fromEntries(cur.meds.filter((m) => m.name.trim()).map((m, i) => [i, { purpose: m.purpose ?? null, howToTake: m.howToTake ?? null }])),
+            instructions: cur.instructions,
+            howtoIds: cur.howtoIds,
+            language,
+          });
+          json = {
+            card: card as unknown as Card,
+            warnings: translation.untranslated > 0 ? ["Some lines could not be translated and are shown in English."] : [],
+          };
+        }
       } else {
         const r = await fetch("/api/explain", {
           method: "POST",

@@ -248,18 +248,17 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       hamstring: { x: 0.21, y: 0.92, s: 0.8 },                               // the back of the thigh
     },
   },
-  // Both kidneys from the front with their vessels. The bladder is not drawn;
-  // its spot sits below, where it would be.
+  // The urinary system from the front: kidneys, the two tubes, the bladder.
   kidney: {
     src: asset("/anatomy/kidney.png"),
     w: 1065,
-    h: 1062,
-    label: "The kidneys",
+    h: 1412,
+    label: "The kidneys, the tubes and the bladder",
     spots: {
-      kidney: { x: 0.18, y: 0.38, s: 1 },                                    // the left-hand kidney
-      ureter: { x: 0.33, y: 0.58, s: 0.6 },                                  // where the tube leaves the kidney
-      bladder: { x: 0.5, y: 0.86, s: 1 },                                    // below, between the hips
-      prostate: { x: 0.5, y: 0.95, s: 0.6 },                                 // just under the bladder
+      kidney: { x: 0.2, y: 0.24, s: 1 },                                     // the left-hand kidney
+      ureter: { x: 0.37, y: 0.55, s: 0.6 },                                  // the tube down to the bladder
+      bladder: { x: 0.49, y: 0.85, s: 1 },                                   // the bladder
+      prostate: { x: 0.49, y: 0.96, s: 0.5 },                                // just below it, at the outlet
     },
   },
   // The foot and ankle, bones, seen from above and slightly to the side.
