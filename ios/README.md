@@ -1,5 +1,11 @@
 # PillPile for iOS
 
+> **Status:** this app is the original *PillPile* medication checker (the
+> `/pillpile` surface of the web app). It has not been ported to the Bedside
+> explain tool, which is web-first because the clinician turns a laptop or
+> tablet toward the patient. It still builds, runs, and passes its UI tests
+> against the same server.
+
 A native SwiftUI client for the PillPile server.
 
 ## Why a native app at all

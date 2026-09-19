@@ -127,6 +127,19 @@ export default function ExplainPage() {
   }
 
   async function build(showPatient: boolean) {
+    // Browsers only allow audio that starts inside a user gesture. The click on
+    // "Turn the screen around" is that gesture, but the first clip arrives
+    // after a fetch - so unlock playback now with a silent clip, while the
+    // gesture is still live.
+    if (showPatient && typeof window !== "undefined") {
+      try {
+        const a = new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQxAADB8AhSmxhIIEVCSiJrDCQBTcu3UrAIwUdkRgQbFAZC1CQEwTJ9mjRvBA4UOLD8nKVOWfh+UlK3z/177OXrfOdKl7pyn3Xf//WreyTRUoAWgBgkOAGbZHBgG1OF6zM82DWbZaUmMBptgQhGjsyYqc9ae9XPAcyjiJvlN18v7wWm6jyMqxXWIzcxxCmqk7qFTlxQGA9wFO7WkpIi16kJmS0yLdG/qU8KY/8ZIgOgRQUNCYgvZtEyGqoJ9cJGhZlfDhMTFf");
+        a.volume = 0;
+        void a.play().catch(() => {});
+      } catch {
+        // Nothing to unlock; the Play button still works.
+      }
+    }
     setBusy(true);
     try {
       const r = await fetch("/api/explain", {

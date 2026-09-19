@@ -17,7 +17,9 @@
     "prebuild": "sh scripts/declutter.sh",
     "pretypecheck": "sh scripts/declutter.sh",
     "typecheck": "tsc --noEmit",
-    "precache:tts": "tsx scripts/precache-tts.ts"
+    "precache:tts": "tsx scripts/precache-tts.ts",
+    "verify:explain": "tsx scripts/verify-explain.ts",
+    "verify": "npm run typecheck && npm run verify:explain && npm run eval && npm run eval:otc"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
