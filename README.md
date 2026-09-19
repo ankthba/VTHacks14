@@ -45,6 +45,30 @@ PillPile computes that number and shows the arithmetic.
 
 ---
 
+## "Can I take this?"
+
+The app was one-shot: scan, read, close. But the question people actually have
+arrives later, standing in an aisle at 11pm holding a box of cold medicine.
+
+So the results page carries a check: type or tap a product and it runs the same
+deterministic checks against the medicines already on your table, *before* you
+buy it.
+
+**The interesting part is that it refuses to guess.** An OTC brand name is not a
+product. Measured: "NyQuil" covers at least four marketed formulations, and
+three contain acetaminophen while NyQuil Kids Allergy does not. Worse, RxNorm's
+fuzzy matcher resolves these silently and wrongly in the *unsafe* direction —
+"DayQuil" matched "DayQuil Cough" (dextromethorphan only, hiding the
+acetaminophen), and "Advil PM" matched plain "Advil", dropping the
+diphenhydramine. A user on Norco would have been told they were fine.
+
+So formulations are enumerated from openFDA and **the user is asked which box
+they are holding**, with the acetaminophen-containing ones marked. If nothing
+resolves, the app says so and points at the Drug Facts panel rather than
+answering. `npm run eval:otc` guards this path specifically.
+
+---
+
 ## Reconciliation means comparing two lists
 
 Analysing the bottles on the table is useful, but it is not what
@@ -236,6 +260,7 @@ To use your own photos, copy `.env.example` to `.env.local` and set
 |---|---|
 | `npm run dev` | Dev server |
 | `npm run eval` | Scores every model-free check against the 40-case ground-truth set and exits non-zero on any regression |
+| `npm run eval:otc` | Checks over-the-counter resolution — that acetaminophen-containing formulations are found, and that ambiguous brands surface every variant instead of picking one |
 | `npm run verify:core` | Runs the demo scenarios plus a negative control through the real pipeline and prints ingredients, findings and schedule |
 | `npm run precache` | Walks every scenario and warms `.cache/` |
 | `npm run verify:offline` | Re-runs with `PILLPILE_OFFLINE=1`, where a cache miss throws — proves the demo needs no network |
@@ -273,6 +298,7 @@ response, with one retry on parse failure · no database.
 | Class grouping | `lib/classgroups.ts` |
 | Deterministic checks | `lib/analyze.ts` |
 | Discharge-list reconciliation | `lib/reconcile.ts` |
+| OTC resolution + "can I take this?" | `lib/otc.ts`, `lib/checkAddition.ts` |
 | Ground-truth eval set | `eval/cases.ts`, `eval/reconcile-cases.ts` |
 | Dose parsing | `lib/strength.ts` |
 | Label-grounded interactions | `lib/interactions.ts` |
@@ -317,6 +343,10 @@ be trusted.
   ingredients but different release profiles — metoprolol tartrate versus
   metoprolol succinate ER — are not distinguished, and a modified-release
   mismatch is a real clinical difference we would currently call a match.
+- **"Can I take this?" does not check dose limits for the new product.** Per-dose
+  mg is not reliably parseable from an OTC brand name, so it reports shared
+  ingredients and classes but will not tell you the combined daily total.
+- **It is not yet on iOS.** The feature is web-only for now.
 - **Our reported accuracy is self-scored.** We wrote the code and the labels,
   and 40 cases is a small set. Treat it as a regression guard, not a validation.
 

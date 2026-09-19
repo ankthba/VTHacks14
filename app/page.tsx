@@ -6,6 +6,7 @@ import { FindingCard } from "@/components/FindingCard";
 import { ScheduleGrid } from "@/components/ScheduleGrid";
 import { ReconcileTable } from "@/components/ReconcileTable";
 import { ReadAloud } from "@/components/ReadAloud";
+import { CanITake } from "@/components/CanITake";
 import { SCENARIOS } from "@/lib/fixtures";
 import type { BottleRecord } from "@/lib/schemas";
 import type { AnalysisResult, NormalizedMed, ReconcileRow } from "@/lib/types";
@@ -35,6 +36,7 @@ export default function Home() {
   const [stage, setStage] = useState<Stage>("start");
   const [bottles, setBottles] = useState<BottleRecord[]>([]);
   const [discharge, setDischarge] = useState<BottleRecord[]>([]);
+  const [activeDemo, setActiveDemo] = useState<string | null>(null);
   const [result, setResult] = useState<ApiResult | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +53,7 @@ export default function Home() {
       if (!res.ok) throw new Error(json.error ?? "Failed");
       setBottles(json.bottles);
       setDischarge(json.discharge ?? []);
+      setActiveDemo(id);
       setStage("review");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -70,6 +73,7 @@ export default function Home() {
         const json = await res.json();
         if (!res.ok) throw new Error(json.detail ?? json.error ?? "Failed");
 
+        setActiveDemo(null);
         if (kind === "discharge") {
           if (!json.discharge?.length) {
             throw new Error("No medications were found on that paperwork.");
@@ -208,6 +212,8 @@ export default function Home() {
       {stage === "results" && result && (
         <Results
           result={result}
+          bottles={bottles}
+          demo={activeDemo}
           language={language}
           onLanguage={(l) => { setLanguage(l); analyze(l); }}
           onRestart={() => { setStage("start"); setBottles([]); setDischarge([]); setResult(null); }}
@@ -310,11 +316,15 @@ function StartScreen({
 
 function Results({
   result,
+  bottles,
+  demo,
   language,
   onLanguage,
   onRestart,
 }: {
   result: ApiResult;
+  bottles: BottleRecord[];
+  demo: string | null;
   language: string;
   onLanguage: (l: string) => void;
   onRestart: () => void;
@@ -399,6 +409,8 @@ function Results({
           {result.findings.map((f) => <FindingCard key={f.id} finding={f} />)}
         </div>
       </section>
+
+      <CanITake current={bottles} demo={demo} />
 
       <section>
         <h2 className="text-2xl font-bold mb-4">Your daily schedule</h2>

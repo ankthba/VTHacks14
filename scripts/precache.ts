@@ -13,6 +13,8 @@ import { deterministicFindings, buildSchedule } from "../lib/analyze";
 import { labelInteractions } from "../lib/interactions";
 import { summarizeMeds } from "../lib/onepager";
 import { reconcile } from "../lib/reconcile";
+import { findOTCVariants } from "../lib/otc";
+import { OTC_CASES } from "../eval/otc-cases";
 
 (async () => {
   for (const s of SCENARIOS) {
@@ -37,5 +39,11 @@ import { reconcile } from "../lib/reconcile";
         (unresolved.length ? `  UNRESOLVED: ${unresolved.join(", ")}` : ""),
     );
   }
+  // The "can I take this?" quick-picks need warming too.
+  process.stdout.write("  otc          ");
+  for (const c of OTC_CASES) await findOTCVariants(c.query);
+  for (const q of ["DayQuil", "Advil PM", "Tylenol PM"]) await findOTCVariants(q);
+  console.log(`${OTC_CASES.length + 3} products`);
+
   console.log("\nCache is warm. Commit the .cache/ directory.");
 })();
