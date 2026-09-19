@@ -16,8 +16,9 @@ export interface ArtDiagram {
   w: number;
   h: number;
   label: string;
-  /** Position for each mark the conditions on this view can set. */
-  spots: Record<string, ArtSpot>;
+  /** Position for each mark the conditions on this view can set. A drawing
+      with two views of the same part carries one spot per view. */
+  spots: Record<string, ArtSpot | ArtSpot[]>;
 }
 
 export const SPOT_SRC = asset("/anatomy/spot.png");
@@ -71,6 +72,27 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       clavicle: { x: 0.61, y: 0.18, s: 0.8 },        // mid-shaft of the collarbone
     },
   },
+  // The whole spine, from behind (left) and from the side (right). Lumbar
+  // conditions are spotted on both views.
+  spine: {
+    src: asset("/anatomy/spine.png"),
+    w: 728,
+    h: 1218,
+    label: "The spine, from behind and from the side",
+    spots: {
+      disc: [{ x: 0.22, y: 0.83, s: 0.7 }, { x: 0.73, y: 0.82, s: 0.7 }],       // L4-L5
+      vertebra: [{ x: 0.22, y: 0.74, s: 0.7 }, { x: 0.75, y: 0.75, s: 0.7 }],   // a lumbar body
+      muscle: [{ x: 0.32, y: 0.76, s: 0.8 }, { x: 0.88, y: 0.76, s: 0.8 }],     // beside and behind the lumbar spine
+      sacrum: [{ x: 0.22, y: 0.91, s: 0.8 }, { x: 0.77, y: 0.92, s: 0.8 }],     // the base of the spine
+      coccyx: { x: 0.72, y: 0.985, s: 0.5 },                                     // the tailbone tip, side view
+    },
+  },
+};
+
+/** Every spot for a mark, whether the drawing has one view or two. */
+export const spotsFor = (art: ArtDiagram, mark: string): ArtSpot[] => {
+  const v = art.spots[mark];
+  return v === undefined ? [] : Array.isArray(v) ? v : [v];
 };
 
 /** The default spot, as a fraction of the drawing's width. */

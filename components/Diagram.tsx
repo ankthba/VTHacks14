@@ -1,5 +1,5 @@
 import type { DiagramId } from "@/lib/anatomy/conditions";
-import { ART, SPOT_SRC, SPOT_WIDTH } from "@/lib/anatomy/art";
+import { ART, SPOT_SRC, SPOT_WIDTH, spotsFor } from "@/lib/anatomy/art";
 
 /**
  * Anatomically modeled diagrams for the exam room.
@@ -55,11 +55,10 @@ export function Diagram({
     return (
       <div className={className} role="img" aria-label={art.label} style={{ position: "relative", width: "100%", aspectRatio: `${art.w} / ${art.h}` }}>
         <img src={art.src} alt="" className="block w-full h-full" draggable={false} />
-        {marks.filter((m) => art.spots[m]).map((m) => {
-          const p = art.spots[m];
+        {marks.flatMap((m) => spotsFor(art, m).map((p, i) => ({ key: `${m}-${i}`, p }))).map(({ key, p }) => {
           return (
             <img
-              key={m}
+              key={key}
               src={SPOT_SRC}
               alt=""
               aria-hidden
