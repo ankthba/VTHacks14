@@ -26,6 +26,8 @@ import { detectHowTos } from "./howto";
 
 export const ParsedNoteSchema = z.object({
   diagnoses: z.array(z.string()),
+  /** Lines the parser could not place. Shown to the clinician, never the patient. */
+  skipped: z.array(z.string()).default([]),
   medications: z.array(
     z.object({
       name: z.string(),
@@ -50,6 +52,7 @@ export interface ParseResult extends ParsedNote {
 }
 
 const SECTION_ALIASES: Record<keyof ParsedNote, string[]> = {
+  skipped: [],
   diagnoses: [
     "diagnosis", "diagnoses", "dx", "discharge diagnosis", "discharge diagnoses", "discharge dx",
     "principal diagnosis", "principal dx", "primary diagnosis", "primary dx", "final diagnosis",
@@ -161,7 +164,7 @@ function sentences(text: string): string[] {
 }
 
 export function parseDeterministic(text: string): ParsedNote {
-  const out: ParsedNote = { diagnoses: [], medications: [], instructions: [], followUp: [] };
+  const out: ParsedNote = { diagnoses: [], skipped: [], medications: [], instructions: [], followUp: [] };
   let section: keyof ParsedNote | null = null;
   let sawHeader = false;
 
@@ -209,10 +212,16 @@ export function parseDeterministic(text: string): ParsedNote {
 function pushInto(out: ParsedNote, key: keyof ParsedNote, value: string) {
   if (!value) return;
   if (key === "medications") {
+    // A line under a medications header that has no dose is NOT a medication.
+    // Treating "Headache (QOD)" as a drug sent it to RxNorm, which matched an
+    // aspirin/caffeine headache powder, and the patient was told to take it.
+    // If it cannot be read as a drug order it goes to the clinician as skipped.
     const med = parseMedLine(value);
-    out.medications.push(med ?? { name: value, strength: null, sig: null });
+    if (med) out.medications.push(med);
+    else if (value.length > 3) out.skipped.push(value);
     return;
   }
+  if (key === "skipped") return;
   if (key === "diagnoses") {
     // "Distal radius fracture, left, nondisplaced" is ONE diagnosis; a comma
     // followed by a capital starts another. Semicolons always separate.
@@ -276,7 +285,8 @@ Return JSON only:
 
 RULES
 - Copy phrases as written. Do not paraphrase, expand abbreviations, or add anything not in the document.
-- Include only medications the patient is told to TAKE. Skip anything stopped, held, or listed as an allergy.
+- Include only medications the patient is told to TAKE, and only if a drug NAME is actually written. A symptom, a heading, or a frequency on its own ("Headache (QOD)") is not a medication.
+- Skip anything stopped, held, or listed as an allergy.
 - Use null when directions are absent. Use [] for empty sections.
 - No prose, no code fence.`;
 
@@ -288,7 +298,9 @@ export async function parseNote(
   text: string,
   images: ImagePart[] = [],
 ): Promise<ParseResult> {
-  const det = text.trim() ? parseDeterministic(text) : { diagnoses: [], medications: [], instructions: [], followUp: [] };
+  const det = text.trim()
+    ? parseDeterministic(text)
+    : { diagnoses: [], skipped: [], medications: [], instructions: [], followUp: [] };
   let result: ParsedNote = det;
   let method: ParseResult["method"] = "deterministic";
 
@@ -335,6 +347,7 @@ function merge(a: ParsedNote, b: ParsedNote): ParsedNote {
   }
   return {
     diagnoses: dedupe([...a.diagnoses, ...b.diagnoses]),
+    skipped: dedupe([...a.skipped, ...b.skipped]),
     medications: meds,
     instructions: dedupe([...a.instructions, ...b.instructions]),
     followUp: dedupe([...a.followUp, ...b.followUp]),

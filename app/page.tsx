@@ -17,6 +17,7 @@ interface MedExplain {
 }
 interface Card {
   headline: string;
+  skipped: string[];
   diagram: DiagramId | null;
   marks: string[];
   meds: MedExplain[];
@@ -49,7 +50,7 @@ export default function ExplainPage() {
   const [region, setRegion] = useState(REGIONS[0]);
   const [conditionId, setConditionId] = useState<string | null>(null);
   const [customHeadline, setCustomHeadline] = useState("");
-  const [meds, setMeds] = useState<{ name: string; strength?: string | null; sig: string }[]>([{ name: "", sig: "" }]);
+  const [meds, setMeds] = useState<{ name: string; strength?: string | null; sig: string; purpose?: string; howToTake?: string }[]>([{ name: "", sig: "" }]);
   const [instructions, setInstructions] = useState<string[]>([]);
   const [howtoIds, setHowtoIds] = useState<string[]>([]);
   const [freeInstruction, setFreeInstruction] = useState("");
@@ -59,6 +60,7 @@ export default function ExplainPage() {
   const [noteBusy, setNoteBusy] = useState(false);
   const [noteError, setNoteError] = useState<string | null>(null);
   const [noteStatus, setNoteStatus] = useState<string | null>(null);
+  const [skippedLines, setSkippedLines] = useState<string[]>([]);
   const noteFileRef = useRef<HTMLInputElement>(null);
 
   const [card, setCard] = useState<Card | null>(null);
@@ -104,6 +106,7 @@ export default function ExplainPage() {
       const instr = [...(json.instructions ?? []), ...(json.followUp ?? [])];
       if (instr.length) setInstructions(instr);
       if (json.howtoIds?.length) setHowtoIds(json.howtoIds);
+      setSkippedLines(json.skipped ?? []);
 
       const bits = [
         json.conditionLabel ? `matched "${json.conditionLabel}"` : "no diagnosis in the library",
@@ -112,6 +115,7 @@ export default function ExplainPage() {
         ...(json.howtoIds?.length ? [`${json.howtoIds.length} how-to walkthrough(s) attached`] : []),
       ];
       setNoteStatus(`Read the note (${json.method}): ${bits.join(", ")}. Review below, then turn the screen.`);
+      setTimeout(() => build(false), 0);
     } catch (e) {
       setNoteError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -128,7 +132,9 @@ export default function ExplainPage() {
         body: JSON.stringify({
           conditionId,
           customHeadline: customHeadline || null,
-          medNames: meds.filter((m) => m.name.trim()).map((m) => ({ name: m.name, strength: m.strength ?? null, sig: m.sig })),
+          medNames: meds
+            .filter((m) => m.name.trim())
+            .map((m) => ({ name: m.name, strength: m.strength ?? null, sig: m.sig, purpose: m.purpose ?? null, howToTake: m.howToTake ?? null })),
           instructions,
           howtoIds,
           language,
@@ -137,6 +143,29 @@ export default function ExplainPage() {
       const json = await r.json();
       setCard(json.card ?? null);
       setWarnings(json.warnings ?? []);
+      // Pull the generated sentences back into the rows so the clinician can
+      // reword them. Only for English previews - the story is built fresh.
+      if (json.card && language === "English") {
+        const kept = meds.filter((m) => m.name.trim());
+        const byIdx = new Map<number, { purpose: string; howToTake: string }>(
+          json.card.meds.map((m: { sourceIndex: number; purpose: string; howToTake: string }) => [m.sourceIndex, m]),
+        );
+        setMeds(kept.map((m, i) => {
+          const g = byIdx.get(i);
+          return g ? { ...m, purpose: m.purpose ?? g.purpose, howToTake: m.howToTake ?? g.howToTake } : m;
+        }));
+      }
+      // Anything dropped at build time is a line the patient will NOT hear.
+      // It is shown here, and the screen is not turned until it has been seen.
+      const dropped: string[] = json.card?.skipped ?? [];
+      if (dropped.length && showPatient) {
+        setSkippedLines((prev) => [...new Set([...prev, ...dropped])]);
+        setWarnings((w) => [
+          ...w,
+          `${dropped.length} line(s) were not readable as medicines and were left out. They are listed under "Not used" - fix or ignore them, then turn the screen.`,
+        ]);
+        return;
+      }
       if (showPatient) setPatientView(true);
     } finally {
       setBusy(false);
@@ -227,6 +256,28 @@ export default function ExplainPage() {
             {noteError && (
               <p className="text-sm mt-3" style={{ color: "var(--high)" }}>{noteError}</p>
             )}
+            {skippedLines.length > 0 && (
+              <div className="mt-4 rounded-xl border p-3" style={{ background: "var(--moderate-bg)", borderColor: "var(--moderate)" }}>
+                <p className="text-sm font-semibold" style={{ color: "var(--moderate)" }}>
+                  Not used &mdash; the patient will not see these
+                </p>
+                <ul className="mt-1 space-y-0.5 text-sm">
+                  {skippedLines.map((l) => (
+                    <li key={l} className="flex justify-between gap-3">
+                      <span className="font-mono">{l}</span>
+                      <button onClick={() => setSkippedLines((p) => p.filter((x) => x !== l))} className="underline text-[color:var(--muted)]">
+                        dismiss
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs text-[color:var(--muted)] mt-2">
+                  A line is used only when it is clearly a drug with a dose, or a
+                  diagnosis or instruction the library recognises. Add anything
+                  missing in the sections below.
+                </p>
+              </div>
+            )}
             <p className="text-xs text-[color:var(--muted)] mt-3">
               The note is read once and never stored. Which diagram and which
               plain sentence a diagnosis becomes is decided by our curated
@@ -304,23 +355,45 @@ export default function ExplainPage() {
             <h2 className="display-sm text-2xl mb-3">Medicines</h2>
             <div className="space-y-2">
               {meds.map((m, i) => (
-                <div key={i} className="grid gap-2 sm:grid-cols-2">
-                  <input
-                    value={m.name}
-                    placeholder="Ibuprofen 600 mg"
-                    onChange={(e) =>
-                      setMeds((p) => p.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))
-                    }
-                    className="rounded-lg border border-[color:var(--line)] bg-white px-3 py-2.5 text-[15px]"
-                  />
-                  <input
-                    value={m.sig}
-                    placeholder="1 tablet three times daily with food"
-                    onChange={(e) =>
-                      setMeds((p) => p.map((x, j) => (j === i ? { ...x, sig: e.target.value } : x)))
-                    }
-                    className="rounded-lg border border-[color:var(--line)] bg-white px-3 py-2.5 text-[15px]"
-                  />
+                <div key={i} className="rounded-xl border border-[color:var(--line-soft)] p-3 space-y-2" style={{ background: "var(--surface-warm)" }}>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <input
+                      value={m.name}
+                      placeholder="Ibuprofen 600 mg"
+                      onChange={(e) =>
+                        setMeds((p) => p.map((x, j) => (j === i ? { ...x, name: e.target.value, purpose: undefined, howToTake: undefined } : x)))
+                      }
+                      className="rounded-lg border border-[color:var(--line)] bg-white px-3 py-2.5 text-[15px]"
+                    />
+                    <input
+                      value={m.sig}
+                      placeholder="1 tablet three times daily with food"
+                      onChange={(e) =>
+                        setMeds((p) => p.map((x, j) => (j === i ? { ...x, sig: e.target.value, howToTake: undefined } : x)))
+                      }
+                      className="rounded-lg border border-[color:var(--line)] bg-white px-3 py-2.5 text-[15px]"
+                    />
+                  </div>
+                  {(m.purpose !== undefined || m.howToTake !== undefined) && (
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <label className="block">
+                        <span className="block text-xs font-semibold text-[color:var(--muted)] mb-1">What the patient hears it is for</span>
+                        <input
+                          value={m.purpose ?? ""}
+                          onChange={(e) => setMeds((p) => p.map((x, j) => (j === i ? { ...x, purpose: e.target.value } : x)))}
+                          className="w-full rounded-lg border border-[color:var(--line)] bg-white px-3 py-2 text-[15px]"
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="block text-xs font-semibold text-[color:var(--muted)] mb-1">How to take it, in their words</span>
+                        <input
+                          value={m.howToTake ?? ""}
+                          onChange={(e) => setMeds((p) => p.map((x, j) => (j === i ? { ...x, howToTake: e.target.value } : x)))}
+                          className="w-full rounded-lg border border-[color:var(--line)] bg-white px-3 py-2 text-[15px]"
+                        />
+                      </label>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

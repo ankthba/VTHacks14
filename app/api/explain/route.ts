@@ -9,7 +9,15 @@ const BodySchema = z.object({
   conditionId: z.string().nullish(),
   customHeadline: z.string().nullish(),
   medNames: z
-    .array(z.object({ name: z.string(), strength: z.string().nullish(), sig: z.string().nullish() }))
+    .array(
+      z.object({
+        name: z.string(),
+        strength: z.string().nullish(),
+        sig: z.string().nullish(),
+        purpose: z.string().nullish(),
+        howToTake: z.string().nullish(),
+      }),
+    )
     .default([]),
   instructions: z.array(z.string()).default([]),
   howtoIds: z.array(z.string()).default([]),
@@ -40,6 +48,9 @@ export async function POST(req: NextRequest) {
         fill_date: null,
         confidence: 1,
       })),
+      medOverrides: Object.fromEntries(
+        body.medNames.map((m, i) => [i, { purpose: m.purpose, howToTake: m.howToTake }]),
+      ),
       instructions: body.instructions,
       howtoIds: body.howtoIds,
       language: body.language,

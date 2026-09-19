@@ -63,15 +63,22 @@ export async function POST(req: NextRequest) {
     // Miss - fall through to the API.
   }
 
-  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${DEFAULT_VOICE}`, {
-    method: "POST",
-    headers: { "xi-api-key": key, "content-type": "application/json", accept: "audio/mpeg" },
-    body: JSON.stringify({
-      text,
-      model_id: MODEL,
-      voice_settings: { stability: 0.55, similarity_boost: 0.75 },
-    }),
-  });
+  const call = () =>
+    fetch(`https://api.elevenlabs.io/v1/text-to-speech/${DEFAULT_VOICE}`, {
+      method: "POST",
+      headers: { "xi-api-key": key, "content-type": "application/json", accept: "audio/mpeg" },
+      body: JSON.stringify({
+        text,
+        model_id: MODEL,
+        voice_settings: { stability: 0.55, similarity_boost: 0.75 },
+      }),
+    });
+  let res = await call();
+  // 429 is the free tier's concurrency cap, not a real failure. One retry.
+  if (res.status === 429) {
+    await new Promise((r) => setTimeout(r, 1200));
+    res = await call();
+  }
 
   if (!res.ok) {
     return NextResponse.json(

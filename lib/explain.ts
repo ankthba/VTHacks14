@@ -4,6 +4,7 @@ import { displayName } from "./display";
 import { byId } from "./anatomy/conditions";
 import { translateStrings, LANGUAGES } from "./translate";
 import { howToById, type HowToArt } from "./howto";
+import { fetchLabel, firstSentence } from "./openfda";
 import type { BottleRecord } from "./schemas";
 
 /**
@@ -21,6 +22,8 @@ import type { BottleRecord } from "./schemas";
  */
 
 export interface MedExplain {
+  /** Index into the medications the clinician entered, so edits line up. */
+  sourceIndex: number;
   name: string;
   shortLabel: string;
   purpose: string;
@@ -35,17 +38,21 @@ export interface MedExplain {
  */
 export interface Slide {
   kind: "picture" | "medicine" | "todo" | "howto" | "end";
+  /** Small label above the title so the screen explains itself: "Your medicine, 1 of 3". */
+  kicker: string;
   title: string;
   lines: string[];
   /** What the voice says for this slide. */
   spoken: string;
-  /** For how-to steps: which picture, and "step 2 of 6". */
+  /** For a how-to: the picture, and the numbered steps shown on the one slide. */
   art?: HowToArt;
-  step?: { n: number; of: number };
+  steps?: string[];
 }
 
 export interface ExplainCard {
   headline: string;
+  /** Lines from the note that were NOT turned into anything. For the clinician. */
+  skipped: string[];
   diagram: string | null;
   marks: string[];
   meds: MedExplain[];
@@ -61,8 +68,10 @@ export interface ExplainCard {
 
 /** Fixed phrases the story needs, translated with everything else. */
 const PHRASES = {
-  yourMedicines: "Your medicines",
+  whatHappened: "What happened",
+  yourMedicine: "Your medicine",
   whatToDo: "What to do next",
+  howTo: "How to do it",
   thatsAll: "That is everything.",
   askUs: "If anything is unclear, ask us before you leave.",
 };
@@ -74,6 +83,12 @@ export interface HowToSlideInput {
   art: HowToArt;
 }
 
+/**
+ * A story is short on purpose: one picture, one screen per medicine, one
+ * screen of what to do, one screen per how-to WITH its steps listed, and an
+ * end. A typical visit is six to nine screens. Splitting every step onto its
+ * own screen produced 48 for one note, which nobody will sit through.
+ */
 export function buildSlides(
   headline: string,
   meds: MedExplain[],
@@ -82,19 +97,21 @@ export function buildSlides(
   phrases: typeof PHRASES,
 ): Slide[] {
   const slides: Slide[] = [
-    { kind: "picture", title: headline, lines: [], spoken: headline },
+    { kind: "picture", kicker: phrases.whatHappened, title: headline, lines: [], spoken: headline },
   ];
-  for (const m of meds) {
+  meds.forEach((m, k) => {
     slides.push({
       kind: "medicine",
+      kicker: `${phrases.yourMedicine}${meds.length > 1 ? ` ${k + 1} / ${meds.length}` : ""}`,
       title: m.name,
       lines: [m.purpose, m.howToTake],
       spoken: `${m.name}. ${m.purpose} ${m.howToTake}`,
     });
-  }
+  });
   if (instructions.length) {
     slides.push({
       kind: "todo",
+      kicker: phrases.whatToDo,
       title: phrases.whatToDo,
       lines: instructions,
       spoken: `${phrases.whatToDo}. ${instructions.join(" ")}`,
@@ -103,24 +120,17 @@ export function buildSlides(
   for (const h of howtos) {
     slides.push({
       kind: "howto",
+      kicker: phrases.howTo,
       title: h.title,
       lines: [h.why],
-      spoken: `${h.title}. ${h.why}`,
+      steps: h.steps,
       art: h.art,
-    });
-    h.steps.forEach((step, k) => {
-      slides.push({
-        kind: "howto",
-        title: step,
-        lines: [],
-        spoken: step,
-        art: h.art,
-        step: { n: k + 1, of: h.steps.length },
-      });
+      spoken: `${h.title}. ${h.why} ${h.steps.map((st, i) => `${i + 1}. ${st}`).join(" ")}`,
     });
   }
   slides.push({
     kind: "end",
+    kicker: "",
     title: phrases.thatsAll,
     lines: [phrases.askUs],
     spoken: `${phrases.thatsAll} ${phrases.askUs}`,
@@ -128,10 +138,30 @@ export function buildSlides(
   return slides;
 }
 
+/**
+ * Is this "medication" plausibly a drug at all?
+ *
+ * RxNorm's fuzzy matcher will resolve almost any text to SOMETHING - "Headache
+ * (QOD)" became an aspirin/caffeine headache powder. A resolution is trusted
+ * only if the printed name shares a word with the canonical name (ibuprofen ->
+ * "ibuprofen 600 MG") or the line carried an explicit dose. Otherwise the line
+ * is handed back to the clinician rather than read to the patient.
+ */
+function plausibleMed(inputName: string, strength: string | null, canonical: string | null): boolean {
+  if (strength) return true;
+  if (!canonical) return false;
+  const words = (t: string) =>
+    t.toLowerCase().replace(/[^a-z]+/g, " ").split(" ").filter((w) => w.length >= 4);
+  const a = new Set(words(inputName));
+  return words(canonical).some((w) => a.has(w) || [...a].some((x) => w.startsWith(x) || x.startsWith(w)));
+}
+
 export async function buildExplainCard(input: {
   conditionId?: string | null;
   customHeadline?: string | null;
   meds: BottleRecord[];
+  /** Clinician edits to the generated sentences, by medication index. */
+  medOverrides?: Record<number, { purpose?: string | null; howToTake?: string | null }>;
   instructions: string[];
   howtoIds?: string[];
   language?: string;
@@ -143,19 +173,34 @@ export async function buildExplainCard(input: {
     "Here is what we found and what happens next.";
 
   const normalized = await normalizeAll(input.meds);
-  const meds: MedExplain[] = normalized.map((m) => {
-    const p = plainPurpose(m);
-    const s = plainSig(m.sig);
-    return {
+  const skipped: string[] = [];
+  const meds: MedExplain[] = [];
+  for (let k = 0; k < normalized.length; k++) {
+    const m = normalized[k];
+    const rec = input.meds[k];
+    if (m.unresolved || !plausibleMed(rec.drug_text ?? "", rec.strength, m.canonical_name)) {
+      skipped.push([rec.drug_text, rec.strength, rec.sig].filter(Boolean).join(" "));
+      continue;
+    }
+    // Only fetch the label when the class map has no sentence - it is a
+    // network call, and the curated sentence is better anyway.
+    let labelText: string | null = null;
+    if (!plainPurpose(m, null, input.conditionId).curated) {
+      const label = await fetchLabel(m);
+      labelText = firstSentence(label?.indications_and_usage, 300);
+    }
+    const p = plainPurpose(m, labelText, input.conditionId);
+    const sg = plainSig(m.sig);
+    const ov = input.medOverrides?.[k];
+    meds.push({
+      sourceIndex: k,
       name: displayName(m),
       shortLabel: p.shortLabel,
-      purpose: m.unresolved
-        ? "Ask the pharmacist what this one is for."
-        : p.sentence,
-      howToTake: s.text,
-      curated: p.curated,
-    };
-  });
+      purpose: ov?.purpose?.trim() || p.sentence,
+      howToTake: ov?.howToTake?.trim() || sg.text,
+      curated: p.curated || !!ov?.purpose?.trim(),
+    });
+  }
 
   let instructions = input.instructions.map((i) => i.trim()).filter(Boolean);
   let howtos: HowToSlideInput[] = (input.howtoIds ?? [])
@@ -206,6 +251,7 @@ export async function buildExplainCard(input: {
   return {
     card: {
       headline: finalHeadline,
+      skipped,
       diagram: condition?.diagram ?? null,
       marks: condition?.marks ?? [],
       meds,

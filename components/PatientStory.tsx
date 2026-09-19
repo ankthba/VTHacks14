@@ -35,6 +35,10 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, onBack }: P
   const [show3d, setShow3d] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const cache = useRef<Map<number, Promise<string | null>>>(new Map());
+  // The free ElevenLabs tier allows two requests in flight. Prefetch plus the
+  // current slide plus an impatient tap was three, and the third fell back to
+  // the browser voice mid-story. All TTS requests now go through one lane.
+  const lane = useRef<Promise<unknown>>(Promise.resolve());
   const slide = slides[Math.min(i, slides.length - 1)];
   const last = i >= slides.length - 1;
 
@@ -43,13 +47,21 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, onBack }: P
       if (n < 0 || n >= slides.length) return Promise.resolve(null);
       const hit = cache.current.get(n);
       if (hit) return hit;
-      const p = fetch("/api/tts", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ text: slides[n].spoken }),
-      })
-        .then(async (r) => (r.ok ? URL.createObjectURL(await r.blob()) : null))
+      const once = () =>
+        fetch("/api/tts", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ text: slides[n].spoken }),
+        }).then(async (r) => (r.ok ? URL.createObjectURL(await r.blob()) : null));
+      const p: Promise<string | null> = lane.current
+        .then(once)
+        .then(async (url) => {
+          if (url) return url;
+          await new Promise((res) => setTimeout(res, 900));
+          return once();
+        })
         .catch(() => null);
+      lane.current = p.catch(() => null);
       cache.current.set(n, p);
       return p;
     },
@@ -158,12 +170,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, onBack }: P
             <div className="w-40 sm:w-56 float-card p-4">
               <HowToArt id={slide.art} />
             </div>
-            {slide.step && (
-              <p className="text-sm font-semibold uppercase tracking-[0.1em] text-[color:var(--muted)] mb-2">
-                Step {slide.step.n} of {slide.step.of}
-              </p>
-            )}
-          </div>
+                      </div>
         )}
 
         {slide.kind === "medicine" && (
@@ -175,18 +182,39 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, onBack }: P
 
         <h1
           className="display leading-[0.98]"
-          style={{ fontSize: slide.kind === "picture" ? "clamp(2rem, 5.5vw, 4.5rem)" : "clamp(2.6rem, 8vw, 6.5rem)" }}
+          style={{
+            fontSize:
+              slide.kind === "picture" ? "clamp(2rem, 5.5vw, 4.5rem)"
+              : slide.kind === "howto" ? "clamp(1.8rem, 4.5vw, 3.4rem)"
+              : "clamp(2.6rem, 8vw, 6.5rem)",
+          }}
         >
           {slide.title}
         </h1>
 
+        {slide.steps && slide.steps.length > 0 && (
+          <ol className="mt-6 space-y-3">
+            {slide.steps.map((st, n) => (
+              <li key={n} className="flex gap-4 items-start" style={{ fontSize: "clamp(1.15rem, 2.4vw, 1.8rem)", lineHeight: 1.3 }}>
+                <span
+                  className="flex-none w-9 h-9 rounded-full flex items-center justify-center text-base font-bold"
+                  style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
+                >
+                  {n + 1}
+                </span>
+                <span>{st}</span>
+              </li>
+            ))}
+          </ol>
+        )}
+
         {slide.lines.length > 0 && (
-          <div className="mt-8 space-y-5">
+          <div className={slide.kind === "howto" ? "mt-4" : "mt-8 space-y-5"}>
             {slide.lines.map((l, n) => (
               <p
                 key={n}
                 className={slide.kind === "todo" ? "flex gap-4 items-start" : ""}
-                style={{ fontSize: "clamp(1.4rem, 3.2vw, 2.4rem)", lineHeight: 1.3 }}
+                style={{ fontSize: slide.kind === "howto" ? "clamp(1.1rem, 2vw, 1.5rem)" : "clamp(1.4rem, 3.2vw, 2.4rem)", lineHeight: 1.3, color: slide.kind === "howto" ? "var(--muted)" : undefined }}
               >
                 {slide.kind === "todo" && <span style={{ color: "var(--accent)" }}>&#10003;</span>}
                 <span className={n === 1 && slide.kind === "medicine" ? "font-semibold" : ""}>{l}</span>
@@ -215,7 +243,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, onBack }: P
           </button>
         )}
         <span className="ml-auto">
-          {voice === "browser" ? "Built-in voice" : voice === "elevenlabs" ? "" : ""}
+          {voice === "browser" ? "Built-in voice" : voice === "elevenlabs" ? "Voice: ElevenLabs" : ""}
         </span>
         <button onClick={onBack} className="underline">
           Back to the clinician view
@@ -229,6 +257,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, onBack }: P
           <div key={n} className="finding-card py-3 border-b">
             <p className="text-xl font-bold">{s.title}</p>
             {s.lines.map((l, k) => <p key={k} className="text-lg">{l}</p>)}
+            {s.steps?.map((st, k) => <p key={k} className="text-lg">{k + 1}. {st}</p>)}
           </div>
         ))}
       </div>
