@@ -43,7 +43,7 @@ author; this is a drafting tool.
 
 Next.js 16, TypeScript, Tailwind. RxNorm and RxClass for drug identity and
 class, openFDA for labels, MyMemory for key-less translation, ElevenLabs for
-voice, Sketchfab (CC BY) for the opt-in 3D models. The look is a document,
+voice. The look is a document,
 not an app: warm beige paper, Lora and Figtree, hairlines instead of boxes,
 no shadows, and the body figures are our own ink. WCAG AA on every pairing.
 
@@ -80,7 +80,7 @@ numbered on it. That note is now five screens.
 and they read as gory to someone who has just had bad news — and a third-party
 model cannot be marked with *your* fracture. The whole-body locator zooming into
 a marked drawing answers "where on me", which the model never could, and it
-prints. 3D stayed, as an opt-in, with the least clinical models we could find.
+prints. So we removed 3D entirely and drew the anatomy ourselves.
 
 **The free ElevenLabs tier is 10,000 characters for the weekend.** Audio is
 cached to disk by text hash and committed, so every replay on stage is free and

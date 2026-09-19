@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Diagram } from "@/components/Diagram";
 import { BodyLocator, type BodyType } from "@/components/BodyLocator";
 import { HowToArt } from "@/components/HowToArt";
-import { Anatomy3D } from "@/components/Anatomy3D";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 import type { Slide } from "@/lib/explain";
 import { bestVoice, whenVoicesReady } from "@/lib/voices";
@@ -36,7 +35,6 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [voice, setVoice] = useState<"elevenlabs" | "browser" | null>(null);
-  const [show3d, setShow3d] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const cache = useRef<Map<number, Promise<string | null>>>(new Map());
   // The free ElevenLabs tier allows two requests in flight. Prefetch plus the
@@ -173,7 +171,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
       <section className="flex-1 flex flex-col justify-center px-6 sm:px-12 py-8 max-w-5xl w-full mx-auto">
         {slide.kind === "picture" && diagram && (
           <div className="mx-auto w-full max-w-[440px] mb-8" onClick={(e) => e.stopPropagation()}>
-            {show3d ? <Anatomy3D view={diagram} className="no-print" /> : <BodyLocator view={diagram} marks={marks} body={body} />}
+            <BodyLocator view={diagram} marks={marks} body={body} />
             <div className="flex flex-wrap gap-2 mt-3 no-print">
               {(["female", "male"] as BodyType[]).map((b) => (
                 <button
@@ -184,11 +182,6 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
                   {b === "female" ? "Female" : "Male"}
                 </button>
               ))}
-              {diagram !== "body" && (
-                <button onClick={() => setShow3d((v) => !v)} className="chip">
-                  {show3d ? "Back to the drawing" : "See it in 3D"}
-                </button>
-              )}
             </div>
           </div>
         )}

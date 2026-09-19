@@ -44,16 +44,24 @@ export function Diagram({
   id,
   marks = [],
   className,
+  fit = false,
 }: {
   id: DiagramId;
   marks?: string[];
   className?: string;
+  /** Size by the container's height instead of its width, so a tall drawing
+      inside a fixed frame is never cut off at the top or bottom. */
+  fit?: boolean;
 }) {
+  const sizing = fit
+    ? { height: "100%", width: "auto", maxWidth: "100%" }
+    : { width: "100%", height: "auto" };
+
   // The clinician's own drawing, when there is one for this view.
   const art = ART[id];
   if (art) {
     return (
-      <div className={className} role="img" aria-label={art.label} style={{ position: "relative", width: "100%", aspectRatio: `${art.w} / ${art.h}` }}>
+      <div className={className} role="img" aria-label={art.label} style={{ position: "relative", aspectRatio: `${art.w} / ${art.h}`, ...sizing }}>
         <img src={art.src} alt="" className="block w-full h-full" draggable={false} />
         {marks.flatMap((m) => spotsFor(art, m).map((p, i) => ({ key: `${m}-${i}`, p }))).map(({ key, p }) => {
           return (
@@ -85,7 +93,7 @@ export function Diagram({
     viewBox: "0 0 300 360",
     className,
     role: "img" as const,
-    style: { color: "var(--foreground)", width: "100%", height: "auto" },
+    style: { color: "var(--foreground)", ...sizing },
   };
 
   // ---- Forearm, wrist and hand - anterior (palm-up) view -------------------

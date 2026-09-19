@@ -86,8 +86,8 @@ This is the part we would put on a poster.
 - **It never translates a drug name.** The patient has to match it to the
   bottle.
 - **It never shows a specimen.** The default picture is a whole-body locator
-  zooming into a marked line drawing — it answers *"where on me"*, which a
-  third-party 3D model cannot, and it prints. 3D is opt-in.
+  zooming into a hand-drawn part with a red spot on it — it answers
+  *"where on me"*, and it prints. There is no 3D and no stock illustration.
 - **The model, when present, only translates or fills parsing gaps.** Which
   diagram and which plain sentence a diagnosis becomes is decided by the
   library. Nothing clinical is generated.
@@ -169,5 +169,4 @@ mattered more on the screen a doctor turns toward a patient.
 ## Data and assets
 
 RxNorm / RxClass (NLM) · openFDA drug labels · MyMemory translation · ElevenLabs
-· 3D models from Sketchfab under CC BY (attributed in-app) · Instrument Serif /
-Instrument Sans.
+· Lora / Figtree. The anatomy drawings are our own.

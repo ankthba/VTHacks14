@@ -132,8 +132,8 @@ export function BodyLocator({
         className="absolute inset-0 flex items-center justify-center p-6 transition-all duration-700 ease-out"
         style={{ transform: zoomed ? "scale(1)" : "scale(0.6)", opacity: zoomed ? 1 : 0 }}
       >
-        <div className="w-full max-w-[420px]">
-          <Diagram id={view} marks={marks} />
+        <div className="h-full w-full flex items-center justify-center">
+          <Diagram id={view} marks={marks} fit />
         </div>
       </div>
       <span className="absolute bottom-3 right-3 meta-chip no-print">
