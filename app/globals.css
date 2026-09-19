@@ -611,15 +611,15 @@ html { scroll-behavior: smooth; }
 .border-b { background-image: var(--wave-soft); background-repeat: repeat-x; background-position: 0 100%; background-size: 300px 3px; }
 
 /*
- * Dark mode: deep green paper, beige ink and beige buttons. Only ever on by
- * the button, never by the system setting. The drawings are masks, so they
- * simply take the new ink.
+ * Evergreen: a near-black green board, brown pads and menus, beige ink and
+ * beige buttons. Only ever on by the button, never by the system setting.
+ * The drawings are masks, so they simply take the new ink.
  */
 :root[data-theme="dark"] {
   color-scheme: dark;
   --background: #06110c;
-  --surface: #0a1810;
-  --surface-warm: #0f2016;
+  --surface: #1c1812;
+  --surface-warm: #2a2219;
   --foreground: #efe7d6;
   --foreground-deep: #efe7d6;
   --muted: #b9ad98;
@@ -649,7 +649,7 @@ html { scroll-behavior: smooth; }
 :root[data-theme="dark"] .ink-row { --ink: #efe7d6; }
 :root[data-theme="dark"] body::before { opacity: 0.05; filter: invert(1); }
 :root[data-theme="dark"] .field::placeholder, :root[data-theme="dark"] .field.note::placeholder { color: #7f8f80; }
-:root[data-theme="dark"] .menu-item.active, :root[data-theme="dark"] .menu-item:hover { background: #142a1d; }
+:root[data-theme="dark"] .menu-item.active, :root[data-theme="dark"] .menu-item:hover { background: #2a2219; }
 .theme-toggle { display: inline-flex; align-items: center; }
 
 /* Paper is paper: printing always uses the light tokens. */

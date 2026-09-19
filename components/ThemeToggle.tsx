@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 const KEY = "aperta-theme";
 
 /**
- * Paper or chalkboard. The chalkboard is never on unless you ask: a deep
- * green board with beige chalk. It ignores the system setting on purpose, so
+ * Paper or Evergreen. Evergreen is never on unless you ask: a near-black
+ * green with brown pads and beige ink. It ignores the system setting, so
  * a laptop in a dark clinic room shows the doctor exactly the page they set
  * up. The choice is remembered in this browser only.
  */
@@ -22,7 +22,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
     try { localStorage.setItem(KEY, next ? "dark" : "light"); } catch {}
   };
   return (
-    <button type="button" onClick={flip} className={`chip theme-toggle ${className}`} aria-pressed={dark} title={dark ? "Back to paper" : "Write it on the chalkboard"}>
+    <button type="button" onClick={flip} className={`chip theme-toggle ${className}`} aria-pressed={dark} title={dark ? "Back to paper" : "Evergreen"}>
       {dark ? (
         /* A sun with a face and rays that never quite agree on a length. */
         <svg viewBox="0 0 24 24" width="18" height="18" className="sun" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
@@ -44,7 +44,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
           <path className="star2" d="M20.6 12.2 L20.6 12.3" strokeWidth="2.4" />
         </svg>
       )}
-      <span className="ml-1.5">{dark ? "Paper" : "Chalk"}</span>
+      <span className="ml-1.5">{dark ? "Paper" : "Evergreen"}</span>
     </button>
   );
 }
