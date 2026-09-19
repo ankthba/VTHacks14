@@ -62,6 +62,8 @@ export default function Home() {
     }, 330);
   }
   const [query, setQuery] = useState("");
+  /** A condition the pointer is resting on: the preview shows it before it is chosen. */
+  const [hoverId, setHoverId] = useState<string | null>(null);
   const [conditionId, setConditionId] = useState<string | null>(null);
   const [choosing, setChoosing] = useState(false);
   const [customHeadline, setCustomHeadline] = useState("");
@@ -106,6 +108,7 @@ export default function Home() {
     return CONDITIONS.map((c) => ({ c, s: score(c) })).filter((x) => x.s >= 0).sort((a, b) => a.s - b.s).slice(0, 14).map((x) => x.c);
   }, [query]);
   const listed = query.trim() ? found : inRegion;
+  const hovered = hoverId ? CONDITIONS.find((c) => c.id === hoverId) ?? null : null;
   const hasContent = !!selected || meds.length > 0 || instructions.length > 0;
 
   type Snapshot = {
@@ -302,7 +305,7 @@ export default function Home() {
   return (
     <div className={`flex-1 w-full turn ${flip}`}>
       <div className="max-w-6xl mx-auto px-5">
-        <nav className="nav">
+        <nav className="nav rise">
           <a href={IS_STATIC ? "./" : "/"} className="wordmark flex items-center gap-2">
             <img src={asset("/anatomy/spot.png")} alt="" width={18} height={17} draggable={false} />
             {APP_NAME}
@@ -313,10 +316,10 @@ export default function Home() {
           <a href="https://github.com/ankthba/VTHacks14" className="ml-auto" target="_blank" rel="noopener noreferrer">GitHub</a>
         </nav>
 
-        <header className="pt-12 pb-10">
+        <header className="pt-12 pb-10 rise" style={{ animationDelay: "60ms" }}>
           <h1 className="display" style={{ fontSize: "clamp(2.4rem, 5vw, 4rem)" }}>
             {taglineWords.join(" ")}{" "}
-            <span className="ink-under">{taglineLast}<InkUnderline className="ink-under-svg" /></span>
+            <span className="ink-under">{taglineLast}<InkUnderline className="ink-under-svg" draw /></span>
           </h1>
           <p className="text-lg text-[color:var(--muted)] mt-4 max-w-xl">
             Paste the note you already wrote. Check what the patient will hear. Turn the screen.
@@ -331,10 +334,10 @@ export default function Home() {
 
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_400px] items-start pb-16">
           {/* ---------------- The document ---------------- */}
-          <div className="doc">
+          <div className="doc rise" style={{ animationDelay: "220ms" }}>
             <section>
               <div className="step">
-                <span className={stepClass(!!noteStatus, true)}><InkRing className="ring" />1</span>
+                <span className={stepClass(!!noteStatus, true)}><InkRing className="ring" draw />1</span>
                 <h2 className="display-sm text-2xl">Start from the note</h2>
               </div>
 
@@ -383,7 +386,7 @@ export default function Home() {
 
             <section>
               <div className="step">
-                <span className={stepClass(false, hasContent)}><InkRing className="ring" />2</span>
+                <span className={stepClass(false, hasContent)}><InkRing className="ring" draw />2</span>
                 <h2 className="display-sm text-2xl">Check what they will hear</h2>
               </div>
               {!hasContent && (
@@ -428,7 +431,11 @@ export default function Home() {
                       {listed.map((c) => (
                         <button
                           key={c.id}
-                          onClick={() => { setConditionId(c.id); setRegion(c.region); setCustomHeadline(c.plain); setChoosing(false); setQuery(""); }}
+                          onClick={() => { setConditionId(c.id); setRegion(c.region); setCustomHeadline(c.plain); setChoosing(false); setQuery(""); setHoverId(null); }}
+                          onMouseEnter={() => setHoverId(c.id)}
+                          onMouseLeave={() => setHoverId(null)}
+                          onFocus={() => setHoverId(c.id)}
+                          onBlur={() => setHoverId(null)}
                           className="row w-full text-left py-3 hover:opacity-75"
                         >
                           <span
@@ -534,15 +541,15 @@ export default function Home() {
 
             <section className="lg:hidden">
               <div className="step">
-                <span className={stepClass(false, canTurn)}><InkRing className="ring" />3</span>
+                <span className={stepClass(false, canTurn)}><InkRing className="ring" draw />3</span>
                 <h2 className="display-sm text-2xl">Turn the screen</h2>
               </div>
-              <button onClick={() => build(true)} disabled={!canTurn} className="btn btn-primary w-full py-4 text-lg disabled:opacity-50">{primaryLabel}</button>
+              <button onClick={() => build(true)} disabled={!canTurn} className="btn btn-primary btn-turn w-full py-4 text-lg disabled:opacity-50">{primaryLabel}</button>
             </section>
           </div>
 
           {/* ---------------- The preview ---------------- */}
-          <aside className="lg:sticky lg:top-6 space-y-4">
+          <aside className="lg:sticky lg:top-6 space-y-4 rise" style={{ animationDelay: "320ms" }}>
             <div className="slide-preview">
               <div className="flex items-center justify-between gap-2 flex-wrap mb-5">
                 <select value={language} onChange={(e) => setLanguage(e.target.value)} className="chip">
@@ -557,16 +564,16 @@ export default function Home() {
                 </div>
               </div>
 
-              {selected ? (
-                <div className="mx-auto max-w-[220px] mb-5"><Diagram id={selected.diagram} marks={selected.marks} /></div>
+              {(hovered ?? selected) ? (
+                <div key={(hovered ?? selected)!.id} className="mx-auto max-w-[220px] mb-5 rise"><Diagram id={(hovered ?? selected)!.diagram} marks={(hovered ?? selected)!.marks} /></div>
               ) : (
                 <div className="mx-auto h-44 mb-5 flex items-end justify-center gap-6 transition-opacity duration-500" aria-hidden style={{ opacity: noteBusy ? 1 : 0.3 }}>
                   <div className="h-full"><Figure region="body" body="female" spot={false} searching={noteBusy} /></div>
                   <div className="h-full"><Figure region="body" body="male" spot={false} searching={noteBusy} /></div>
                 </div>
               )}
-              {(customHeadline || selected?.plain) && (
-                <p className="display-sm" style={{ fontSize: "1.6rem" }}>{customHeadline || selected?.plain}</p>
+              {(hovered?.plain || customHeadline || selected?.plain) && (
+                <p key={hovered?.id ?? "chosen"} className="display-sm rise" style={{ fontSize: "1.6rem" }}>{hovered?.plain || customHeadline || selected?.plain}</p>
               )}
 
               {meds.filter((m) => m.name.trim()).length > 0 && (
@@ -581,7 +588,7 @@ export default function Home() {
               )}
             </div>
 
-            <button onClick={() => build(true)} disabled={!canTurn} className="btn btn-primary w-full py-4 text-lg disabled:opacity-50 hidden lg:block">
+            <button onClick={() => build(true)} disabled={!canTurn} className="btn btn-primary btn-turn w-full py-4 text-lg disabled:opacity-50 hidden lg:block">
               {primaryLabel}
             </button>
             {warnings.map((w) => <p key={w} className="text-sm text-[color:var(--muted)]">{w}</p>)}

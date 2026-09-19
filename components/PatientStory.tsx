@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Diagram } from "@/components/Diagram";
 import { BodyLocator, type BodyType } from "@/components/BodyLocator";
-import { InkCheck, InkStroke } from "@/components/Ink";
+import { InkCheck, InkSound, InkStroke } from "@/components/Ink";
 import { HowToArt } from "@/components/HowToArt";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 import type { Slide } from "@/lib/explain";
@@ -169,7 +169,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
               className="h-3 flex-1 transition-colors"
               style={{ color: n <= i ? "var(--accent)" : "var(--line)" }}
             >
-              <InkStroke className="block w-full h-full" />
+              <InkStroke className="block w-full h-full" draw={n === i} />
             </button>
           ))}
         </div>
@@ -243,7 +243,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
                 className={slide.kind === "todo" ? "flex gap-4 items-start" : ""}
                 style={{ fontSize: slide.kind === "howto" ? "clamp(1.1rem, 2vw, 1.5rem)" : "clamp(1.4rem, 3.2vw, 2.4rem)", lineHeight: 1.3, color: slide.kind === "howto" ? "var(--muted)" : undefined }}
               >
-                {slide.kind === "todo" && <InkCheck className="flex-none mt-2 text-[color:var(--accent-text)]" size={30} />}
+                {slide.kind === "todo" && <InkCheck className="flex-none mt-2 text-[color:var(--accent-text)]" size={30} draw delay={250 + n * 220} />}
                 <span className={n === 1 && slide.kind === "medicine" ? "font-semibold" : ""}>{l}</span>
               </p>
             ))}
@@ -271,7 +271,8 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
             Print this
           </button>
         )}
-        <span className="ml-auto">
+        <span className="ml-auto flex items-center gap-2">
+          {voice && <InkSound speaking={playing} className="text-[color:var(--accent-text)]" />}
           {voice === "browser" ? "Built-in voice" : voice === "elevenlabs" ? "Voice: ElevenLabs" : ""}
         </span>
         <button onClick={onBack} className="underline">
