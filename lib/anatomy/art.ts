@@ -40,6 +40,23 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       palm: { x: 0.44, y: 0.54, s: 1.1 },           // across the metacarpals
     },
   },
+  // Knee from the front: femur above, patella, tibia below, fibula to the right.
+  knee: {
+    src: asset("/anatomy/knee.png"),
+    w: 515,
+    h: 1083,
+    label: "Bones and ligaments of the knee",
+    spots: {
+      patella: { x: 0.375, y: 0.43, s: 0.8 },        // the kneecap
+      bursa: { x: 0.375, y: 0.42, s: 1.2 },          // in front of the kneecap
+      acl: { x: 0.375, y: 0.47, s: 0.8 },            // inside the joint, between the condyles
+      meniscus: { x: 0.375, y: 0.49, s: 1.2 },       // the joint line
+      back: { x: 0.375, y: 0.5, s: 1 },              // behind the joint
+      mcl: { x: 0.21, y: 0.5, s: 0.7 },              // inner edge of the joint
+      tibia: { x: 0.375, y: 0.53, s: 1.2 },          // the tibial plateau
+      "patellar-tendon": { x: 0.375, y: 0.56, s: 0.7 }, // kneecap down to the shin
+    },
+  },
 };
 
 /** The default spot, as a fraction of the drawing's width. */
