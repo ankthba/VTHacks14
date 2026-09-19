@@ -10,6 +10,10 @@ in their language, read aloud, one idea per screen, printed for the fridge.
 Built at VTHacks 14, September 2026, for the Impiricus track: *build the next
 HCP engagement tool.*
 
+**Live demo:** https://aniketh.net/aperta/ — the two example notes, in English
+and Spanish, with their audio. (Static site; live parsing of any note runs in
+the full app below.)
+
 ---
 
 ## Educational demo. Not medical advice.
@@ -114,10 +118,21 @@ Spanish and committed, so the demo runs with the wifi unplugged.
 | `GEMINI_API_KEY` | Photographing a printed note; one-batch translation; gap-filling on unstructured prose. |
 
 ```bash
+npm run verify         # typecheck + note-parsing regression + medication evals
 npm run precache:tts   # generate demo audio through the real pipeline
-npm run eval           # the medication engine's 40-case ground-truth set
-npm run eval:otc       # over-the-counter resolution
+npm run export:demo    # prebuild the demo bundle (needs the dev server up)
+npm run export:static  # static site for /aperta -> ./out
 ```
+
+### Publishing the static demo
+
+GitHub Pages has no server, so the published site is the demo in "static
+mode": `export:demo` runs both example notes through the real pipeline and
+saves the parse, the card per language and every cached clip into
+`public/demo`; `export:static` builds with `basePath: /aperta` and the server
+routes moved aside. Copy `out/` to `aperta/` in the site repo. The site root
+needs a `.nojekyll` file, or Pages silently drops the `_next/` directory and
+the page arrives unstyled.
 
 ## Surfaces
 

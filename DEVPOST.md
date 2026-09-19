@@ -4,6 +4,8 @@
 
 Paste the discharge note. Turn the screen around. The patient understands.
 
+**Try it:** https://aniketh.net/aperta/ · **Code:** https://github.com/ankthba/VTHacks14
+
 ## Inspiration
 
 Patients forget most of what they are told in a visit and misremember much of
