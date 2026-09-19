@@ -659,3 +659,14 @@ html { scroll-behavior: smooth; }
     --line: #bbb; --line-soft: #ddd; --ink: #111; --accent: #c3d8a6; --accent-ink: #1c2612; --accent-text: #3f6335;
   }
 }
+
+/* The sun spins its rays and the moon rocks to sleep when you hover the toggle. */
+.theme-toggle .sun .rays, .theme-toggle .moon { transform-origin: 12px 12px; transform-box: view-box; }
+.theme-toggle:hover .sun .rays { animation: sun-spin 2.4s linear infinite; }
+.theme-toggle:hover .moon { animation: moon-rock 1.6s ease-in-out infinite; }
+.theme-toggle:hover .moon .star { animation: twinkle 900ms ease-in-out infinite alternate; }
+.theme-toggle:hover .moon .star2 { animation: twinkle 700ms ease-in-out 200ms infinite alternate; }
+@keyframes sun-spin { to { transform: rotate(360deg); } }
+@keyframes moon-rock { 0%, 100% { transform: rotate(-9deg); } 50% { transform: rotate(9deg); } }
+@keyframes twinkle { from { opacity: 0.3; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .theme-toggle:hover .sun .rays, .theme-toggle:hover .moon, .theme-toggle:hover .moon .star, .theme-toggle:hover .moon .star2 { animation: none; } }
