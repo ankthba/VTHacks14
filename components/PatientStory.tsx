@@ -203,7 +203,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
         )}
 
         {slide.kicker && (
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[color:var(--muted)] mb-3">
+          <p className="text-[15px] font-bold text-[color:var(--accent-text)] mb-3">
             {slide.kicker}
           </p>
         )}
@@ -244,7 +244,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
                 className={slide.kind === "todo" ? "flex gap-4 items-start" : ""}
                 style={{ fontSize: slide.kind === "howto" ? "clamp(1.1rem, 2vw, 1.5rem)" : "clamp(1.4rem, 3.2vw, 2.4rem)", lineHeight: 1.3, color: slide.kind === "howto" ? "var(--muted)" : undefined }}
               >
-                {slide.kind === "todo" && <span style={{ color: "var(--accent)" }}>&#10003;</span>}
+                {slide.kind === "todo" && <span style={{ color: "var(--accent-text)" }}>&#10003;</span>}
                 <span className={n === 1 && slide.kind === "medicine" ? "font-semibold" : ""}>{l}</span>
               </p>
             ))}

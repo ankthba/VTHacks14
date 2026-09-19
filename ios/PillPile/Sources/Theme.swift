@@ -16,9 +16,10 @@ enum Theme {
     static let line = Color(hex: 0xD8CFBF)
     static let lineSoft = Color(hex: 0xE6DFD2)
 
-    static let accent = Color(hex: 0x4E7541)
+    static let accent = Color(hex: 0x8FB257)
     static let accentInk = Color(hex: 0xF3EEE4)
-    static let lime = Color(hex: 0xA9C98A)
+    static let lime = Color(hex: 0xC4D9A0)
+    static let accentText = Color(hex: 0x4B6A26)
 
     static let high = Color(hex: 0x9A2F1E)
     static let highBG = Color(hex: 0xF8E9E3)

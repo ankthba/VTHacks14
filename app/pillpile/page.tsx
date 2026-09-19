@@ -129,10 +129,10 @@ export default function Home() {
           asking your pharmacist.
         </p>
         <div className="flex flex-wrap gap-2 mt-4">
-          <a href="/" className="meta-chip hover:border-[color:var(--accent)]">
+          <a href="/" className="meta-chip hover:border-[color:var(--accent-text)]">
             Explaining to a patient? Open the explain tool &rarr;
           </a>
-          <a href="/clinician" className="meta-chip hover:border-[color:var(--accent)]">
+          <a href="/clinician" className="meta-chip hover:border-[color:var(--accent-text)]">
             Prescribing? Open the clinician view &rarr;
           </a>
         </div>
@@ -531,7 +531,7 @@ function MedRow({
           {summary.source_url && (
             <>
               {" "}
-              <a href={summary.source_url} target="_blank" rel="noopener noreferrer" className="underline text-[color:var(--accent)]">
+              <a href={summary.source_url} target="_blank" rel="noopener noreferrer" className="underline text-[color:var(--accent-text)]">
                 (FDA label)
               </a>
             </>

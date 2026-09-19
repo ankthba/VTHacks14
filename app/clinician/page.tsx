@@ -281,7 +281,7 @@ export default function ClinicianPage() {
               href={res.brief.labelUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block underline text-[color:var(--accent)]"
+              className="inline-block underline text-[color:var(--accent-text)]"
             >
               Full FDA label on DailyMed
             </a>

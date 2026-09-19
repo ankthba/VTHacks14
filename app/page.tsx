@@ -418,7 +418,7 @@ export default function Home() {
                   <ul className="mb-3 space-y-1.5">
                     {instructions.map((t) => (
                       <li key={t} className="flex justify-between gap-3 text-[15px]">
-                        <span><span style={{ color: "var(--accent)" }}>&#10003;</span> {t}</span>
+                        <span><span style={{ color: "var(--accent-text)" }}>&#10003;</span> {t}</span>
                         <button onClick={() => setInstructions((p) => p.filter((x) => x !== t))} className="link-action">remove</button>
                       </li>
                     ))}

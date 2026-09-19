@@ -139,7 +139,7 @@ export function CanITake({
                   key={v.id}
                   onClick={() => run(query, v.id)}
                   disabled={busy}
-                  className="w-full text-left rounded-xl border border-[color:var(--line)] p-3 hover:border-[color:var(--accent)] disabled:opacity-50"
+                  className="w-full text-left rounded-xl border border-[color:var(--line)] p-3 hover:border-[color:var(--accent-text)] disabled:opacity-50"
                 >
                   <span className="font-bold block">{v.brand}</span>
                   <span className="text-sm text-[color:var(--muted)]">

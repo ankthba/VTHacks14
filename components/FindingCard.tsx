@@ -79,7 +79,7 @@ export function FindingCard({
               href={c.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="underline text-[color:var(--accent)]"
+              className="underline text-[color:var(--accent-text)]"
             >
               {c.label}
             </a>

@@ -16,25 +16,27 @@
  *    on a projector.
  */
 :root {
-  /* Warm ivory-beige ground with cream surfaces and warm brown-black text -
-     the calm of a reading page. Green appears only on things you can press,
-     and it is matcha: deep enough to carry white type, soft enough not to
-     shout. */
-  --background: #f3eee4;
-  --surface: #faf7f1;
-  --surface-warm: #ebe5d8;
+  /* Warm ivory-beige page, cream surfaces, warm brown-black text. Matcha is
+     the only colour: a milky yellow-green FILL with dark green ink for
+     anything you press, and a deeper matcha for links, because the fill
+     itself cannot carry text on the page. */
+  --background: #f4efe4;
+  --surface: #fbf8f2;
+  --surface-warm: #ece6d8;
   --foreground: #2a2520;
-  --foreground-deep: #1f1b17;
+  --foreground-deep: #24291a;
   --muted: #675d51;
   --line: #d8cfbf;
   --line-soft: #e6dfd2;
 
-  --accent: #4e7541;
-  --accent-hover: #43663a;
-  --accent-ink: #f7faf0;
-  --lime: #a9c98a;
+  --accent: #8fb257;
+  --accent-hover: #7fa348;
+  --accent-ink: #1c2612;
+  --accent-text: #4b6a26;
+  --lime: #c4d9a0;
+  /* Text on the one dark surface (the disclaimer bar). */
+  --on-dark: #f4efe4;
 
-  /* Semantic, warmed to sit in the palette. A warning still reads as one. */
   --high: #9a2f1e;
   --high-bg: #f8e9e3;
   --moderate: #7f5d0a;
@@ -42,7 +44,7 @@
   --ok: #3f6335;
   --ok-bg: #e6efdb;
 
-  --radius-card: 12px;
+  --radius-card: 14px;
   --radius-pill: 999px;
 }
 
@@ -69,24 +71,44 @@ body {
   font-size: 17px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  position: relative;
 }
+
+/* A faint paper grain, so the page is a surface rather than a flat colour. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.2 0 0 0 0 0.15 0 0 0 0 0.1 0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+body > * { position: relative; z-index: 1; }
 
 /*
  * Display type: serif, regular weight, tight tracking, leading just under 1.
  * The restraint is the point - weight 400 at a large size, not bold.
  */
+/*
+ * Display type: a soft serif at a medium weight with the "wonk" on, tracking
+ * left alone. The old setting - hairline serif, weight 400, -0.02em - was the
+ * cold part.
+ */
 .display {
   font-family: var(--font-display), Georgia, serif;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 0.95;
+  font-weight: 600;
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 72;
+  letter-spacing: -0.005em;
+  line-height: 1.02;
 }
 
 .display-sm {
   font-family: var(--font-display), Georgia, serif;
-  font-weight: 400;
-  letter-spacing: -0.015em;
-  line-height: 1.1;
+  font-weight: 600;
+  font-variation-settings: "SOFT" 80, "WONK" 1, "opsz" 36;
+  letter-spacing: 0;
+  line-height: 1.15;
 }
 
 /* Pill buttons, straight from the source. */
@@ -100,6 +122,7 @@ body {
 .btn-primary {
   background: var(--accent);
   color: var(--accent-ink);
+  box-shadow: inset 0 -2px 0 rgba(28, 38, 18, 0.12);
 }
 .btn-primary:hover:not(:disabled) {
   background: var(--accent-hover);
@@ -112,7 +135,7 @@ body {
 }
 .btn-secondary:hover:not(:disabled) {
   background: var(--surface-warm);
-  border-color: var(--foreground);
+  border-color: var(--accent-text);
 }
 
 .chip {
@@ -123,7 +146,7 @@ body {
   font-size: 14px;
 }
 .chip:hover:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   background: #fff;
 }
 
@@ -134,7 +157,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--accent-text);
   outline-offset: 2px;
 }
 
@@ -259,26 +282,26 @@ body {
 }
 .step-n {
   flex: none;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
   font-weight: 700;
-  background: var(--foreground);
-  color: var(--background);
+  background: var(--accent);
+  color: var(--accent-ink);
   transform: translateY(4px);
 }
-.step-n.done { background: var(--accent); color: var(--accent-ink); }
+.step-n.done { background: var(--accent-text); color: #fff; }
 .step-n.todo { background: var(--surface-warm); color: var(--muted); }
 
 /* The document: one tall panel, sections divided by hairlines, no nested boxes. */
 .doc {
   background: var(--surface);
   border: 1px solid var(--line-soft);
-  border-radius: 20px;
+  border-radius: 22px;
   box-shadow:
     0 1px 2px rgba(42, 37, 32, 0.04),
     0 12px 32px -12px rgba(42, 37, 32, 0.16);
@@ -290,18 +313,16 @@ body {
 .field {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 12px;
   background: #fff;
   padding: 10px 12px;
   font-size: 15px;
 }
-.field:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+.field:focus { outline: 2px solid var(--accent-text); outline-offset: 1px; border-color: var(--accent-text); }
 .field-label {
   display: block;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 700;
   color: var(--muted);
   margin-bottom: 6px;
 }
@@ -313,7 +334,7 @@ body {
   padding: 0;
   font: inherit;
   font-size: 14px;
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
