@@ -1,4 +1,5 @@
 import type { DiagramId } from "@/lib/anatomy/conditions";
+import { ART, SPOT_SRC, SPOT_WIDTH } from "@/lib/anatomy/art";
 
 /**
  * Anatomically modeled diagrams for the exam room.
@@ -48,6 +49,30 @@ export function Diagram({
   marks?: string[];
   className?: string;
 }) {
+  // The clinician's own drawing, when there is one for this view.
+  const art = ART[id];
+  if (art) {
+    return (
+      <div className={className} role="img" aria-label={art.label} style={{ position: "relative", width: "100%", aspectRatio: `${art.w} / ${art.h}` }}>
+        <img src={art.src} alt="" className="block w-full h-full" draggable={false} />
+        {marks.filter((m) => art.spots[m]).map((m) => {
+          const p = art.spots[m];
+          return (
+            <img
+              key={m}
+              src={SPOT_SRC}
+              alt=""
+              aria-hidden
+              draggable={false}
+              className="spot absolute"
+              style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%`, width: `${SPOT_WIDTH * p.s * 100}%`, transform: "translate(-50%, -50%)" }}
+            />
+          );
+        })}
+      </div>
+    );
+  }
+
   const on = (k: string) => marks.includes(k);
   const base = {
     fill: "none",

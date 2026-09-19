@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Diagram } from "@/components/Diagram";
 import { asset } from "@/lib/staticMode";
+import { SPOT_SRC } from "@/lib/anatomy/art";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 
 /**
@@ -21,7 +22,6 @@ const ART: Record<BodyType, { src: string; w: number; h: number }> = {
   male: { src: asset("/anatomy/male.png"), w: 414, h: 1149 },
   female: { src: asset("/anatomy/female.png"), w: 368, h: 1143 },
 };
-const SPOT_SRC = asset("/anatomy/spot.png");
 
 /**
  * Where each anatomical view sits on the figure, as fractions of its box:
