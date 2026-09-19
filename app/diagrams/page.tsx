@@ -53,7 +53,7 @@ export default function DiagramsPage() {
         {uniqueViews().length} anatomical views. Every red spot on a condition
         sits on the real structure.
       </p>
-      <h2 className="display-sm text-3xl mt-10 mb-4">The views</h2>
+      <div className="mt-10" />
       <div className="grid gap-x-10 gap-y-12 grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
         {uniqueViews().map((id) => (
           <a key={id} href={`#${slug(homeOf(id))}`} className="card view-link block">
