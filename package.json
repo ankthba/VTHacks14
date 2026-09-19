@@ -16,7 +16,8 @@
     "declutter": "sh scripts/declutter.sh",
     "prebuild": "sh scripts/declutter.sh",
     "pretypecheck": "sh scripts/declutter.sh",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "precache:tts": "tsx scripts/precache-tts.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

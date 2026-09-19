@@ -1,0 +1,1 @@
+{"rxclassDrugInfoList":{"rxclassDrugInfo":[{"minConcept":{"rxcui":"1373150","name":"guaiac","tty":"IN"},"rxclassMinConceptItem":{"classId":"D006138","className":"Guaiac","classType":"CHEM"},"rela":"has_ingredient","relaSource":"MEDRT"}]}}

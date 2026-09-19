@@ -48,7 +48,13 @@ export function ReadAloud({ text, lang }: { text: string; lang: string }) {
       });
 
       if (!res.ok) {
-        setNote("Using your browser's built-in voice (no ElevenLabs key set).");
+        // 503 = no key, 502 = ElevenLabs refused (quota, voice, network).
+        // Either way the built-in voice reads it; the note just says which.
+        setNote(
+          res.status === 503
+            ? "Using your browser's built-in voice (no ElevenLabs key set)."
+            : "Using your browser's built-in voice (ElevenLabs unavailable right now).",
+        );
         speakInBrowser();
         return;
       }
