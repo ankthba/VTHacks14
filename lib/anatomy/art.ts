@@ -233,6 +233,21 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       nerve: { x: 0.69, y: 0.7, s: 0.7 },                                    // the nerve running down the forearm
     },
   },
+  // The pelvis and both hips from the front. Marks sit on the left-hand hip.
+  hip: {
+    src: asset("/anatomy/hip.png"),
+    w: 952,
+    h: 869,
+    label: "The pelvis and hips",
+    spots: {
+      joint: { x: 0.25, y: 0.5, s: 0.9 },                                    // the ball in its socket
+      neck: { x: 0.19, y: 0.6, s: 0.8 },                                     // the neck of the thigh bone
+      bursa: { x: 0.12, y: 0.64, s: 0.7 },                                   // the bony point on the outside
+      groin: { x: 0.34, y: 0.8, s: 0.8 },                                    // the inner thigh, near the groin
+      vein: { x: 0.37, y: 0.91, s: 0.8 },                                    // the deep vein down the inner thigh
+      hamstring: { x: 0.21, y: 0.92, s: 0.8 },                               // the back of the thigh
+    },
+  },
 };
 
 /** Every spot for a mark, whether the drawing has one view or two. */
