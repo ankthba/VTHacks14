@@ -1,4 +1,4 @@
-# Bedside — Devpost
+# Aperta — Devpost
 
 ## One line
 
@@ -178,7 +178,7 @@ already has the content and the HCP network. That's you."
 | **Impiricus** | The pitch above. Physician-initiated, in-room, content-delivering, measurable. |
 | **Overall** | Real problem, working end-to-end demo with no keys, measured accuracy, visible refusals. |
 | **Best UI/UX** | Granola-derived system across web and iOS; WCAG AA verified; one idea per screen; paced read-aloud as the accessibility feature. |
-| **HokieAI sidekick** | *Proposed:* a campus assistant should refuse medication questions — Bedside is what sits on the other side of that boundary. A `/ask` hand-off page that answers only drug questions with citations is a 45-minute add. |
+| **HokieAI sidekick** | *Proposed:* a campus assistant should refuse medication questions — Aperta is what sits on the other side of that boundary. A `/ask` hand-off page that answers only drug questions with citations is a 45-minute add. |
 
 ## Limitations we will say out loud
 
