@@ -1,5 +1,6 @@
 import { CONDITIONS, REGIONS, type DiagramId } from "@/lib/anatomy/conditions";
 import { Diagram } from "@/components/Diagram";
+import { VIEWS } from "@/lib/anatomy/views";
 import { InkArrow } from "@/components/Ink";
 import { UpButton } from "@/components/UpButton";
 import { IS_STATIC, asset } from "@/lib/staticMode";
@@ -49,7 +50,8 @@ export default function DiagramsPage() {
             <div className="aspect-square w-full flex items-center justify-center p-[5%]">
               <Diagram id={id} fit />
             </div>
-            <p className="text-sm font-semibold mt-3 capitalize">{id}</p>
+            <p className="text-sm font-semibold mt-3">{VIEWS[id].label}</p>
+            <p className="text-[13px] leading-snug text-[color:var(--muted)] mt-1">{VIEWS[id].plain}</p>
           </a>
         ))}
       </div>
