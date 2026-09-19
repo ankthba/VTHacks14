@@ -116,7 +116,7 @@ export default function ClinicianPage() {
 
         <label className="block mt-4">
           <span className="block text-sm font-semibold mb-1">
-            Current medications &mdash; one per line
+            Current medications, one per line
           </span>
           <textarea
             value={currentText}

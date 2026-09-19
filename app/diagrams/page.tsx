@@ -1,15 +1,9 @@
 import { CONDITIONS, REGIONS, type DiagramId } from "@/lib/anatomy/conditions";
 import { Diagram } from "@/components/Diagram";
 
-/** Every view once, with every structure it can mark switched on. */
-function uniqueViews() {
-  const seen = new Map<DiagramId, Set<string>>();
-  for (const c of CONDITIONS) {
-    const set = seen.get(c.diagram) ?? new Set<string>();
-    c.marks.forEach((m) => set.add(m));
-    seen.set(c.diagram, set);
-  }
-  return [...seen.entries()].map(([id, marks]) => ({ id, marks: [...marks] }));
+/** Every view once, drawn plain: the red belongs to a diagnosis, not a catalogue. */
+function uniqueViews(): DiagramId[] {
+  return [...new Set(CONDITIONS.map((c) => c.diagram))];
 }
 
 import { APP_NAME } from "@/lib/brand";
@@ -23,17 +17,17 @@ export default function DiagramsPage() {
       <h1 className="display text-5xl">Anatomy library</h1>
       <p className="text-lg text-[color:var(--muted)] mt-3 max-w-2xl">
         {CONDITIONS.length} conditions across{" "}
-        {new Set(CONDITIONS.map((c) => c.diagram)).size} anatomical views. Each
-        marked structure is a real one.
+        {uniqueViews().length} anatomical views. Every red spot on a condition
+        sits on the real structure.
       </p>
       <h2 className="display-sm text-3xl mt-10 mb-4">The views</h2>
       <div className="grid gap-4 grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
-        {uniqueViews().map((v) => (
-          <div key={v.id} className="card">
+        {uniqueViews().map((id) => (
+          <div key={id} className="card">
             <div className="aspect-square w-full flex items-center justify-center">
-              <Diagram id={v.id} marks={v.marks} fit />
+              <Diagram id={id} fit />
             </div>
-            <p className="text-sm font-semibold mt-3 capitalize">{v.id}</p>
+            <p className="text-sm font-semibold mt-3 capitalize">{id}</p>
           </div>
         ))}
       </div>

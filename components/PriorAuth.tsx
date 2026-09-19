@@ -104,7 +104,7 @@ export function PriorAuth({
 
       <div className="mt-5">
         <p className="text-sm font-semibold mb-2">
-          Tried and failed &mdash; what a payer adjudicates on
+          Tried and failed: what a payer adjudicates on
         </p>
         <div className="space-y-2">
           {tried.map((t, i) => (
@@ -206,7 +206,7 @@ export function PriorAuth({
             </pre>
             <p className="text-sm text-[color:var(--muted)] mt-2">
               {res.composed
-                ? "Composed from the assembled statements only — the model was given the evidence and forbidden from adding to it."
+                ? "Composed from the assembled statements only. The model was given the evidence and forbidden from adding to it."
                 : "Assembled deterministically. No model was involved."}
             </p>
           </div>

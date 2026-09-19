@@ -4,13 +4,13 @@
 
 A clinician pastes the discharge summary. The tool turns it into what the
 patient still understands at home: where on their body, one plain sentence,
-each medicine and how to take it, what to do next, and how to actually do it —
+each medicine and how to take it, what to do next, and how to actually do it,
 in their language, read aloud, one idea per screen, printed for the fridge.
 
 Built at VTHacks 14, September 2026, for the Impiricus track: *build the next
 HCP engagement tool.*
 
-**Live demo:** https://aniketh.net/aperta/ — the two example notes, in English
+**Live demo:** https://aniketh.net/aperta/ shows the two example notes, in English
 and Spanish, with their audio. (Static site; live parsing of any note runs in
 the full app below.)
 
@@ -18,7 +18,7 @@ the full app below.)
 
 ## Educational demo. Not medical advice.
 
-Every screen and printout carries that line. Nothing is stored — the note lives
+Every screen and printout carries that line. Nothing is stored. The note lives
 for one request. No real patient data was used; the demo notes are synthetic.
 The clinician is the author: every generated sentence is shown to them and is
 editable before the screen is turned toward the patient.
@@ -35,7 +35,7 @@ being genuinely useful in that moment is *"be the answer, not the ad."*
 Underneath is a real problem: patients forget most of what they are told in a
 visit and misremember much of the rest. The evidence-based fix is teach-back,
 which a fifteen-minute slot does not allow. So the explanation becomes an
-artifact instead — built in the seconds the clinician already spends explaining,
+artifact instead, built in the seconds the clinician already spends explaining,
 from the note they already wrote.
 
 ---
@@ -59,7 +59,7 @@ paste the note (or photograph it)
   ├─► HOW-TO      instructions that name a procedure attach a walkthrough
   │               (socket irrigation, inhaler + spacer, crutches, eye drops…)
   │
-  ├─► TRANSLATE   Spanish, Vietnamese, Chinese, Arabic — free, key-less, cached
+  ├─► TRANSLATE   Spanish, Vietnamese, Chinese, Arabic. Free, key-less, cached
   │
   └─► TURN THE SCREEN
                   whole body → region glows → zoom into the marked drawing;
@@ -73,7 +73,7 @@ This is the part we would put on a poster.
 
 - **It never invents a medication.** A line under *Medications* is a drug only
   if it reads as a drug order. A note with `Headache (QOD)` in that section
-  once became an aspirin/caffeine headache powder — RxNorm's fuzzy matcher will
+  once became an aspirin/caffeine headache powder. RxNorm's fuzzy matcher will
   resolve almost anything to *something*. A resolution is now trusted only if
   the printed name shares a word with the canonical one or carried a dose.
   Everything else is handed to the clinician as **Not used**, and the screen
@@ -86,7 +86,7 @@ This is the part we would put on a poster.
 - **It never translates a drug name.** The patient has to match it to the
   bottle.
 - **It never shows a specimen.** The default picture is a whole-body locator
-  zooming into a hand-drawn part with a red spot on it — it answers
+  zooming into a hand-drawn part with a red spot on it. It answers
   *"where on me"*, and it prints. There is no 3D and no stock illustration.
 - **The model, when present, only translates or fills parsing gaps.** Which
   diagram and which plain sentence a diagnosis becomes is decided by the
@@ -139,7 +139,7 @@ the page arrives unstyled.
 | Route | |
 |---|---|
 | `/` | The explain tool. Clinician side, then *Turn the screen around* |
-| `/diagrams` | The anatomy library — every condition with its structure marked |
+| `/diagrams` | The anatomy library: every condition with its structure marked |
 | `/clinician` | Prescriber check: label-grounded interactions, renal/hepatic sections, access, prior-auth draft |
 | `/pillpile` | The original patient medication checker this grew out of |
 | `/labels` | Printable synthetic bottle labels for props |
@@ -150,7 +150,7 @@ The project began as PillPile, a patient-facing checker that found hidden
 duplicate ingredients (Norco + Tylenol → 5,300 mg of acetaminophen a day) by
 set intersection over RxNorm identifiers, with a 40-case eval that caught five
 real bugs. That engine still powers every medication sentence here. The pivot
-was recognising that the same discipline — computed, cited, refusing to guess —
+was recognising that the same discipline, computed, cited, refusing to guess,
 mattered more on the screen a doctor turns toward a patient.
 
 ## Limitations

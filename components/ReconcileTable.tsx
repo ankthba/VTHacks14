@@ -58,7 +58,7 @@ export function ReconcileTable({ rows }: { rows: ReconcileRow[] }) {
                       </span>
                     </>
                   ) : (
-                    <span className="text-[color:var(--muted)]">&mdash;</span>
+                    <span className="text-[color:var(--muted)]">none</span>
                   )}
                 </td>
                 <td className="py-4 border-b border-[color:var(--line-soft)]">
@@ -70,7 +70,7 @@ export function ReconcileTable({ rows }: { rows: ReconcileRow[] }) {
                       </span>
                     </>
                   ) : (
-                    <span className="text-[color:var(--muted)]">&mdash;</span>
+                    <span className="text-[color:var(--muted)]">none</span>
                   )}
                 </td>
               </tr>

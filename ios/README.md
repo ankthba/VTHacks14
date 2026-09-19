@@ -16,8 +16,8 @@ cannot:
 
 - **The real camera**, rather than a file picker.
 - **Offline read-aloud.** `AVSpeechSynthesizer` needs no API key and no network,
-  so the accessibility feature — the one that matters most for the intended user
-  — cannot be taken out by conference wifi or a missing ElevenLabs key.
+  so the accessibility feature, the one that matters most for the intended user,
+  cannot be taken out by conference wifi or a missing ElevenLabs key.
 
 ## What it deliberately does NOT do
 
@@ -57,7 +57,7 @@ to `~/Library/Developer/Xcode/DerivedData` avoids the synced folder entirely.
 ## Pointing it at a server
 
 The app talks to `http://localhost:3000` by default, which the simulator reaches
-on the host Mac. Change it under the gear icon — use the deployed URL when
+on the host Mac. Change it under the gear icon. Use the deployed URL when
 running on a physical phone.
 
 `NSAllowsLocalNetworking` is set so a plain-HTTP dev server works; a deployed

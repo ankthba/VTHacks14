@@ -214,7 +214,7 @@ export function renderPriorAuthLetter(
   patient: PatientContext,
 ): string {
   const L: string[] = [];
-  L.push("PRIOR AUTHORIZATION REQUEST — CLINICAL JUSTIFICATION");
+  L.push("PRIOR AUTHORIZATION REQUEST: CLINICAL JUSTIFICATION");
   L.push("");
   L.push(`Requested medication: ${packet.candidateCanonical ?? packet.candidateName}`);
   if (patient.diagnosis) L.push(`Indication: ${patient.diagnosis}`);
@@ -225,7 +225,7 @@ export function renderPriorAuthLetter(
   for (const e of packet.evidence) {
     L.push(`- ${e.claim} ${SOURCE_TAG[e.source]}`);
     if (e.quote) L.push(`    "${e.quote.slice(0, 300)}"`);
-    if (e.citation) L.push(`    Source: ${e.citation.label} — ${e.citation.url}`);
+    if (e.citation) L.push(`    Source: ${e.citation.label} (${e.citation.url})`);
   }
 
   if (packet.alternatives.length) {

@@ -143,6 +143,23 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       pleura: { x: 0.1, y: 0.65, s: 1.2 },                                   // the lining at the edge of the lung
     },
   },
+  // The abdomen from the front: liver and stomach above, the bowel below.
+  abdomen: {
+    src: asset("/anatomy/abdomen.png"),
+    w: 749,
+    h: 964,
+    label: "Organs of the abdomen",
+    spots: {
+      liver: { x: 0.32, y: 0.17, s: 1.4 },                                   // upper right of the abdomen
+      stomach: { x: 0.66, y: 0.2, s: 1.1 },                                  // upper left
+      gallbladder: { x: 0.39, y: 0.24, s: 0.6 },                             // tucked under the liver
+      pancreas: { x: 0.51, y: 0.28, s: 1 },                                  // behind the stomach
+      bowel: { x: 0.48, y: 0.55, s: 1.6 },                                   // the coils of the bowel
+      appendix: { x: 0.47, y: 0.77, s: 0.7 },                                // hanging off the start of the large bowel
+      rectum: { x: 0.5, y: 0.96, s: 0.6 },                                   // the last stretch
+      hernia: { x: 0.15, y: 0.83, s: 0.8 },                                  // the groin
+    },
+  },
 };
 
 /** Every spot for a mark, whether the drawing has one view or two. */

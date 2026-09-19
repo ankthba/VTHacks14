@@ -173,7 +173,7 @@ export default function Home() {
           <h2 className="display-sm text-3xl mb-2">Check what we read</h2>
           <p className="text-[color:var(--muted)] mb-5">
             Everything below came off the labels. Fix anything that is wrong
-            before we check it &mdash; a wrong name here would make every check
+            before we check it. A wrong name here would make every check
             wrong too.
           </p>
           <BottleReview
@@ -252,7 +252,7 @@ function StartScreen({
         <h2 className="display-sm text-3xl">Take a photo of your bottles</h2>
         <p className="text-[color:var(--muted)] mt-2 max-w-xl">
           One photo of the whole pile, or several photos. We read the printed
-          label &mdash; never the pills themselves.
+          label, never the pills themselves.
         </p>
         <input
           ref={fileRef}
@@ -281,7 +281,7 @@ function StartScreen({
         </h2>
         <p className="text-[color:var(--muted)] mt-1 text-[15px]">
           Photograph the medication list the hospital sent you home with, and we
-          will compare it against your bottles &mdash; what is missing, what is
+          will compare it against your bottles: what is missing, what is
           extra, and where the strengths disagree.
         </p>
         <input
@@ -520,7 +520,7 @@ function MedRow({
            Worth saying out loud: it usually means an old bottle. */
         <p className="text-sm mt-2 inline-block px-2 py-1 rounded" style={{ background: "var(--moderate-bg)", color: "var(--moderate)" }}>
           This product has been discontinued. We matched it to the historical
-          record, so it is still fully checked &mdash; but it may be an old
+          record, so it is still fully checked, but it may be an old
           bottle worth asking about.
         </p>
       )}

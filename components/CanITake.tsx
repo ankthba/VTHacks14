@@ -76,7 +76,7 @@ export function CanITake({
       <h2 className="display-sm text-3xl">Can I take something else?</h2>
       <p className="text-[color:var(--muted)] mt-1 text-[15px]">
         About to buy a cold or pain medicine? Check it against what you already
-        take &mdash; before you buy it, not after.
+        take, before you buy it, not after.
       </p>
 
       <form
@@ -180,7 +180,7 @@ export function CanITake({
             </p>
             {res.chosen && (
               <p className="text-sm text-[color:var(--muted)] mt-1">
-                Checked: {res.chosen.brand} &mdash;{" "}
+                Checked: {res.chosen.brand},{" "}
                 {res.chosen.substanceNames.join(", ").toLowerCase()}
               </p>
             )}

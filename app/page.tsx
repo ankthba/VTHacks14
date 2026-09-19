@@ -334,7 +334,7 @@ export default function Home() {
 
               {skippedLines.length > 0 && (
                 <div className="mt-4 pl-4 border-l-2" style={{ borderColor: "var(--moderate)" }}>
-                  <p className="text-sm font-semibold" style={{ color: "var(--moderate)" }}>Not used &mdash; the patient will not hear these</p>
+                  <p className="text-sm font-semibold" style={{ color: "var(--moderate)" }}>Not used. The patient will not hear these</p>
                   <ul className="mt-2 space-y-1 text-sm">
                     {skippedLines.map((l) => (
                       <li key={l} className="flex justify-between gap-3">
@@ -528,14 +528,14 @@ export default function Home() {
               ) : (
                 <div className="h-28 mb-5 flex items-center justify-center text-[14px] text-[color:var(--muted)]">The picture appears here.</div>
               )}
-              <p className="display-sm" style={{ fontSize: "1.6rem" }}>{customHeadline || selected?.plain || "\u2014"}</p>
+              <p className="display-sm" style={{ fontSize: "1.6rem" }}>{customHeadline || selected?.plain || "\u2026"}</p>
 
               {meds.filter((m) => m.name.trim()).length > 0 && (
                 <div className="mt-5 pt-4 border-t border-[color:var(--line-soft)] space-y-2">
                   {meds.filter((m) => m.name.trim()).map((m, i) => (
                     <p key={i} className="text-[15px]">
                       <span className="font-semibold">{m.name}</span>
-                      {m.purpose && <span className="text-[color:var(--muted)]"> &mdash; {m.purpose}</span>}
+                      {m.purpose && <span className="text-[color:var(--muted)]"> &middot; {m.purpose}</span>}
                     </p>
                   ))}
                 </div>
@@ -555,7 +555,7 @@ export default function Home() {
         <footer className="py-8 border-t border-[color:var(--line-soft)] text-[13px] text-[color:var(--muted)] flex flex-wrap gap-x-6 gap-y-2">
           <span>{APP_NAME}</span>
           <span>VTHacks 14</span>
-          <span>Educational demo &mdash; not medical advice</span>
+          <span>Educational demo. Not medical advice.</span>
         </footer>
       </div>
     </div>

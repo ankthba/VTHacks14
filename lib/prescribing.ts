@@ -142,7 +142,7 @@ export async function accessSignal(ingredientName: string): Promise<AccessSignal
       ? `${totalGeneric} generic products registered against ${brandCount} brand. Long-established generic.`
       : verdict === "generic available"
         ? `${totalGeneric} generic product(s) registered against ${brandCount} brand. Registration does not mean a generic is actually marketed or low cost.`
-        : `No generic registered — ${brandCount} brand product(s) only. Prior authorisation is more likely.`;
+        : `No generic registered: ${brandCount} brand product(s) only. Prior authorisation is more likely.`;
 
   return { genericCount, brandCount, authorizedGenericCount, verdict, note };
 }
