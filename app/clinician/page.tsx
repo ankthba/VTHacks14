@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FindingCard } from "@/components/FindingCard";
+import { PriorAuth } from "@/components/PriorAuth";
 import type { Finding } from "@/lib/types";
 
 interface Brief {
@@ -256,6 +257,24 @@ export default function ClinicianPage() {
               </p>
             </section>
           )}
+
+          <PriorAuth
+            candidate={candidate}
+            candidateStrength={strength}
+            current={currentText
+              .split("\n")
+              .map((l) => l.trim())
+              .filter(Boolean)
+              .map((line) => ({
+                drug_text: line,
+                strength: null,
+                sig: null,
+                quantity: null,
+                prescriber: null,
+                fill_date: null,
+                confidence: 1,
+              }))}
+          />
 
           {res.brief.labelUrl && (
             <a

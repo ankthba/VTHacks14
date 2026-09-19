@@ -126,16 +126,23 @@ export async function accessSignal(ingredientName: string): Promise<AccessSignal
   }
 
   const totalGeneric = genericCount + authorizedGenericCount;
+
+  // Deliberately conservative wording. An NDC listing is a REGISTERED product,
+  // not proof that it is marketed, stocked or cheap - rivaroxaban shows 33
+  // generic listings while still being a costly brand-dominant drug in
+  // practice. Claiming "usually inexpensive" off this number is the kind of
+  // confidently wrong statement a clinician spots in one second, so the note
+  // reports the count and names its own limit instead of inferring price.
   let verdict: AccessSignal["verdict"] = "brand only";
-  if (totalGeneric >= 20) verdict = "widely generic";
+  if (totalGeneric >= 100) verdict = "widely generic";
   else if (totalGeneric > 0) verdict = "generic available";
 
   const note =
     verdict === "widely generic"
-      ? `${totalGeneric} generic products marketed. Usually inexpensive and rarely needs prior authorisation.`
+      ? `${totalGeneric} generic products registered against ${brandCount} brand. Long-established generic.`
       : verdict === "generic available"
-        ? `${totalGeneric} generic product(s) marketed against ${brandCount} brand. Coverage varies by plan.`
-        : `No marketed generic — ${brandCount} brand product(s) only. Expect higher cost and a greater chance of prior authorisation.`;
+        ? `${totalGeneric} generic product(s) registered against ${brandCount} brand. Registration does not mean a generic is actually marketed or low cost.`
+        : `No generic registered — ${brandCount} brand product(s) only. Prior authorisation is more likely.`;
 
   return { genericCount, brandCount, authorizedGenericCount, verdict, note };
 }
