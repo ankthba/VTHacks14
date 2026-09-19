@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		492E4959D75DDFD00274C227 /* FindingCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F7D185A4A7C84CD423D27B4 /* FindingCardView.swift */; };
+		68C47C262599EA583105C952 /* FlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B10AA58D1F7D0DD82934E9F /* FlowTests.swift */; };
 		70CA7CFE5DEA0E2ACE5C72BE /* PillPileApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2B11A9AAC55D77C08F2B2E /* PillPileApp.swift */; };
 		7C775F156250731F2F70C601 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857B329787E381A737A4ED80 /* Models.swift */; };
 		A9BCB1BBA7574422DC7D618B /* ReadAloud.swift in Sources */ = {isa = PBXBuildFile; fileRef = 220B37F73953A2F36BFE0214 /* ReadAloud.swift */; };
@@ -17,7 +18,18 @@
 		E8B19477E72B190D7EE78A38 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F27EB43093253327B191D3B /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		A579C9801345FDD149F97778 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E697B5FD999FD9E134A73932 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 586D8D125831637EF3BBDD9A;
+			remoteInfo = PillPile;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		1B10AA58D1F7D0DD82934E9F /* FlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowTests.swift; sourceTree = "<group>"; };
 		220B37F73953A2F36BFE0214 /* ReadAloud.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadAloud.swift; sourceTree = "<group>"; };
 		5A2B11A9AAC55D77C08F2B2E /* PillPileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PillPileApp.swift; sourceTree = "<group>"; };
 		6F7D185A4A7C84CD423D27B4 /* FindingCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindingCardView.swift; sourceTree = "<group>"; };
@@ -25,6 +37,7 @@
 		7F27EB43093253327B191D3B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		857B329787E381A737A4ED80 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		9B94E0771532BF12B248F041 /* PillPile.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PillPile.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF55ABBD3E77D314E0DED83C /* PillPileUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PillPileUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2E3BDB972160260D508B417 /* ReconcileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReconcileView.swift; sourceTree = "<group>"; };
 		D48BADA621CECB70E64C26E0 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -42,6 +55,7 @@
 			isa = PBXGroup;
 			children = (
 				106901F82F587CCA906F10B3 /* PillPile */,
+				708B2C1F1F2ECC1F650ECB39 /* PillPileUITests */,
 				81DBBC77BA3CCD58D7D57C20 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,10 +75,19 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
+		708B2C1F1F2ECC1F650ECB39 /* PillPileUITests */ = {
+			isa = PBXGroup;
+			children = (
+				1B10AA58D1F7D0DD82934E9F /* FlowTests.swift */,
+			);
+			path = PillPileUITests;
+			sourceTree = "<group>";
+		};
 		81DBBC77BA3CCD58D7D57C20 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				9B94E0771532BF12B248F041 /* PillPile.app */,
+				AF55ABBD3E77D314E0DED83C /* PillPileUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -89,6 +112,24 @@
 			productReference = 9B94E0771532BF12B248F041 /* PillPile.app */;
 			productType = "com.apple.product-type.application";
 		};
+		84B8B9157DA2CE8DD58209BE /* PillPileUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D60F4D4201A4ACC7A794164 /* Build configuration list for PBXNativeTarget "PillPileUITests" */;
+			buildPhases = (
+				1A70A178AA6AE46E6011F35B /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				60C0B45D6E273CE619E71E01 /* PBXTargetDependency */,
+			);
+			name = PillPileUITests;
+			packageProductDependencies = (
+			);
+			productName = PillPileUITests;
+			productReference = AF55ABBD3E77D314E0DED83C /* PillPileUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -98,6 +139,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					84B8B9157DA2CE8DD58209BE = {
+						TestTargetID = 586D8D125831637EF3BBDD9A;
+					};
 				};
 			};
 			buildConfigurationList = 5FB2FF6FA72540636684DA01 /* Build configuration list for PBXProject "PillPile" */;
@@ -115,11 +159,20 @@
 			projectRoot = "";
 			targets = (
 				586D8D125831637EF3BBDD9A /* PillPile */,
+				84B8B9157DA2CE8DD58209BE /* PillPileUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1A70A178AA6AE46E6011F35B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				68C47C262599EA583105C952 /* FlowTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1DA16C39BA588883D70123EE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -137,7 +190,33 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		60C0B45D6E273CE619E71E01 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 586D8D125831637EF3BBDD9A /* PillPile */;
+			targetProxy = A579C9801345FDD149F97778 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		04DC98664A1B91B2706DCDC2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pillpile.uitests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = PillPile;
+			};
+			name = Debug;
+		};
 		4CDF7084222E989F4CA5E781 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -277,6 +356,24 @@
 			};
 			name = Release;
 		};
+		D653DA6D8A4A6C3BA4504AC1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.pillpile.uitests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = PillPile;
+			};
+			name = Release;
+		};
 		DDE343C54F545A7CFDF26E95 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -300,6 +397,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1D60F4D4201A4ACC7A794164 /* Build configuration list for PBXNativeTarget "PillPileUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04DC98664A1B91B2706DCDC2 /* Debug */,
+				D653DA6D8A4A6C3BA4504AC1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		5FB2FF6FA72540636684DA01 /* Build configuration list for PBXProject "PillPile" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

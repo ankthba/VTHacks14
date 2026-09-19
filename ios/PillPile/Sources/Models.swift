@@ -23,6 +23,21 @@ struct BottleRecord: Codable, Identifiable, Hashable {
         case fillDate = "fill_date"
         case confidence
     }
+
+    /// Written by hand so nil fields are sent as explicit `null` rather than
+    /// omitted. The synthesized encoder uses `encodeIfPresent`, which drops the
+    /// key entirely - the server then sees a missing required field. The server
+    /// tolerates both now, but sending a complete object is the honest contract.
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(drugText, forKey: .drugText)
+        try c.encode(strength, forKey: .strength)
+        try c.encode(sig, forKey: .sig)
+        try c.encode(quantity, forKey: .quantity)
+        try c.encode(prescriber, forKey: .prescriber)
+        try c.encode(fillDate, forKey: .fillDate)
+        try c.encode(confidence, forKey: .confidence)
+    }
 }
 
 struct Ingredient: Codable, Hashable {

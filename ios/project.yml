@@ -35,3 +35,17 @@ targets:
         SWIFT_VERSION: "5.0"
         TARGETED_DEVICE_FAMILY: "1"
         GENERATE_INFOPLIST_FILE: NO
+
+  PillPileUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: PillPileUITests
+    dependencies:
+      - target: PillPile
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.pillpile.uitests
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: YES
