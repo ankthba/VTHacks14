@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import { CONDITIONS, REGIONS } from "@/lib/anatomy/conditions";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 import { Diagram } from "@/components/Diagram";
+import { Anatomy3D } from "@/components/Anatomy3D";
 import { ReadAloud } from "@/components/ReadAloud";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 
@@ -153,8 +154,17 @@ export default function ExplainPage() {
         </button>
 
         {card.diagram && (
-          <div className="mx-auto max-w-sm mb-8">
-            <Diagram id={card.diagram} marks={card.marks} />
+          /* Real anatomy to recognise, and a marked diagram to point at. Only
+             the diagram prints - an iframe does not, and the sheet still has to
+             go home on paper. */
+          <div className="grid gap-6 md:grid-cols-[1.4fr_1fr] items-start mb-8">
+            <Anatomy3D view={card.diagram} className="no-print" />
+            <div className="float-card p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[color:var(--muted)] mb-2">
+                Where exactly
+              </p>
+              <Diagram id={card.diagram} marks={card.marks} />
+            </div>
           </div>
         )}
 
