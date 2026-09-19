@@ -9,7 +9,8 @@
     "lint": "eslint",
     "precache": "tsx scripts/precache.ts",
     "verify:core": "tsx scripts/verify-core.ts",
-    "verify:offline": "PILLPILE_OFFLINE=1 tsx scripts/precache.ts"
+    "verify:offline": "PILLPILE_OFFLINE=1 tsx scripts/precache.ts",
+    "eval": "tsx scripts/eval.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

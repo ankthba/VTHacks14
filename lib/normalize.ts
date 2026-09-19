@@ -1,4 +1,11 @@
-import { approximateCandidates, classes, ingredients, properties } from "./rxnorm";
+import {
+  approximateCandidates,
+  classes,
+  historyStatus,
+  ingredients,
+  ownConceptRxcuis,
+  properties,
+} from "./rxnorm";
 import { perDoseMg } from "./strength";
 import type { NormalizedMed } from "./types";
 import type { BottleRecord } from "./schemas";
@@ -43,7 +50,9 @@ export async function normalizeOne(
     ]);
     if (!props || ings.length === 0) continue;
 
-    const cls = await classes(cand.rxcui);
+    // Pass the drug's own concepts so inherited combination-product
+    // classes are rejected (see rxnorm.classes).
+    const cls = await classes(cand.rxcui, await ownConceptRxcuis(cand.rxcui));
     return {
       ...base,
       rxcui: cand.rxcui,
@@ -54,6 +63,35 @@ export async function normalizeOne(
       classes: cls,
       per_dose_mg: perDoseMg(props.name, ings),
       unresolved: false,
+    };
+  }
+
+  // Nothing active matched. Before giving up, check whether the top candidates
+  // are retired concepts - a discontinued brand such as Vicodin resolves only
+  // here, and that is exactly the old bottle this app exists to catch.
+  for (const cand of candidates.slice(0, 4)) {
+    const hist = await historyStatus(cand.rxcui);
+    if (!hist) continue;
+
+    // Classes come from the current generic equivalent, since the retired
+    // concept itself carries none.
+    const cls = hist.scdRxcui
+      ? await classes(hist.scdRxcui, await ownConceptRxcuis(hist.scdRxcui))
+      : [];
+
+    return {
+      ...base,
+      rxcui: cand.rxcui,
+      canonical_name: hist.name,
+      tty: hist.tty,
+      match_score: cand.score,
+      ingredients: hist.ingredients,
+      classes: cls,
+      per_dose_mg: Object.keys(hist.perDoseMg).length
+        ? hist.perDoseMg
+        : perDoseMg(hist.name, hist.ingredients),
+      unresolved: false,
+      discontinued: true,
     };
   }
 

@@ -27,6 +27,8 @@ export interface NormalizedMed {
   /** mg of each ingredient per single dose, when parseable from the strength string. */
   per_dose_mg: Record<string, number>;
   unresolved?: boolean;
+  /** Matched only against a retired RxNorm concept (withdrawn brand). */
+  discontinued?: boolean;
 }
 
 export interface Citation {

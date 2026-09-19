@@ -107,7 +107,25 @@ function isRouteNoise(classId: string) {
   return ROUTE_NOISE_PREFIXES.some((p) => classId.startsWith(p));
 }
 
-const atcOf = (cs: DrugClass[]) => cs.filter((c) => c.classType.startsWith("ATC"));
+/**
+ * COMBINATION-PRODUCT CONTAMINATION was the single biggest source of false
+ * positives here, and it is now handled upstream by provenance filtering in
+ * rxnorm.classes() rather than by pattern-matching class names.
+ *
+ * The problem: RxClass maps classes at the ingredient level, so a
+ * single-ingredient drug inherited the ATC code of every combination product it
+ * appears in. Measured, all wrong: amlodipine carried "Renin-inhibitors" (from
+ * aliskiren/amlodipine) and so looked like duplicate therapy next to
+ * lisinopril; acetaminophen carried "Opioids in combination with non-opioid
+ * analgesics" and so looked like an opioid next to ibuprofen. Both of those
+ * pairs are commonly and intentionally co-prescribed, and flagging them is
+ * worse than silence - it teaches the patient to ignore the app.
+ *
+ * eval/cases.ts neg-01 through neg-04 and neg-11 exist to keep it fixed.
+ */
+
+const atcOf = (cs: DrugClass[]) =>
+  cs.filter((c) => c.classType.startsWith("ATC"));
 const epcOf = (cs: DrugClass[]) => cs.filter((c) => c.classType === "EPC");
 
 export interface ClassMatch {

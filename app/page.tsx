@@ -373,6 +373,15 @@ function MedRow({
         </span>
       </p>
       <p className="text-sm text-[color:var(--muted)] mt-1">{med.canonical_name}</p>
+      {med.discontinued && (
+        /* A withdrawn brand resolves only against RxNorm's historical record.
+           Worth saying out loud: it usually means an old bottle. */
+        <p className="text-sm mt-2 inline-block px-2 py-1 rounded" style={{ background: "var(--moderate-bg)", color: "var(--moderate)" }}>
+          This product has been discontinued. We matched it to the historical
+          record, so it is still fully checked &mdash; but it may be an old
+          bottle worth asking about.
+        </p>
+      )}
       {med.sig && <p className="text-[15px] mt-2">How to take it: {med.sig}</p>}
       {summary && (
         <p className="text-[15px] mt-1">
