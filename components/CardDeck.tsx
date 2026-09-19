@@ -53,7 +53,7 @@ export function CardDeck({
       </div>
 
       <article
-        className="float-card p-6 sm:p-9"
+        className="card p-6 sm:p-9"
         style={{ background: tone.bg, borderColor: card.warning ? tone.fg : undefined }}
       >
         <span

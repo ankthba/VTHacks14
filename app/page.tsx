@@ -48,6 +48,7 @@ const COMMON_INSTRUCTIONS = [
  */
 export default function Home() {
   const [region, setRegion] = useState(REGIONS[0]);
+  const [query, setQuery] = useState("");
   const [conditionId, setConditionId] = useState<string | null>(null);
   const [choosing, setChoosing] = useState(false);
   const [customHeadline, setCustomHeadline] = useState("");
@@ -56,7 +57,7 @@ export default function Home() {
   const [freeInstruction, setFreeInstruction] = useState("");
   const [howtoIds, setHowtoIds] = useState<string[]>([]);
   const [language, setLanguage] = useState("English");
-  const [bodyType, setBodyType] = useState<BodyType>("neutral");
+  const [bodyType, setBodyType] = useState<BodyType>("male");
   const [languages, setLanguages] = useState<string[]>(ALL_LANGUAGES);
 
   const [noteText, setNoteText] = useState("");
@@ -77,6 +78,21 @@ export default function Home() {
 
   const selected = CONDITIONS.find((c) => c.id === conditionId) ?? null;
   const inRegion = useMemo(() => CONDITIONS.filter((c) => c.region === region), [region]);
+  /** Search across every category: label, plain sentence, and the clinical words. */
+  const found = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    const score = (c: (typeof CONDITIONS)[number]) => {
+      if (c.label.toLowerCase().startsWith(q)) return 0;
+      if (c.label.toLowerCase().includes(q)) return 1;
+      if (c.synonyms.some((x) => x.startsWith(q))) return 2;
+      if (c.synonyms.some((x) => x.includes(q))) return 3;
+      if (c.region.toLowerCase().includes(q) || c.plain.toLowerCase().includes(q)) return 4;
+      return -1;
+    };
+    return CONDITIONS.map((c) => ({ c, s: score(c) })).filter((x) => x.s >= 0).sort((a, b) => a.s - b.s).slice(0, 14).map((x) => x.c);
+  }, [query]);
+  const listed = query.trim() ? found : inRegion;
   const hasContent = !!selected || meds.length > 0 || instructions.length > 0;
 
   type Snapshot = {
@@ -317,7 +333,7 @@ export default function Home() {
               {noteError && <p className="text-sm mt-3" style={{ color: "var(--high)" }}>{noteError}</p>}
 
               {skippedLines.length > 0 && (
-                <div className="mt-4 rounded-xl p-4" style={{ background: "var(--moderate-bg)" }}>
+                <div className="mt-4 pl-4 border-l-2" style={{ borderColor: "var(--moderate)" }}>
                   <p className="text-sm font-semibold" style={{ color: "var(--moderate)" }}>Not used &mdash; the patient will not hear these</p>
                   <ul className="mt-2 space-y-1 text-sm">
                     {skippedLines.map((l) => (
@@ -357,16 +373,28 @@ export default function Home() {
                   />
                 ) : (
                   <>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {REGIONS.map((r) => (
-                        <button key={r} onClick={() => setRegion(r)} className={`chip ${r === region ? "on" : ""}`}>{r}</button>
-                      ))}
-                    </div>
+                    <input
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder={`Search ${CONDITIONS.length} conditions - "ankle", "UTI", "S52"`}
+                      className="field mb-4"
+                      aria-label="Search conditions"
+                    />
+                    {!query.trim() && (
+                      <div className="tabs mb-3">
+                        {REGIONS.map((r) => (
+                          <button key={r} onClick={() => setRegion(r)} className={`tab ${r === region ? "on" : ""}`}>{r}</button>
+                        ))}
+                      </div>
+                    )}
+                    {query.trim() && listed.length === 0 && (
+                      <p className="text-[15px] text-[color:var(--muted)]">Nothing matches. Try the part of the body, or the ICD-10 code.</p>
+                    )}
                     <div className="list-hairline border-t border-[color:var(--line-soft)]">
-                      {inRegion.map((c) => (
+                      {listed.map((c) => (
                         <button
                           key={c.id}
-                          onClick={() => { setConditionId(c.id); setCustomHeadline(c.plain); setChoosing(false); }}
+                          onClick={() => { setConditionId(c.id); setRegion(c.region); setCustomHeadline(c.plain); setChoosing(false); setQuery(""); }}
                           className="row w-full text-left py-3 hover:opacity-75"
                         >
                           <span
@@ -374,7 +402,10 @@ export default function Home() {
                             style={{ borderColor: c.id === conditionId ? "var(--accent)" : "var(--line)", background: c.id === conditionId ? "var(--accent)" : "transparent" }}
                           />
                           <span>
-                            <span className="font-semibold block">{c.label}</span>
+                            <span className="font-semibold block">
+                              {c.label}
+                              {query.trim() && <span className="font-normal text-[13px] text-[color:var(--muted)]"> &middot; {c.region}</span>}
+                            </span>
                             <span className="text-[14px] text-[color:var(--muted)]">{c.plain}</span>
                           </span>
                         </button>
@@ -485,7 +516,7 @@ export default function Home() {
                 </select>
                 <div className="flex gap-1">
                   {(["female", "male"] as BodyType[]).map((b) => (
-                    <button key={b} onClick={() => setBodyType((cur) => (cur === b ? "neutral" : b))} className={`chip ${bodyType === b ? "on" : ""}`}>
+                    <button key={b} onClick={() => setBodyType(b)} className={`chip ${bodyType === b ? "on" : ""}`}>
                       {b === "female" ? "Female" : "Male"}
                     </button>
                   ))}

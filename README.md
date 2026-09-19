@@ -49,7 +49,7 @@ paste the note (or photograph it)
   │               deterministic first (headers, ICD-10, dose patterns, prose);
   │               a model fills gaps only if one is configured
   │
-  ├─► MATCH       diagnosis → curated library (40 conditions, 12 anatomical views)
+  ├─► MATCH       diagnosis → curated library (205 conditions in 21 categories, 18 anatomical views)
   │               ICD-10 code outranks any phrase; longest synonym wins
   │
   ├─► EXPLAIN     one plain sentence per medicine, from a curated class map
@@ -155,7 +155,7 @@ mattered more on the screen a doctor turns toward a patient.
 
 ## Limitations
 
-- The condition library is 40 conditions. A diagnosis outside it gets the note's
+- The condition library is 205 conditions across 21 categories. A diagnosis outside it gets the note's
   own words and a body outline, and the clinician is told so.
 - Plain-language mapping is by drug class, corrected by visit context for the
   conditions we cover. It can still be wrong for an off-label use; that is why

@@ -1,279 +1,722 @@
 /**
- * Simple, deliberately non-photographic diagrams for the exam room.
+ * The condition library.
  *
- * Line drawings, not anatomical renders, and that is a design decision rather
- * than a shortcut. The audience is a patient who has just been given news and
- * may be frightened, in pain, or reading in a second language. Detail competes
- * with comprehension: a clear picture beats an accurate one when the goal is
- * "understand what happened to me".
+ * Organised the way a patient looks for things - by where it hurts - not by
+ * which drawing we happen to have. Each entry carries the one plain sentence
+ * the patient hears, the drawing and the structure to mark on it, the words a
+ * real clinical note uses for it, and its ICD-10 prefixes so EHR exports match.
  *
- * Each diagram exposes `mark` regions the clinician can highlight, so one
- * drawing serves several conditions without a separate asset each time.
- *
- * `synonyms` exist so a parsed clinical note can be matched against this list -
- * a discharge summary says "Colles fracture" or "NSTEMI", not our plain label.
+ * Plain sentences describe what happened. They never tell the patient what to
+ * do - that is the clinician's line, and the instructions section.
  */
 
 export interface Condition {
   id: string;
-  /** What a clinician would search for. */
   label: string;
+  /** The category a patient would look under. */
   region: string;
-  /** One plain sentence a patient can repeat back. This is the whole point. */
   plain: string;
   diagram: DiagramId;
   marks: string[];
-  /** Terms that may appear in a real note for this condition. */
   synonyms: string[];
-  /** ICD-10-CM prefixes. EHR exports lead with the code, not the words. */
   icd10: string[];
 }
 
 export type DiagramId =
-  | "wrist"
-  | "knee"
-  | "shoulder"
-  | "spine"
-  | "heart"
-  | "lung"
-  | "head"
-  | "abdomen"
-  | "ankle"
-  | "hip"
-  | "mouth"
-  | "body";
+  | "head" | "eye" | "ear" | "mouth" | "neck" | "shoulder" | "elbow" | "wrist"
+  | "heart" | "lung" | "abdomen" | "kidney" | "spine" | "hip" | "knee" | "ankle"
+  | "skin" | "body";
 
 const C = (
-  id: string,
-  label: string,
-  region: string,
-  plain: string,
-  diagram: DiagramId,
-  marks: string[],
-  synonyms: string[],
-): Condition => ({ id, label, region, plain, diagram, marks, synonyms, icd10: [] });
+  id: string, label: string, region: string, plain: string,
+  diagram: DiagramId, marks: string[], synonyms: string[], icd10: string[] = [],
+): Condition => ({ id, label, region, plain, diagram, marks, synonyms, icd10 });
 
 export const CONDITIONS: Condition[] = [
-  // ---- Wrist / hand --------------------------------------------------------
-  C("distal-radius-fracture", "Distal radius fracture (broken wrist)", "Wrist",
-    "You broke one of the two bones in your forearm, close to your wrist.",
-    "wrist", ["radius-break"],
-    ["distal radius", "colles", "colles' fracture", "broken wrist", "wrist fracture", "radial fracture"]),
-  C("scaphoid-fracture", "Scaphoid fracture", "Wrist",
-    "You broke a small bone on the thumb side of your wrist. This one heals slowly because it has a poor blood supply.",
-    "wrist", ["scaphoid"], ["scaphoid", "navicular fracture"]),
-  C("carpal-tunnel", "Carpal tunnel syndrome", "Wrist",
-    "A nerve is being squeezed as it passes through a narrow tunnel in your wrist. That is why your fingers tingle.",
-    "wrist", ["scaphoid"], ["carpal tunnel", "median nerve compression"]),
+  // ===================== Head & brain =====================
+  C("concussion", "Concussion", "Head & brain",
+    "Your brain was shaken inside your skull. Nothing is broken, but it needs quiet and rest to recover.",
+    "head", ["brain"], ["concussion", "mild tbi", "head injury", "mtbi", "concussion without loss of consciousness", "concussion with loss of consciousness"], ["S06.0"]),
+  C("ischemic-stroke", "Stroke", "Head & brain",
+    "A blood vessel in your brain became blocked, so part of your brain did not get blood.",
+    "head", ["vessel"], ["stroke", "cva", "ischemic stroke", "ischaemic stroke", "cerebrovascular accident", "cerebral infarction", "acute ischemic stroke"], ["I63"]),
+  C("tia", "Mini-stroke (TIA)", "Head & brain",
+    "Blood flow to part of your brain was briefly blocked. The symptoms passed, but it is a warning sign.",
+    "head", ["vessel"], ["tia", "transient ischemic attack", "transient cerebral ischemic attack", "mini stroke"], ["G45.9", "G45"]),
+  C("migraine", "Migraine", "Head & brain",
+    "This is a migraine. Nerves and blood vessels around your brain become irritated, which causes the pain and the light sensitivity.",
+    "head", ["brain"], ["migraine", "migraine headache", "migraine without aura", "migraine with aura"], ["G43"]),
+  C("tension-headache", "Tension headache", "Head & brain",
+    "This is a tension headache. The muscles around your head and neck are tight, and that tightness is what hurts.",
+    "head", ["brain"], ["tension headache", "tension-type headache", "tension type headache"], ["G44.2"]),
+  C("bells-palsy", "Bell's palsy", "Head & brain",
+    "The nerve that moves one side of your face is swollen, so that side is weak for now. Most people recover fully.",
+    "head", ["nerve"], ["bell's palsy", "bells palsy", "facial nerve palsy", "facial palsy"], ["G51.0"]),
+  C("epilepsy", "Seizures (epilepsy)", "Head & brain",
+    "Your brain sometimes has a burst of extra electrical activity. That is what a seizure is.",
+    "head", ["brain"], ["epilepsy", "seizure disorder", "seizures", "seizure"], ["G40"]),
+  C("bppv", "Vertigo (BPPV)", "Head & brain",
+    "Tiny crystals in your inner ear have moved into the wrong place. When you turn your head they send a false spinning signal.",
+    "ear", ["inner-ear"], ["bppv", "benign paroxysmal positional vertigo", "positional vertigo", "vertigo"], ["H81.1"]),
+  C("sleep-apnea", "Sleep apnoea", "Head & brain",
+    "While you sleep, the back of your throat relaxes and closes off your airway for a few seconds at a time, over and over.",
+    "head", ["throat"], ["sleep apnea", "sleep apnoea", "obstructive sleep apnea", "osa"], ["G47.33"]),
+  C("dementia", "Dementia", "Head & brain",
+    "Parts of the brain that handle memory and thinking are slowly working less well.",
+    "head", ["brain"], ["dementia", "alzheimer", "alzheimer's disease", "alzheimers", "cognitive impairment"], ["F03", "G30", "F01"]),
 
-  // ---- Knee ----------------------------------------------------------------
-  C("meniscus-tear", "Meniscus tear", "Knee",
-    "You tore the cushion of cartilage that sits between the two bones of your knee.",
-    "knee", ["meniscus"], ["meniscus", "meniscal tear", "torn cartilage"]),
-  C("acl-tear", "ACL tear", "Knee",
-    "You tore one of the ligaments that holds your knee steady from the inside.",
-    "knee", ["acl"], ["acl", "anterior cruciate", "cruciate ligament"]),
-  C("knee-osteoarthritis", "Knee osteoarthritis", "Knee",
-    "The smooth surface inside your knee has worn down, so the bones rub instead of gliding.",
-    "knee", ["meniscus"], ["osteoarthritis", "oa knee", "degenerative joint disease", "knee arthritis"]),
+  // ===================== Eyes =====================
+  C("conjunctivitis", "Pink eye (conjunctivitis)", "Eyes",
+    "The thin clear layer over the white of your eye is inflamed. That is why it is red, itchy and weepy.",
+    "eye", ["conjunctiva"], ["conjunctivitis", "pink eye", "pinkeye", "bacterial conjunctivitis", "viral conjunctivitis", "allergic conjunctivitis"], ["H10"]),
+  C("stye", "Stye", "Eyes",
+    "A tiny gland at the edge of your eyelid is blocked and infected. It is a small boil on the lid.",
+    "eye", ["lid"], ["stye", "hordeolum", "chalazion"], ["H00.0", "H00.1"]),
+  C("corneal-abrasion", "Scratched eye (corneal abrasion)", "Eyes",
+    "The clear front window of your eye has a scratch on it. It heals quickly but it is very sore while it does.",
+    "eye", ["cornea"], ["corneal abrasion", "scratched cornea", "scratched eye", "corneal injury"], ["S05.0"]),
+  C("cataract", "Cataract", "Eyes",
+    "The lens inside your eye has become cloudy, like looking through a fogged window.",
+    "eye", ["lens"], ["cataract", "cataracts", "nuclear sclerosis"], ["H25", "H26"]),
+  C("glaucoma", "Glaucoma", "Eyes",
+    "The pressure inside your eye is too high, and over time that damages the nerve at the back of the eye.",
+    "eye", ["retina"], ["glaucoma", "open angle glaucoma", "ocular hypertension"], ["H40"]),
+  C("dry-eye", "Dry eye", "Eyes",
+    "Your eyes are not making enough tears, or the tears dry up too fast, so the surface is dry and gritty.",
+    "eye", ["cornea"], ["dry eye", "dry eyes", "dry eye syndrome", "keratoconjunctivitis sicca"], ["H04.12"]),
+  C("diabetic-retinopathy", "Diabetic eye disease", "Eyes",
+    "High blood sugar over time has damaged the tiny blood vessels at the back of your eye.",
+    "eye", ["retina"], ["diabetic retinopathy", "retinopathy"], ["E11.3", "E10.3"]),
+  C("retinal-detachment", "Detached retina", "Eyes",
+    "The light-sensing layer at the back of your eye has pulled away from the wall behind it.",
+    "eye", ["retina"], ["retinal detachment", "detached retina", "retinal tear"], ["H33"]),
 
-  // ---- Shoulder ------------------------------------------------------------
+  // ===================== Ears =====================
+  C("otitis-media", "Middle ear infection", "Ears",
+    "There is infection and fluid in the small space behind your eardrum. The pressure on the eardrum is what hurts.",
+    "ear", ["middle-ear"], ["otitis media", "middle ear infection", "ear infection", "acute otitis media", "aom"], ["H66", "H65"]),
+  C("otitis-externa", "Swimmer's ear", "Ears",
+    "The skin of your ear canal is infected and swollen.",
+    "ear", ["canal"], ["otitis externa", "swimmer's ear", "swimmers ear", "outer ear infection"], ["H60"]),
+  C("earwax", "Blocked ear (wax)", "Ears",
+    "Wax has built up and is blocking your ear canal, which is why sounds are muffled.",
+    "ear", ["wax"], ["cerumen impaction", "impacted cerumen", "ear wax", "earwax"], ["H61.2"]),
+  C("perforated-eardrum", "Perforated eardrum", "Ears",
+    "There is a small hole in your eardrum. Most heal on their own within a few weeks.",
+    "ear", ["eardrum"], ["perforated eardrum", "tympanic membrane perforation", "ruptured eardrum", "tm perforation"], ["H72", "S09.2"]),
+  C("tinnitus", "Ringing in the ears (tinnitus)", "Ears",
+    "You hear a ringing or buzzing that is coming from inside your hearing system, not from outside.",
+    "ear", ["inner-ear"], ["tinnitus"], ["H93.1"]),
+  C("hearing-loss", "Hearing loss", "Ears",
+    "The part of your ear that turns sound into nerve signals is not working as well as it used to.",
+    "ear", ["inner-ear"], ["hearing loss", "sensorineural hearing loss", "presbycusis", "conductive hearing loss"], ["H90", "H91"]),
+  C("menieres", "Ménière's disease", "Ears",
+    "Fluid builds up in your inner ear, which brings on spells of spinning, ringing and muffled hearing.",
+    "ear", ["inner-ear"], ["meniere", "meniere's disease", "menieres", "ménière"], ["H81.0"]),
+
+  // ===================== Nose & throat =====================
+  C("common-cold", "Common cold", "Nose & throat",
+    "This is a cold - a virus in your nose and throat. It runs its course in about a week.",
+    "head", ["sinus"], ["common cold", "upper respiratory infection", "viral uri", "uri", "viral upper respiratory", "nasopharyngitis"], ["J00", "J06.9"]),
+  C("sinusitis", "Sinus infection", "Nose & throat",
+    "The air spaces behind your cheeks and forehead are blocked and inflamed. That is the pressure and the thick mucus.",
+    "head", ["sinus"], ["sinusitis", "sinus infection", "rhinosinusitis", "acute sinusitis", "chronic sinusitis"], ["J01", "J32"]),
+  C("allergic-rhinitis", "Hay fever (allergies)", "Nose & throat",
+    "Your nose is reacting to something in the air - pollen, dust, pets - as if it were harmful.",
+    "head", ["sinus"], ["allergic rhinitis", "hay fever", "seasonal allergies", "nasal allergies"], ["J30"]),
+  C("strep-throat", "Strep throat", "Nose & throat",
+    "A bacteria called strep is infecting your throat. Antibiotics clear it.",
+    "head", ["throat"], ["strep throat", "streptococcal pharyngitis", "strep pharyngitis", "group a strep"], ["J02.0"]),
+  C("pharyngitis", "Sore throat (viral)", "Nose & throat",
+    "Your throat is inflamed from a virus. Antibiotics do not help a virus; time and comfort do.",
+    "head", ["throat"], ["pharyngitis", "viral pharyngitis", "sore throat"], ["J02.9", "J02"]),
+  C("tonsillitis", "Tonsillitis", "Nose & throat",
+    "The two lumps of tissue at the back of your throat - the tonsils - are swollen and infected.",
+    "head", ["throat"], ["tonsillitis", "acute tonsillitis", "peritonsillar"], ["J03", "J36"]),
+  C("mono", "Glandular fever (mono)", "Nose & throat",
+    "A virus is causing a very sore throat, swollen glands and deep tiredness. It can take weeks to fully pass.",
+    "head", ["throat"], ["mononucleosis", "infectious mononucleosis", "mono", "glandular fever", "ebv"], ["B27"]),
+  C("laryngitis", "Laryngitis", "Nose & throat",
+    "Your voice box is inflamed, which is why your voice is hoarse or gone.",
+    "head", ["throat"], ["laryngitis", "hoarseness", "acute laryngitis"], ["J04.0"]),
+  C("nosebleed", "Nosebleed", "Nose & throat",
+    "Small blood vessels just inside your nose broke and bled. It looks like a lot but it usually is not.",
+    "head", ["sinus"], ["epistaxis", "nosebleed", "nose bleed"], ["R04.0"]),
+  C("croup", "Croup", "Nose & throat",
+    "A virus has made the airway just below the voice box swell, which causes the barking cough.",
+    "head", ["throat"], ["croup", "laryngotracheitis", "laryngotracheobronchitis"], ["J05.0"]),
+
+  // ===================== Mouth & teeth =====================
+  C("wisdom-tooth-extraction", "Wisdom tooth extraction", "Mouth & teeth",
+    "The teeth at the very back of your jaw were taken out. There is now a small hole in the bone where each one sat, and it will fill in over the next few weeks.",
+    "mouth", ["socket"], ["wisdom tooth", "wisdom teeth", "third molar", "third molars", "impacted third molar", "impacted teeth", "impacted tooth", "tooth extraction", "dental extraction", "extraction site", "s/p extraction"], ["K01.1", "Z98.81"]),
+  C("dry-socket", "Dry socket", "Mouth & teeth",
+    "The blood clot that should be protecting the hole where your tooth was has come out too early, so the bone underneath is exposed. That is why it hurts more now than it did.",
+    "mouth", ["socket"], ["dry socket", "alveolar osteitis", "alveolitis"], ["K10.3", "M27.3"]),
+  C("dental-abscess", "Tooth abscess", "Mouth & teeth",
+    "There is a pocket of infection at the root of one of your teeth. Antibiotics calm it down, but the tooth itself will need treating.",
+    "mouth", ["root"], ["dental abscess", "tooth abscess", "periapical abscess", "odontogenic infection"], ["K04.7", "K04.6"]),
+  C("caries", "Cavity (tooth decay)", "Mouth & teeth",
+    "Acid from bacteria has eaten a hole in the hard outer layer of a tooth.",
+    "mouth", ["tooth"], ["dental caries", "caries", "tooth decay", "dental cavity", "cavities"], ["K02"]),
+  C("gingivitis", "Gum disease", "Mouth & teeth",
+    "Your gums are inflamed where plaque sits along the teeth. That is why they are red and bleed when you brush.",
+    "mouth", ["gum"], ["gingivitis", "periodontitis", "gum disease", "periodontal disease"], ["K05.0", "K05.1", "K05.3"]),
+  C("oral-thrush", "Oral thrush", "Mouth & teeth",
+    "A yeast that normally lives in the mouth has overgrown, leaving white patches on the tongue and cheeks.",
+    "mouth", ["tongue"], ["oral thrush", "oral candidiasis", "thrush"], ["B37.0"]),
+  C("canker-sore", "Mouth ulcer (canker sore)", "Mouth & teeth",
+    "A small, shallow sore has opened on the soft lining inside your mouth. It is not contagious and heals on its own.",
+    "mouth", ["tongue"], ["canker sore", "aphthous ulcer", "aphthous stomatitis", "mouth ulcer"], ["K12.0"]),
+  C("tmj", "Jaw joint pain (TMJ)", "Mouth & teeth",
+    "The hinge joint just in front of your ear, where your jaw opens and closes, is strained and sore.",
+    "mouth", ["joint"], ["tmj", "temporomandibular", "tmd", "jaw pain", "temporomandibular joint"], ["M26.6"]),
+
+  // ===================== Neck =====================
+  C("neck-strain", "Neck strain", "Neck",
+    "The muscles and soft tissue of your neck were overstretched. It is painful, but nothing is damaged in the bones.",
+    "neck", ["muscle"], ["neck strain", "cervical strain", "cervical sprain", "whiplash", "neck sprain"], ["S13.4", "S16.1"]),
+  C("cervical-radiculopathy", "Pinched nerve in the neck", "Neck",
+    "A nerve where it leaves your neck is being squeezed by a disc or bone spur. That is why the pain runs down your arm.",
+    "neck", ["disc"], ["cervical radiculopathy", "pinched nerve neck", "cervical disc herniation", "cervical disc"], ["M50.1", "M54.12"]),
+  C("cervical-spondylosis", "Wear and tear in the neck", "Neck",
+    "The discs and joints in your neck have worn with age. It is very common and usually manageable.",
+    "neck", ["vertebra"], ["cervical spondylosis", "cervical osteoarthritis", "degenerative disc disease cervical"], ["M47.812", "M50.3"]),
+  C("torticollis", "Wry neck (torticollis)", "Neck",
+    "A muscle on one side of your neck has gone into spasm, pulling your head to one side.",
+    "neck", ["muscle"], ["torticollis", "wry neck", "acute torticollis"], ["M43.6"]),
+  C("swollen-lymph-nodes", "Swollen glands", "Neck",
+    "The glands in your neck are swollen because they are fighting an infection nearby.",
+    "neck", ["gland"], ["lymphadenopathy", "swollen lymph nodes", "swollen glands", "cervical lymphadenopathy", "lymphadenitis"], ["R59", "L04.0"]),
+
+  // ===================== Shoulder =====================
   C("rotator-cuff-tear", "Rotator cuff tear", "Shoulder",
     "You tore one of the tendons that lifts and turns your shoulder.",
-    "shoulder", ["cuff"], ["rotator cuff", "supraspinatus tear", "cuff tear"]),
-  C("shoulder-dislocation", "Shoulder dislocation", "Shoulder",
+    "shoulder", ["cuff"], ["rotator cuff", "supraspinatus tear", "cuff tear", "rotator cuff syndrome"], ["M75.1", "S46.0"]),
+  C("shoulder-impingement", "Shoulder impingement", "Shoulder",
+    "A tendon in your shoulder is getting pinched under the bone above it each time you lift your arm.",
+    "shoulder", ["cuff"], ["impingement", "shoulder impingement", "subacromial impingement", "subacromial bursitis"], ["M75.4", "M75.5"]),
+  C("shoulder-dislocation", "Dislocated shoulder", "Shoulder",
     "The ball of your arm bone came out of its socket. We have put it back.",
-    "shoulder", ["cuff"], ["dislocation", "dislocated shoulder", "glenohumeral dislocation"]),
-  C("frozen-shoulder", "Adhesive capsulitis (frozen shoulder)", "Shoulder",
+    "shoulder", ["humerus-head"], ["dislocation", "dislocated shoulder", "glenohumeral dislocation", "dislocation of shoulder joint", "anterior dislocation of humerus"], ["S43.0"]),
+  C("frozen-shoulder", "Frozen shoulder", "Shoulder",
     "The lining around your shoulder joint has tightened, so the joint cannot move through its full range.",
-    "shoulder", ["cuff"], ["adhesive capsulitis", "frozen shoulder"]),
+    "shoulder", ["cuff"], ["adhesive capsulitis", "frozen shoulder"], ["M75.0"]),
+  C("ac-separation", "Separated shoulder (AC joint)", "Shoulder",
+    "The ligaments holding your collarbone to the top of your shoulder blade were stretched or torn.",
+    "shoulder", ["ac"], ["ac separation", "acromioclavicular", "ac joint sprain", "separated shoulder", "ac joint injury"], ["S43.1", "S43.5"]),
+  C("biceps-tendinitis", "Biceps tendon inflammation", "Shoulder",
+    "The tendon that joins your biceps muscle to the front of your shoulder is inflamed.",
+    "shoulder", ["biceps"], ["biceps tendinitis", "bicipital tendinitis", "biceps tendonitis", "biceps tendinopathy"], ["M75.2"]),
+  C("clavicle-fracture", "Broken collarbone", "Shoulder",
+    "You broke your collarbone - the bone that runs from your shoulder to the top of your chest.",
+    "shoulder", ["clavicle"], ["clavicle fracture", "broken collarbone", "clavicular fracture", "fracture of clavicle"], ["S42.0"]),
+  C("proximal-humerus-fracture", "Broken upper arm (near the shoulder)", "Shoulder",
+    "You broke the top of your upper arm bone, close to the shoulder joint.",
+    "shoulder", ["humerus-head"], ["proximal humerus fracture", "humeral neck fracture", "fracture of upper end of humerus", "surgical neck fracture"], ["S42.2"]),
 
-  // ---- Back ----------------------------------------------------------------
-  C("lumbar-disc-herniation", "Lumbar disc herniation", "Lower back",
-    "One of the cushions between the bones of your lower back is bulging and pressing on a nerve. That is why the pain runs down your leg.",
-    "spine", ["disc"], ["disc herniation", "herniated disc", "hnp", "sciatica", "radiculopathy", "slipped disc"]),
-  C("spinal-stenosis", "Lumbar spinal stenosis", "Lower back",
-    "The channel your spinal nerves run through has narrowed, so they get squeezed when you stand and walk.",
-    "spine", ["disc"], ["stenosis", "spinal stenosis", "canal narrowing"]),
-  C("compression-fracture", "Vertebral compression fracture", "Lower back",
-    "One of the bones in your spine has collapsed a little, like a can pressed from both ends.",
-    "spine", ["disc"], ["compression fracture", "vertebral fracture", "wedge fracture"]),
+  // ===================== Elbow & arm =====================
+  C("tennis-elbow", "Tennis elbow", "Elbow & arm",
+    "The tendon on the outside of your elbow is overworked and sore. You do not have to play tennis to get it.",
+    "elbow", ["lateral-epicondyle"], ["tennis elbow", "lateral epicondylitis", "lateral epicondylalgia"], ["M77.1"]),
+  C("golfers-elbow", "Golfer's elbow", "Elbow & arm",
+    "The tendon on the inside of your elbow is overworked and sore.",
+    "elbow", ["medial-epicondyle"], ["golfer's elbow", "golfers elbow", "medial epicondylitis"], ["M77.0"]),
+  C("olecranon-bursitis", "Swollen elbow tip (bursitis)", "Elbow & arm",
+    "The small fluid sac over the point of your elbow is inflamed and swollen.",
+    "elbow", ["olecranon"], ["olecranon bursitis", "elbow bursitis"], ["M70.2"]),
+  C("radial-head-fracture", "Broken elbow (radial head)", "Elbow & arm",
+    "You broke the top of one of your forearm bones where it meets the elbow.",
+    "elbow", ["radial-head"], ["radial head fracture", "fracture of head of radius", "radial neck fracture"], ["S52.1"]),
+  C("nursemaids-elbow", "Pulled elbow (children)", "Elbow & arm",
+    "A bone in the forearm slipped slightly out of the ring that holds it at the elbow. It goes back with a quick movement and heals with no lasting harm.",
+    "elbow", ["radial-head"], ["nursemaid's elbow", "nursemaids elbow", "pulled elbow", "radial head subluxation"], ["S53.03"]),
+  C("cubital-tunnel", "Pinched nerve at the elbow", "Elbow & arm",
+    "The nerve that runs behind your elbow - the funny bone nerve - is being squeezed. That is the tingling in your ring and little fingers.",
+    "elbow", ["nerve"], ["cubital tunnel", "ulnar neuropathy", "ulnar nerve entrapment"], ["G56.2"]),
+  C("forearm-fracture", "Broken forearm", "Elbow & arm",
+    "You broke one or both of the bones between your elbow and your wrist.",
+    "wrist", ["radius-break"], ["forearm fracture", "both bone forearm", "ulna fracture", "fracture of shaft of radius", "fracture of shaft of ulna", "nightstick fracture"], ["S52.2", "S52.3", "S52.4"]),
 
-  // ---- Heart ---------------------------------------------------------------
-  C("atrial-fibrillation", "Atrial fibrillation", "Heart",
+  // ===================== Wrist & hand =====================
+  C("distal-radius-fracture", "Broken wrist", "Wrist & hand",
+    "You broke one of the two bones in your forearm, close to your wrist.",
+    "wrist", ["radius-break"], ["distal radius", "colles", "colles' fracture", "broken wrist", "wrist fracture", "radial fracture", "lower end of radius", "lower end of the radius", "fracture of the lower end of", "distal end of radius", "distal radial", "smith fracture", "smith's fracture"], ["S52.5", "S52.6"]),
+  C("scaphoid-fracture", "Scaphoid fracture", "Wrist & hand",
+    "You broke a small bone on the thumb side of your wrist. This one heals slowly because it has a poor blood supply.",
+    "wrist", ["scaphoid"], ["scaphoid", "navicular fracture"], ["S62.0"]),
+  C("wrist-sprain", "Sprained wrist", "Wrist & hand",
+    "The ligaments that hold your wrist bones together were stretched. The bones are not broken.",
+    "wrist", ["scaphoid"], ["wrist sprain", "sprained wrist", "sprain of wrist"], ["S63.5"]),
+  C("carpal-tunnel", "Carpal tunnel syndrome", "Wrist & hand",
+    "A nerve is being squeezed as it passes through a narrow tunnel in your wrist. That is why your fingers tingle.",
+    "wrist", ["tunnel"], ["carpal tunnel", "median nerve compression", "median neuropathy"], ["G56.0"]),
+  C("de-quervain", "Thumb tendon inflammation (De Quervain's)", "Wrist & hand",
+    "The tendons that move your thumb are inflamed where they pass over the wrist. Gripping and lifting is what sets it off.",
+    "wrist", ["tendon"], ["de quervain", "de quervain's", "dequervain", "thumb tenosynovitis"], ["M65.4"]),
+  C("trigger-finger", "Trigger finger", "Wrist & hand",
+    "A tendon in your finger has a swollen spot that catches as it slides, so the finger locks and then snaps straight.",
+    "wrist", ["finger"], ["trigger finger", "stenosing tenosynovitis", "trigger thumb"], ["M65.3"]),
+  C("boxers-fracture", "Broken hand (boxer's fracture)", "Wrist & hand",
+    "You broke the long bone in your hand that leads to your little finger, usually from punching something.",
+    "wrist", ["metacarpal"], ["boxer's fracture", "boxers fracture", "fifth metacarpal fracture", "metacarpal fracture"], ["S62.3"]),
+  C("finger-fracture", "Broken finger", "Wrist & hand",
+    "You broke one of the small bones in your finger.",
+    "wrist", ["finger"], ["finger fracture", "phalanx fracture", "phalangeal fracture", "broken finger", "fracture of finger"], ["S62.6"]),
+  C("mallet-finger", "Mallet finger", "Wrist & hand",
+    "The tendon that straightens the tip of your finger has torn away, so the tip droops and cannot lift on its own.",
+    "wrist", ["finger"], ["mallet finger", "extensor tendon injury", "baseball finger"], ["M20.01", "S66.3"]),
+  C("ganglion-cyst", "Ganglion cyst", "Wrist & hand",
+    "A small sac of joint fluid has bulged out to form a lump on your wrist. It is harmless.",
+    "wrist", ["cyst"], ["ganglion cyst", "ganglion", "wrist ganglion"], ["M67.4"]),
+  C("hand-osteoarthritis", "Arthritis in the hand", "Wrist & hand",
+    "The smooth surfaces in the small joints of your fingers have worn, so the joints are stiff and sore.",
+    "wrist", ["finger"], ["hand osteoarthritis", "osteoarthritis of hand", "hand oa", "finger arthritis"], ["M19.04", "M18"]),
+  C("dupuytren", "Dupuytren's contracture", "Wrist & hand",
+    "The tissue under the skin of your palm is thickening into cords, which slowly pull one or more fingers toward the palm.",
+    "wrist", ["palm"], ["dupuytren", "dupuytren's contracture", "dupuytrens"], ["M72.0"]),
+
+  // ===================== Chest & heart =====================
+  C("atrial-fibrillation", "Atrial fibrillation", "Chest & heart",
     "The top chambers of your heart are beating irregularly instead of in a steady rhythm. That lets blood pool, which can form a clot.",
-    "heart", ["atria"], ["atrial fibrillation", "afib", "a-fib", "af with rvr"]),
-  C("myocardial-infarction", "Myocardial infarction (heart attack)", "Heart",
+    "heart", ["atria"], ["atrial fibrillation", "afib", "a-fib", "af with rvr", "paroxysmal atrial fibrillation", "persistent atrial fibrillation", "atrial flutter"], ["I48"]),
+  C("myocardial-infarction", "Heart attack", "Chest & heart",
     "One of the arteries feeding your heart muscle became blocked, so part of the muscle was starved of blood.",
-    "heart", ["coronary"], ["myocardial infarction", "mi", "nstemi", "stemi", "heart attack", "acute coronary syndrome", "acs"]),
-  C("heart-failure", "Heart failure", "Heart",
-    "Your heart is not pumping strongly enough, so fluid backs up into your lungs and legs.",
-    "heart", ["atria"], ["heart failure", "chf", "hfref", "hfpef", "congestive heart failure"]),
-  C("angina", "Angina", "Heart",
+    "heart", ["coronary"], ["myocardial infarction", "mi", "nstemi", "stemi", "heart attack", "acute coronary syndrome", "acs", "st elevation myocardial infarction", "non-st elevation myocardial infarction", "non st elevation", "type 2 mi", "s/p pci", "s/p des"], ["I21", "I22", "I25.2"]),
+  C("angina", "Angina", "Chest & heart",
     "Your heart muscle is not getting quite enough blood when it works hard. That is the chest tightness you feel.",
-    "heart", ["coronary"], ["angina", "stable angina", "chest pain cardiac"]),
-
-  // ---- Lungs ---------------------------------------------------------------
-  C("pneumonia", "Pneumonia", "Lungs",
-    "There is an infection in part of your lung. The small air sacs there have filled with fluid, so less air gets through.",
-    "lung", ["lobe"], ["pneumonia", "cap", "community acquired pneumonia", "lobar pneumonia"]),
-  C("copd", "COPD exacerbation", "Lungs",
-    "The airways in your lungs are narrowed and inflamed, which is why breathing out is harder than breathing in.",
-    "lung", ["airway"], ["copd", "chronic obstructive", "emphysema", "copd exacerbation"]),
-  C("asthma", "Asthma exacerbation", "Lungs",
-    "The airways in your lungs tightened and swelled, so air cannot move through them easily.",
-    "lung", ["airway"], ["asthma", "asthma exacerbation", "reactive airway"]),
-  C("pulmonary-embolism", "Pulmonary embolism", "Lungs",
-    "A blood clot travelled to your lung and blocked one of its blood vessels.",
-    "lung", ["lobe"], ["pulmonary embolism", "pe", "lung clot"]),
-
-  // ---- Head ----------------------------------------------------------------
-  C("concussion", "Concussion", "Head",
-    "Your brain was shaken inside your skull. Nothing is broken, but it needs quiet and rest to recover.",
-    "head", ["brain"], ["concussion", "mild tbi", "head injury", "mtbi"]),
-  C("ischemic-stroke", "Ischemic stroke", "Head",
-    "A blood vessel in your brain became blocked, so part of your brain did not get blood.",
-    "head", ["vessel"], ["stroke", "cva", "ischemic stroke", "cerebrovascular accident"]),
-  C("tia", "Transient ischemic attack (TIA)", "Head",
-    "Blood flow to part of your brain was briefly blocked. The symptoms passed, but it is a warning sign.",
-    "head", ["vessel"], ["tia", "transient ischemic", "mini stroke"]),
-  C("migraine", "Migraine", "Head",
-    "This is a migraine. Nerves and blood vessels around your brain become irritated, which causes the pain and the light sensitivity.",
-    "head", ["brain"], ["migraine", "migraine headache"]),
-
-  // ---- Abdomen -------------------------------------------------------------
-  C("appendicitis", "Appendicitis", "Abdomen",
-    "Your appendix, a small pouch attached to your bowel, is inflamed and needs to come out.",
-    "abdomen", ["appendix"], ["appendicitis", "appendix"]),
-  C("cholecystitis", "Gallstones / cholecystitis", "Abdomen",
-    "Stones have formed in your gallbladder and it has become inflamed. That is the pain under your right ribs.",
-    "abdomen", ["gallbladder"], ["cholecystitis", "gallstones", "cholelithiasis", "biliary colic"]),
-  C("diverticulitis", "Diverticulitis", "Abdomen",
-    "Small pouches in your large bowel have become inflamed and infected.",
-    "abdomen", ["bowel"], ["diverticulitis", "diverticular disease"]),
-  C("gerd", "Acid reflux (GERD)", "Abdomen",
-    "Acid from your stomach is washing back up into your food pipe, which is what burns.",
-    "abdomen", ["stomach"], ["gerd", "reflux", "acid reflux", "gastroesophageal reflux"]),
-
-  // ---- Ankle / foot --------------------------------------------------------
-  C("ankle-sprain", "Ankle sprain", "Ankle",
-    "You stretched or tore the ligaments on the outside of your ankle. The bone is not broken.",
-    "ankle", ["ligament"], ["ankle sprain", "sprained ankle", "lateral ligament"]),
-  C("ankle-fracture", "Ankle fracture", "Ankle",
-    "You broke one of the bones that forms your ankle joint.",
-    "ankle", ["malleolus"], ["ankle fracture", "malleolar", "broken ankle", "weber"]),
-  C("achilles-rupture", "Achilles tendon rupture", "Ankle",
-    "The thick cord connecting your calf muscle to your heel has torn.",
-    "ankle", ["achilles"], ["achilles", "tendon rupture"]),
-
-  // ---- Hip -----------------------------------------------------------------
-  C("hip-fracture", "Hip fracture", "Hip",
-    "You broke the top of your thigh bone, near where it meets your hip.",
-    "hip", ["neck"], ["hip fracture", "femoral neck", "intertrochanteric", "broken hip"]),
-  C("hip-osteoarthritis", "Hip osteoarthritis", "Hip",
-    "The smooth surface in your hip joint has worn away, so the bones grind instead of gliding.",
-    "hip", ["joint"], ["hip osteoarthritis", "hip oa", "hip arthritis"]),
-
-  // ---- Mouth / teeth -------------------------------------------------------
-  C("wisdom-tooth-extraction", "Wisdom tooth extraction", "Mouth",
-    "The teeth at the very back of your jaw were taken out. There is now a small hole in the bone where each one sat, and it will fill in over the next few weeks.",
-    "mouth", ["socket"],
-    ["wisdom tooth", "wisdom teeth", "third molar", "third molars", "impacted third molar", "tooth extraction", "dental extraction", "extraction site", "s/p extraction"]),
-  C("dry-socket", "Dry socket", "Mouth",
-    "The blood clot that should be protecting the hole where your tooth was has come out too early, so the bone underneath is exposed. That is why it hurts more now than it did.",
-    "mouth", ["socket"], ["dry socket", "alveolar osteitis", "alveolitis"]),
-  C("dental-abscess", "Tooth abscess", "Mouth",
-    "There is a pocket of infection at the root of one of your teeth. Antibiotics calm it down, but the tooth itself will need treating.",
-    "mouth", ["root"], ["dental abscess", "tooth abscess", "periapical abscess", "odontogenic infection"]),
-
-  // ---- Whole body / systemic ----------------------------------------------
-  C("type-2-diabetes", "Type 2 diabetes", "General",
-    "Your body is not using insulin properly, so too much sugar stays in your blood.",
-    "body", ["core"], ["type 2 diabetes", "t2dm", "diabetes mellitus", "dm2", "hyperglycemia"]),
-  C("hypertension", "High blood pressure", "General",
+    "heart", ["coronary"], ["angina", "stable angina", "unstable angina", "chest pain cardiac"], ["I20"]),
+  C("heart-failure", "Heart failure", "Chest & heart",
+    "Your heart is not pumping strongly enough, so fluid backs up into your lungs and legs.",
+    "heart", ["atria"], ["heart failure", "chf", "hfref", "hfpef", "congestive heart failure", "heart failure with reduced ejection", "heart failure with preserved ejection", "acute on chronic heart failure", "chf exacerbation"], ["I50"]),
+  C("hypertension", "High blood pressure", "Chest & heart",
     "The pressure inside your blood vessels is higher than it should be. It does not usually cause symptoms, which is why it gets missed.",
-    "body", ["core"], ["hypertension", "htn", "high blood pressure", "elevated bp"]),
-  C("uti", "Urinary tract infection", "General",
-    "You have an infection in your urinary system. Antibiotics will clear it.",
-    "body", ["core"], ["uti", "urinary tract infection", "cystitis", "pyelonephritis"]),
-  C("cellulitis", "Cellulitis", "General",
+    "heart", ["vessels"], ["hypertension", "htn", "high blood pressure", "elevated bp", "essential hypertension", "essential (primary) hypertension", "hypertensive"], ["I10", "I11", "I12", "I13"]),
+  C("palpitations", "Palpitations", "Chest & heart",
+    "You are feeling your own heartbeat - racing, pounding or skipping. Your tests will say whether the rhythm itself is a problem.",
+    "heart", ["atria"], ["palpitations", "pvcs", "premature ventricular contractions", "svt", "supraventricular tachycardia"], ["R00.2", "I49.3", "I47.1"]),
+  C("pericarditis", "Pericarditis", "Chest & heart",
+    "The thin sac around your heart is inflamed. It hurts more when you lie flat or breathe in.",
+    "heart", ["pericardium"], ["pericarditis", "acute pericarditis"], ["I30"]),
+  C("costochondritis", "Chest wall pain", "Chest & heart",
+    "The cartilage where your ribs join your breastbone is inflamed. It feels like a heart problem but it is the chest wall.",
+    "heart", ["chest-wall"], ["costochondritis", "chest wall pain", "musculoskeletal chest pain", "tietze"], ["M94.0", "R07.89"]),
+  C("aortic-stenosis", "Narrowed heart valve", "Chest & heart",
+    "The valve that lets blood out of your heart has stiffened and narrowed, so the heart has to push harder.",
+    "heart", ["valve"], ["aortic stenosis", "valvular heart disease", "mitral regurgitation", "aortic regurgitation", "mitral stenosis"], ["I35", "I34", "I05", "I06"]),
+  C("hyperlipidemia", "High cholesterol", "Chest & heart",
+    "There is too much fat in your blood. Over years it can build up inside your arteries.",
+    "heart", ["vessels"], ["hyperlipidemia", "high cholesterol", "dyslipidemia", "hypercholesterolemia", "hld"], ["E78"]),
+  C("dvt", "Blood clot in the leg (DVT)", "Chest & heart",
+    "A clot has formed in a deep vein in your leg. The danger is a piece breaking off and travelling to your lungs, which is why it is treated straight away.",
+    "hip", ["vein"], ["dvt", "deep vein thrombosis", "deep venous thrombosis", "venous thromboembolism", "vte"], ["I82.4", "I82.5", "I80.2"]),
+
+  // ===================== Lungs & breathing =====================
+  C("pneumonia", "Pneumonia", "Lungs & breathing",
+    "There is an infection in part of your lung. The small air sacs there have filled with fluid, so less air gets through.",
+    "lung", ["lobe"], ["pneumonia", "cap", "community acquired pneumonia", "lobar pneumonia", "pneumonia, unspecified organism", "bacterial pneumonia", "aspiration pneumonia"], ["J18", "J15", "J13", "J69.0"]),
+  C("copd", "COPD flare", "Lungs & breathing",
+    "The airways in your lungs are narrowed and inflamed, which is why breathing out is harder than breathing in.",
+    "lung", ["airway"], ["copd", "chronic obstructive", "emphysema", "copd exacerbation", "chronic obstructive pulmonary disease", "acute exacerbation of copd", "aecopd", "chronic bronchitis"], ["J44", "J43"]),
+  C("asthma", "Asthma flare", "Lungs & breathing",
+    "The airways in your lungs tightened and swelled, so air cannot move through them easily.",
+    "lung", ["airway"], ["asthma", "asthma exacerbation", "reactive airway", "acute asthma", "status asthmaticus"], ["J45", "J46"]),
+  C("acute-bronchitis", "Chest cold (bronchitis)", "Lungs & breathing",
+    "The tubes that carry air into your lungs are inflamed by a virus. That is the cough, and it can last a few weeks.",
+    "lung", ["airway"], ["acute bronchitis", "bronchitis", "chest cold"], ["J20"]),
+  C("bronchiolitis", "Bronchiolitis (babies and toddlers)", "Lungs & breathing",
+    "A virus has swollen the very smallest airways in the lungs, which is why breathing is fast and wheezy.",
+    "lung", ["airway"], ["bronchiolitis", "rsv", "rsv bronchiolitis", "respiratory syncytial virus"], ["J21"]),
+  C("influenza", "Flu", "Lungs & breathing",
+    "This is influenza - a virus that hits the whole body at once. Fever, aches and exhaustion are the virus, not a complication.",
+    "lung", ["airway"], ["influenza", "flu", "influenza a", "influenza b"], ["J10", "J11"]),
+  C("covid", "COVID-19", "Lungs & breathing",
+    "You have COVID-19. Most people recover at home; the thing to watch is your breathing.",
+    "lung", ["airway"], ["covid", "covid-19", "covid19", "sars-cov-2", "coronavirus"], ["U07.1"]),
+  C("pulmonary-embolism", "Blood clot in the lung", "Lungs & breathing",
+    "A blood clot travelled to your lung and blocked one of its blood vessels.",
+    "lung", ["lobe"], ["pulmonary embolism", "lung clot", "pulmonary thromboembolism", "segmental pe", "subsegmental pe"], ["I26"]),
+  C("pleural-effusion", "Fluid around the lung", "Lungs & breathing",
+    "Fluid has collected in the space between your lung and your chest wall, so the lung cannot fully expand.",
+    "lung", ["pleura"], ["pleural effusion", "fluid on the lung"], ["J90", "J91"]),
+  C("pneumothorax", "Collapsed lung", "Lungs & breathing",
+    "Air has leaked into the space around your lung and is pressing on it, so part of the lung has collapsed.",
+    "lung", ["pleura"], ["pneumothorax", "collapsed lung", "spontaneous pneumothorax"], ["J93"]),
+
+  // ===================== Stomach & gut =====================
+  C("gastroenteritis", "Stomach bug", "Stomach & gut",
+    "A virus or bacteria is irritating your stomach and gut. The vomiting and diarrhoea are your body clearing it.",
+    "abdomen", ["bowel"], ["gastroenteritis", "stomach bug", "stomach flu", "viral gastroenteritis", "food poisoning", "norovirus"], ["A09", "K52.9", "A08"]),
+  C("gerd", "Acid reflux (GERD)", "Stomach & gut",
+    "Acid from your stomach is washing back up into your food pipe, which is what burns.",
+    "abdomen", ["stomach"], ["gerd", "reflux", "acid reflux", "gastroesophageal reflux", "gastro-esophageal reflux disease", "gastroesophageal reflux disease", "heartburn"], ["K21"]),
+  C("peptic-ulcer", "Stomach ulcer", "Stomach & gut",
+    "There is an open sore in the lining of your stomach or the first part of your gut. Usually a bacteria or anti-inflammatory painkillers caused it.",
+    "abdomen", ["stomach"], ["peptic ulcer", "gastric ulcer", "duodenal ulcer", "stomach ulcer", "h. pylori", "h pylori", "helicobacter"], ["K25", "K26", "K27", "A04.8"]),
+  C("gastritis", "Irritated stomach lining (gastritis)", "Stomach & gut",
+    "The lining of your stomach is inflamed and sore.",
+    "abdomen", ["stomach"], ["gastritis", "acute gastritis", "dyspepsia"], ["K29", "K30"]),
+  C("appendicitis", "Appendicitis", "Stomach & gut",
+    "Your appendix, a small pouch attached to your bowel, is inflamed and needs to come out.",
+    "abdomen", ["appendix"], ["appendicitis", "appendix", "acute appendicitis"], ["K35", "K36", "K37"]),
+  C("cholecystitis", "Gallstones", "Stomach & gut",
+    "Stones have formed in your gallbladder and it has become inflamed. That is the pain under your right ribs.",
+    "abdomen", ["gallbladder"], ["cholecystitis", "gallstones", "cholelithiasis", "biliary colic", "acute cholecystitis", "calculus of gallbladder", "choledocholithiasis"], ["K80", "K81"]),
+  C("diverticulitis", "Diverticulitis", "Stomach & gut",
+    "Small pouches in your large bowel have become inflamed and infected.",
+    "abdomen", ["bowel"], ["diverticulitis", "diverticular disease"], ["K57"]),
+  C("ibs", "Irritable bowel (IBS)", "Stomach & gut",
+    "Your gut is oversensitive and its muscles squeeze in a jumpy way. It is uncomfortable, but it does not damage the bowel.",
+    "abdomen", ["bowel"], ["ibs", "irritable bowel syndrome", "irritable bowel"], ["K58"]),
+  C("constipation", "Constipation", "Stomach & gut",
+    "Stool is moving through your bowel too slowly, so it becomes hard and difficult to pass.",
+    "abdomen", ["bowel"], ["constipation", "chronic constipation", "fecal impaction"], ["K59.0", "K56.41"]),
+  C("hemorrhoids", "Haemorrhoids", "Stomach & gut",
+    "Veins just inside or around your back passage have swollen, like varicose veins. They bleed a little and itch.",
+    "abdomen", ["rectum"], ["hemorrhoids", "haemorrhoids", "piles", "internal hemorrhoids", "external hemorrhoids"], ["K64"]),
+  C("inguinal-hernia", "Hernia (groin)", "Stomach & gut",
+    "A bit of the inside of your abdomen is pushing out through a weak spot in the muscle wall of your groin. That is the bulge.",
+    "abdomen", ["hernia"], ["inguinal hernia", "hernia", "groin hernia", "umbilical hernia", "ventral hernia", "hiatal hernia"], ["K40", "K42", "K43", "K44"]),
+  C("pancreatitis", "Pancreatitis", "Stomach & gut",
+    "Your pancreas - the organ behind your stomach that makes digestive juices - is inflamed. Gallstones and alcohol are the usual causes.",
+    "abdomen", ["pancreas"], ["pancreatitis", "acute pancreatitis", "chronic pancreatitis"], ["K85", "K86"]),
+  C("fatty-liver", "Fatty liver", "Stomach & gut",
+    "Fat has built up inside your liver. It causes no pain, but over years it can scar the liver.",
+    "abdomen", ["liver"], ["fatty liver", "nafld", "nash", "steatosis", "hepatic steatosis", "masld"], ["K76.0", "K75.81"]),
+  C("celiac", "Coeliac disease", "Stomach & gut",
+    "Your immune system reacts to gluten - the protein in wheat, barley and rye - and damages the lining of your gut.",
+    "abdomen", ["bowel"], ["celiac", "coeliac", "celiac disease", "gluten sensitive enteropathy"], ["K90.0"]),
+  C("ibd", "Crohn's or colitis (IBD)", "Stomach & gut",
+    "Your immune system is attacking the lining of your own gut, causing long-term inflammation.",
+    "abdomen", ["bowel"], ["crohn", "crohn's disease", "crohns", "ulcerative colitis", "inflammatory bowel disease", "ibd"], ["K50", "K51"]),
+  C("bowel-obstruction", "Blocked bowel", "Stomach & gut",
+    "Something is stopping food and gas from moving through your bowel, so it backs up.",
+    "abdomen", ["bowel"], ["bowel obstruction", "small bowel obstruction", "sbo", "ileus", "intestinal obstruction"], ["K56"]),
+
+  // ===================== Kidney & bladder =====================
+  C("uti", "Bladder infection (UTI)", "Kidney & bladder",
+    "Bacteria have got into your bladder and are irritating its lining. Antibiotics clear it.",
+    "kidney", ["bladder"], ["uti", "urinary tract infection", "cystitis", "acute cystitis", "bladder infection", "urinary tract infection, site not specified"], ["N39.0", "N30"]),
+  C("pyelonephritis", "Kidney infection", "Kidney & bladder",
+    "A bladder infection has travelled up to one of your kidneys. That is why you have fever and pain in your back.",
+    "kidney", ["kidney"], ["pyelonephritis", "kidney infection", "acute pyelonephritis"], ["N10"]),
+  C("kidney-stone", "Kidney stone", "Kidney & bladder",
+    "A small hard stone formed in your kidney and is now moving down the narrow tube to your bladder. That movement is the pain.",
+    "kidney", ["ureter"], ["kidney stone", "renal calculus", "nephrolithiasis", "ureteral stone", "ureteric stone", "urolithiasis", "renal colic"], ["N20", "N23"]),
+  C("ckd", "Chronic kidney disease", "Kidney & bladder",
+    "Your kidneys are filtering your blood less well than they should. The aim now is to slow that down.",
+    "kidney", ["kidney"], ["chronic kidney disease", "ckd", "renal insufficiency", "chronic renal failure"], ["N18"]),
+  C("aki", "Acute kidney injury", "Kidney & bladder",
+    "Your kidneys suddenly stopped filtering as well as they should - often from dehydration or a medicine. They usually recover.",
+    "kidney", ["kidney"], ["acute kidney injury", "aki", "acute renal failure"], ["N17"]),
+  C("bph", "Enlarged prostate", "Kidney & bladder",
+    "Your prostate has grown with age and is squeezing the tube that carries urine out. That is the slow stream and the night-time trips.",
+    "kidney", ["prostate"], ["bph", "benign prostatic hyperplasia", "enlarged prostate", "prostatic hypertrophy"], ["N40"]),
+  C("overactive-bladder", "Overactive bladder", "Kidney & bladder",
+    "Your bladder muscle squeezes before the bladder is full, which is the sudden urge to go.",
+    "kidney", ["bladder"], ["overactive bladder", "oab", "urge incontinence", "urinary incontinence"], ["N32.81", "N39.41", "N39.3"]),
+  C("prostatitis", "Prostate infection", "Kidney & bladder",
+    "Your prostate is inflamed, usually from an infection.",
+    "kidney", ["prostate"], ["prostatitis", "acute prostatitis", "chronic prostatitis"], ["N41"]),
+
+  // ===================== Lower back =====================
+  C("lumbar-strain", "Lower back strain", "Lower back",
+    "The muscles and ligaments in your lower back were overstretched. It is painful, but nothing is damaged in the spine itself.",
+    "spine", ["muscle"], ["lumbar strain", "low back strain", "back strain", "mechanical low back pain", "lumbago", "low back pain", "lumbar sprain"], ["S39.012", "M54.5", "S33.5"]),
+  C("lumbar-disc-herniation", "Slipped disc", "Lower back",
+    "One of the cushions between the bones of your lower back is bulging and pressing on a nerve. That is why the pain runs down your leg.",
+    "spine", ["disc"], ["disc herniation", "herniated disc", "hnp", "sciatica", "radiculopathy", "slipped disc", "intervertebral disc displacement", "lumbar radiculopathy", "disc displacement", "lumbar disc"], ["M51.1", "M51.2", "M54.1", "M54.3"]),
+  C("spinal-stenosis", "Spinal stenosis", "Lower back",
+    "The channel your spinal nerves run through has narrowed, so they get squeezed when you stand and walk.",
+    "spine", ["disc"], ["stenosis", "spinal stenosis", "canal narrowing", "lumbar stenosis"], ["M48.06", "M48.0"]),
+  C("compression-fracture", "Compression fracture", "Lower back",
+    "One of the bones in your spine has collapsed a little, like a can pressed from both ends.",
+    "spine", ["vertebra"], ["compression fracture", "vertebral fracture", "wedge fracture", "wedge compression fracture", "fracture of lumbar vertebra"], ["S32.0", "M80.08", "M48.5"]),
+  C("spondylolisthesis", "Slipped vertebra", "Lower back",
+    "One of the bones in your lower back has slid forward a little on the one below it.",
+    "spine", ["vertebra"], ["spondylolisthesis", "spondylolysis", "pars defect"], ["M43.1", "M43.0"]),
+  C("si-joint", "Sacroiliac joint pain", "Lower back",
+    "The joint where your spine meets your pelvis - low down, just off centre - is irritated.",
+    "spine", ["sacrum"], ["sacroiliac", "si joint", "sacroiliitis", "si joint dysfunction"], ["M53.3", "M46.1"]),
+  C("coccyx-injury", "Bruised or broken tailbone", "Lower back",
+    "You landed on your tailbone, the small bone at the very bottom of your spine, and bruised or cracked it.",
+    "spine", ["coccyx"], ["coccyx", "tailbone", "coccydynia", "coccyx fracture"], ["S32.2", "M53.3"]),
+  C("scoliosis", "Scoliosis", "Lower back",
+    "Your spine curves to the side more than it should.",
+    "spine", ["vertebra"], ["scoliosis", "kyphosis"], ["M41", "M40"]),
+
+  // ===================== Hip =====================
+  C("hip-fracture", "Broken hip", "Hip",
+    "You broke the top of your thigh bone, near where it meets your hip.",
+    "hip", ["neck"], ["hip fracture", "femoral neck", "intertrochanteric", "broken hip", "fracture of femoral neck", "fracture of neck of femur", "intertrochanteric fracture", "fracture of head and neck of femur"], ["S72.0", "S72.1", "S72.2"]),
+  C("hip-osteoarthritis", "Arthritis in the hip", "Hip",
+    "The smooth surface in your hip joint has worn away, so the bones grind instead of gliding.",
+    "hip", ["joint"], ["hip osteoarthritis", "hip oa", "hip arthritis", "osteoarthritis of hip", "primary osteoarthritis of hip"], ["M16"]),
+  C("trochanteric-bursitis", "Hip bursitis", "Hip",
+    "The small fluid sac over the bony point on the outside of your hip is inflamed. That is why lying on that side hurts.",
+    "hip", ["bursa"], ["trochanteric bursitis", "hip bursitis", "greater trochanteric pain", "gluteal tendinopathy"], ["M70.6", "M70.7"]),
+  C("hip-labral-tear", "Torn hip cartilage (labrum)", "Hip",
+    "The ring of cartilage that deepens your hip socket has a tear in it.",
+    "hip", ["joint"], ["labral tear", "hip labral tear", "acetabular labrum", "femoroacetabular impingement", "fai"], ["S73.19", "M24.15"]),
+  C("groin-strain", "Pulled groin", "Hip",
+    "You overstretched the muscles on the inside of your thigh where they attach near the groin.",
+    "hip", ["groin"], ["groin strain", "adductor strain", "pulled groin", "adductor tendinopathy"], ["S76.2"]),
+  C("hip-flexor-strain", "Hip flexor strain", "Hip",
+    "You overstretched the muscles at the front of your hip that lift your knee.",
+    "hip", ["groin"], ["hip flexor strain", "iliopsoas strain", "iliopsoas tendinitis"], ["S76.1", "M76.1"]),
+  C("hamstring-strain", "Pulled hamstring", "Hip",
+    "You tore some fibres of the big muscle at the back of your thigh.",
+    "hip", ["hamstring"], ["hamstring strain", "hamstring tear", "pulled hamstring"], ["S76.3"]),
+  C("avascular-necrosis", "Bone death in the hip (AVN)", "Hip",
+    "The ball of your hip joint lost its blood supply and part of the bone is dying.",
+    "hip", ["neck"], ["avascular necrosis", "avn", "osteonecrosis"], ["M87"]),
+
+  // ===================== Knee =====================
+  C("meniscus-tear", "Torn cartilage (meniscus)", "Knee",
+    "You tore the cushion of cartilage that sits between the two bones of your knee.",
+    "knee", ["meniscus"], ["meniscus", "meniscal tear", "torn cartilage", "tear of meniscus", "medial meniscus", "lateral meniscus"], ["S83.2", "M23.2"]),
+  C("acl-tear", "ACL tear", "Knee",
+    "You tore one of the ligaments that holds your knee steady from the inside.",
+    "knee", ["acl"], ["acl", "anterior cruciate", "cruciate ligament", "sprain of anterior cruciate"], ["S83.5"]),
+  C("mcl-sprain", "MCL sprain", "Knee",
+    "You stretched or tore the ligament on the inside edge of your knee.",
+    "knee", ["mcl"], ["mcl", "medial collateral", "mcl sprain", "collateral ligament"], ["S83.41", "S83.4"]),
+  C("knee-osteoarthritis", "Arthritis in the knee", "Knee",
+    "The smooth surface inside your knee has worn down, so the bones rub instead of gliding.",
+    "knee", ["meniscus"], ["osteoarthritis", "oa knee", "degenerative joint disease", "knee arthritis", "osteoarthritis of knee", "primary osteoarthritis of knee"], ["M17"]),
+  C("patellofemoral-pain", "Kneecap pain (runner's knee)", "Knee",
+    "Your kneecap is not tracking smoothly in its groove, so the cartilage behind it gets irritated - stairs and sitting make it worse.",
+    "knee", ["patella"], ["patellofemoral", "patellofemoral pain", "runner's knee", "runners knee", "chondromalacia", "anterior knee pain"], ["M22.2", "M22.4"]),
+  C("patellar-tendinitis", "Jumper's knee", "Knee",
+    "The tendon just below your kneecap is overworked and sore.",
+    "knee", ["patellar-tendon"], ["patellar tendinitis", "patellar tendonitis", "jumper's knee", "jumpers knee", "patellar tendinopathy"], ["M76.5"]),
+  C("prepatellar-bursitis", "Swollen kneecap (bursitis)", "Knee",
+    "The small fluid sac in front of your kneecap is inflamed and swollen, usually from kneeling.",
+    "knee", ["bursa"], ["prepatellar bursitis", "housemaid's knee", "knee bursitis"], ["M70.4"]),
+  C("bakers-cyst", "Baker's cyst", "Knee",
+    "Fluid from inside your knee has bulged out into a sac at the back. It is a sign of something irritating the knee, not a danger in itself.",
+    "knee", ["back"], ["baker's cyst", "bakers cyst", "popliteal cyst"], ["M71.2"]),
+  C("patella-fracture", "Broken kneecap", "Knee",
+    "You broke your kneecap - the small bone at the front of the knee.",
+    "knee", ["patella"], ["patella fracture", "patellar fracture", "broken kneecap"], ["S82.0"]),
+  C("tibial-plateau-fracture", "Broken shin bone at the knee", "Knee",
+    "You broke the top of your shin bone, where it forms the bottom of the knee joint.",
+    "knee", ["tibia"], ["tibial plateau", "tibial plateau fracture", "proximal tibia fracture"], ["S82.1"]),
+  C("osgood-schlatter", "Osgood-Schlatter (growing knees)", "Knee",
+    "The tendon below the kneecap pulls on a growth area of the shin bone. It is common in active teenagers and settles as growth finishes.",
+    "knee", ["patellar-tendon"], ["osgood", "osgood-schlatter", "osgood schlatter", "tibial tubercle apophysitis"], ["M92.5"]),
+
+  // ===================== Ankle & foot =====================
+  C("ankle-sprain", "Sprained ankle", "Ankle & foot",
+    "You stretched or tore the ligaments on the outside of your ankle. The bone is not broken.",
+    "ankle", ["ligament"], ["ankle sprain", "sprained ankle", "lateral ligament", "sprain of ankle", "sprain of calcaneofibular", "sprain of talofibular", "lateral ankle sprain", "inversion injury"], ["S93.4", "S93.6"]),
+  C("ankle-fracture", "Broken ankle", "Ankle & foot",
+    "You broke one of the bones that forms your ankle joint.",
+    "ankle", ["malleolus"], ["ankle fracture", "malleolar", "broken ankle", "weber", "fracture of lateral malleolus", "fracture of medial malleolus", "bimalleolar", "trimalleolar"], ["S82.5", "S82.6", "S82.8"]),
+  C("achilles-rupture", "Torn Achilles tendon", "Ankle & foot",
+    "The thick cord connecting your calf muscle to your heel has torn.",
+    "ankle", ["achilles"], ["achilles", "tendon rupture", "rupture of achilles", "achilles tendon tear"], ["S86.0"]),
+  C("achilles-tendinitis", "Achilles tendon pain", "Ankle & foot",
+    "The thick cord above your heel is inflamed from overuse. It is stiff first thing and sore after activity.",
+    "ankle", ["achilles"], ["achilles tendinitis", "achilles tendinopathy", "achilles tendonitis"], ["M76.6"]),
+  C("plantar-fasciitis", "Plantar fasciitis (heel pain)", "Ankle & foot",
+    "The band of tissue along the sole of your foot is inflamed where it attaches at the heel. That is the stab of pain with the first steps of the day.",
+    "ankle", ["plantar"], ["plantar fasciitis", "plantar fasciopathy", "heel pain", "heel spur"], ["M72.2"]),
+  C("gout", "Gout", "Ankle & foot",
+    "Crystals of a waste product called uric acid have formed inside a joint - often the big toe - and the joint is reacting as if it were infected.",
+    "ankle", ["toe"], ["gout", "gouty arthritis", "acute gout", "podagra", "gout flare"], ["M10", "M1A"]),
+  C("bunion", "Bunion", "Ankle & foot",
+    "The joint at the base of your big toe has drifted outward, making a bony bump on the side of your foot.",
+    "ankle", ["toe"], ["bunion", "hallux valgus"], ["M20.1"]),
+  C("metatarsal-fracture", "Broken foot bone (metatarsal)", "Ankle & foot",
+    "You broke one of the long bones in the middle of your foot.",
+    "ankle", ["metatarsal"], ["metatarsal fracture", "stress fracture foot", "jones fracture", "fifth metatarsal", "march fracture"], ["S92.3", "M84.37"]),
+  C("toe-fracture", "Broken toe", "Ankle & foot",
+    "You broke one of the small bones in a toe.",
+    "ankle", ["toe"], ["toe fracture", "broken toe", "fracture of toe", "phalanx fracture toe"], ["S92.4", "S92.5"]),
+  C("ingrown-toenail", "Ingrown toenail", "Ankle & foot",
+    "The edge of your toenail has grown into the skin beside it, and that skin is now sore and often infected.",
+    "ankle", ["nail"], ["ingrown toenail", "ingrown nail", "onychocryptosis", "paronychia toe"], ["L60.0"]),
+  C("mortons-neuroma", "Morton's neuroma", "Ankle & foot",
+    "A nerve between the bones of your forefoot is thickened and pinched. That is the burning under the ball of your foot.",
+    "ankle", ["metatarsal"], ["morton's neuroma", "mortons neuroma", "interdigital neuroma"], ["G57.6"]),
+  C("diabetic-foot-ulcer", "Diabetic foot ulcer", "Ankle & foot",
+    "A sore on your foot is not healing because diabetes has reduced feeling and blood flow there. It needs careful looking after.",
+    "ankle", ["plantar"], ["diabetic foot ulcer", "foot ulcer", "diabetic foot"], ["E11.621", "L97"]),
+
+  // ===================== Skin =====================
+  C("cellulitis", "Skin infection (cellulitis)", "Skin",
     "You have a bacterial infection in the skin and the tissue just under it.",
-    "body", ["core"], ["cellulitis", "skin infection", "soft tissue infection"]),
+    "skin", ["deep"], ["cellulitis", "skin infection", "soft tissue infection", "cellulitis of", "cellulitis and abscess"], ["L03"]),
+  C("abscess", "Abscess (boil)", "Skin",
+    "A pocket of pus has formed under your skin. Draining it is what fixes it; antibiotics alone often cannot reach it.",
+    "skin", ["deep"], ["abscess", "boil", "furuncle", "carbuncle", "cutaneous abscess"], ["L02"]),
+  C("eczema", "Eczema", "Skin",
+    "Your skin's outer barrier is weak, so it dries out, gets irritated and itches. It comes and goes.",
+    "skin", ["surface"], ["eczema", "atopic dermatitis", "dermatitis"], ["L20", "L30"]),
+  C("contact-dermatitis", "Contact rash", "Skin",
+    "Your skin reacted to something it touched - a plant, a metal, a soap.",
+    "skin", ["surface"], ["contact dermatitis", "allergic contact dermatitis", "poison ivy", "irritant dermatitis"], ["L23", "L24", "L25"]),
+  C("psoriasis", "Psoriasis", "Skin",
+    "Your skin cells are being made far faster than normal, so they pile up into thick, scaly patches.",
+    "skin", ["surface"], ["psoriasis", "plaque psoriasis"], ["L40"]),
+  C("shingles", "Shingles", "Skin",
+    "The chickenpox virus, which has been sleeping in a nerve since childhood, has woken up. That is why the rash follows a stripe and why it hurts.",
+    "skin", ["surface"], ["shingles", "herpes zoster", "zoster"], ["B02"]),
+  C("hives", "Hives", "Skin",
+    "Your skin released histamine in response to something, which raised itchy welts. They move around and usually fade within a day.",
+    "skin", ["surface"], ["hives", "urticaria", "acute urticaria"], ["L50"]),
+  C("acne", "Acne", "Skin",
+    "Oil and dead skin are blocking the tiny pores in your skin, and bacteria inside them cause the spots.",
+    "skin", ["follicle"], ["acne", "acne vulgaris", "cystic acne"], ["L70"]),
+  C("impetigo", "Impetigo", "Skin",
+    "A bacterial infection on the surface of the skin is causing honey-coloured crusted sores. It spreads easily by touch.",
+    "skin", ["surface"], ["impetigo"], ["L01"]),
+  C("ringworm", "Ringworm (fungal rash)", "Skin",
+    "A fungus is growing on the surface of your skin in a ring shape. It has nothing to do with worms.",
+    "skin", ["surface"], ["ringworm", "tinea", "tinea corporis", "athlete's foot", "tinea pedis", "jock itch", "tinea cruris"], ["B35"]),
+  C("laceration", "Cut (laceration)", "Skin",
+    "You have a cut that went through the full thickness of the skin. It has been cleaned and closed.",
+    "skin", ["wound"], ["laceration", "wound repair", "sutured laceration", "skin tear"], ["S01", "S41", "S51", "S61", "S71", "S81", "S91"]),
+  C("burn", "Burn", "Skin",
+    "Heat damaged the top layers of your skin. How deep it went decides how it heals.",
+    "skin", ["wound"], ["burn", "scald", "second degree burn", "first degree burn", "partial thickness burn"], ["T30", "T31", "T20", "T21", "T22", "T23", "T24", "T25"]),
+  C("wart", "Wart", "Skin",
+    "A virus in the top layer of your skin is making it grow a small rough lump. Harmless, but slow to clear.",
+    "skin", ["surface"], ["wart", "verruca", "plantar wart", "verruca vulgaris"], ["B07"]),
+  C("skin-cancer-bcc", "Skin cancer (basal cell)", "Skin",
+    "A patch of skin cells has started growing out of control. This is the most common and least dangerous kind, and it is removed with a small procedure.",
+    "skin", ["surface"], ["basal cell carcinoma", "bcc", "basal cell", "squamous cell carcinoma", "scc skin"], ["C44"]),
+
+  // ===================== Mind & mood =====================
+  C("depression", "Depression", "Mind & mood",
+    "This is depression - a medical condition, not a weakness. The chemistry and wiring of mood in the brain are out of balance, and that is treatable.",
+    "head", ["brain"], ["depression", "major depressive disorder", "mdd", "major depression", "depressive disorder"], ["F32", "F33"]),
+  C("anxiety", "Anxiety", "Mind & mood",
+    "Your body's alarm system is switched on too easily and stays on too long. The racing heart and tight chest are the alarm, not a heart problem.",
+    "head", ["brain"], ["anxiety", "generalized anxiety disorder", "gad", "anxiety disorder"], ["F41.1", "F41.9"]),
+  C("panic-disorder", "Panic attacks", "Mind & mood",
+    "A panic attack is a sudden surge of the body's alarm response. It feels dangerous and it is not; it passes within minutes.",
+    "head", ["brain"], ["panic disorder", "panic attack", "panic attacks"], ["F41.0"]),
+  C("insomnia", "Insomnia", "Mind & mood",
+    "You are having trouble falling or staying asleep, and it has gone on long enough to affect your days.",
+    "head", ["brain"], ["insomnia", "sleep disturbance", "chronic insomnia"], ["G47.0", "F51.0"]),
+  C("ptsd", "Post-traumatic stress (PTSD)", "Mind & mood",
+    "After something frightening, your brain is still treating it as happening now. The flashbacks and jumpiness are that, and it can be treated.",
+    "head", ["brain"], ["ptsd", "post traumatic stress", "post-traumatic stress disorder"], ["F43.1"]),
+  C("adhd", "ADHD", "Mind & mood",
+    "The part of your brain that manages attention and impulse works differently. It is not laziness, and there are good treatments.",
+    "head", ["brain"], ["adhd", "attention deficit", "attention-deficit"], ["F90"]),
+  C("bipolar", "Bipolar disorder", "Mind & mood",
+    "Your mood swings between much higher and much lower than normal for weeks at a time. Medicine steadies it.",
+    "head", ["brain"], ["bipolar", "bipolar disorder", "bipolar affective disorder", "manic episode"], ["F31", "F30"]),
+  C("alcohol-use", "Alcohol dependence", "Mind & mood",
+    "Your body has come to depend on alcohol. Stopping suddenly can be dangerous, which is why it is done with support.",
+    "head", ["brain"], ["alcohol use disorder", "alcohol dependence", "alcohol withdrawal", "aud", "alcohol abuse"], ["F10"]),
+  C("opioid-use", "Opioid dependence", "Mind & mood",
+    "Your body has come to depend on opioids. That is a medical condition with medical treatments, and recovery is normal.",
+    "head", ["brain"], ["opioid use disorder", "opioid dependence", "oud", "opioid withdrawal"], ["F11"]),
+  C("postpartum-depression", "Postnatal depression", "Mind & mood",
+    "Depression in the months after having a baby. It is common, it is not your fault, and it responds to treatment.",
+    "head", ["brain"], ["postpartum depression", "postnatal depression", "perinatal depression"], ["F53.0", "O90.6"]),
+
+  // ===================== Women's health =====================
+  C("yeast-infection", "Vaginal yeast infection", "Women's health",
+    "A yeast that normally lives in the vagina in small numbers has overgrown. That is the itching and thick discharge.",
+    "body", ["pelvis"], ["yeast infection", "vaginal candidiasis", "vulvovaginal candidiasis", "vaginal thrush"], ["B37.3"]),
+  C("bacterial-vaginosis", "Bacterial vaginosis", "Women's health",
+    "The normal balance of bacteria in the vagina has shifted. It is not a sexually transmitted infection.",
+    "body", ["pelvis"], ["bacterial vaginosis", "bv"], ["N76.0"]),
+  C("pcos", "Polycystic ovary syndrome", "Women's health",
+    "Your ovaries are making more of certain hormones than usual, which affects periods, skin and weight.",
+    "body", ["pelvis"], ["pcos", "polycystic ovary", "polycystic ovarian syndrome"], ["E28.2"]),
+  C("endometriosis", "Endometriosis", "Women's health",
+    "Tissue like the lining of the womb is growing outside it, and it bleeds and scars each month the way the lining does.",
+    "body", ["pelvis"], ["endometriosis"], ["N80"]),
+  C("fibroids", "Fibroids", "Women's health",
+    "Non-cancerous lumps of muscle have grown in the wall of your womb. They can make periods heavy.",
+    "body", ["pelvis"], ["fibroids", "uterine fibroids", "leiomyoma", "myoma"], ["D25"]),
+  C("menopause", "Menopause", "Women's health",
+    "Your ovaries have stopped releasing eggs and are making much less oestrogen. Hot flushes and sleep changes are the body adjusting.",
+    "body", ["pelvis"], ["menopause", "menopausal", "perimenopause", "perimenopausal"], ["N95.1", "N95.0"]),
+  C("dysmenorrhea", "Painful periods", "Women's health",
+    "The womb squeezes hard to shed its lining, and those cramps are the pain.",
+    "body", ["pelvis"], ["dysmenorrhea", "painful periods", "menstrual cramps"], ["N94.4", "N94.6"]),
+
+  // ===================== Whole body =====================
+  C("type-2-diabetes", "Type 2 diabetes", "Whole body",
+    "Your body is not using insulin properly, so too much sugar stays in your blood.",
+    "body", ["core"], ["type 2 diabetes", "t2dm", "diabetes mellitus", "dm2", "hyperglycemia", "type 2 diabetes mellitus", "diabetes mellitus type 2", "diabetes type 2", "niddm"], ["E11"]),
+  C("type-1-diabetes", "Type 1 diabetes", "Whole body",
+    "Your pancreas has stopped making insulin, the hormone that lets sugar into your cells. Insulin from outside replaces it.",
+    "body", ["core"], ["type 1 diabetes", "t1dm", "dm1", "insulin dependent diabetes", "diabetic ketoacidosis", "dka"], ["E10"]),
+  C("hypothyroidism", "Underactive thyroid", "Whole body",
+    "The gland in your neck that sets your body's pace is making too little hormone, so everything runs slow - energy, warmth, weight.",
+    "neck", ["thyroid"], ["hypothyroidism", "hypothyroid", "hashimoto", "hashimoto's", "underactive thyroid"], ["E03", "E06.3"]),
+  C("hyperthyroidism", "Overactive thyroid", "Whole body",
+    "The gland in your neck that sets your body's pace is making too much hormone, so everything runs fast.",
+    "neck", ["thyroid"], ["hyperthyroidism", "hyperthyroid", "graves", "graves' disease", "overactive thyroid", "thyrotoxicosis"], ["E05"]),
+  C("anemia", "Anaemia", "Whole body",
+    "You have fewer red blood cells than you should, so less oxygen reaches your muscles and brain. That is the tiredness.",
+    "body", ["blood"], ["anemia", "anaemia", "iron deficiency anemia", "iron deficiency", "low hemoglobin"], ["D50", "D64.9", "D51", "D52"]),
+  C("dehydration", "Dehydration", "Whole body",
+    "Your body has lost more fluid than it has taken in.",
+    "body", ["core"], ["dehydration", "volume depletion", "hypovolemia"], ["E86"]),
+  C("obesity", "Obesity", "Whole body",
+    "Your body is carrying more fat than is healthy for it. It is a medical condition with medical treatments, not a character flaw.",
+    "body", ["core"], ["obesity", "morbid obesity", "overweight", "class 3 obesity"], ["E66"]),
+  C("osteoporosis", "Osteoporosis", "Whole body",
+    "Your bones have lost density and break more easily than they should.",
+    "body", ["bones"], ["osteoporosis", "osteopenia", "low bone density"], ["M81", "M85.8"]),
+  C("vitamin-d-deficiency", "Low vitamin D", "Whole body",
+    "Your body is short of vitamin D, which it needs to use calcium for bones and muscles.",
+    "body", ["bones"], ["vitamin d deficiency", "low vitamin d", "hypovitaminosis d"], ["E55"]),
+  C("rheumatoid-arthritis", "Rheumatoid arthritis", "Whole body",
+    "Your immune system is attacking the lining of your own joints, which is why several of them are swollen and stiff at once.",
+    "body", ["joints"], ["rheumatoid arthritis", "ra", "seropositive rheumatoid", "inflammatory arthritis"], ["M05", "M06"]),
+  C("lupus", "Lupus", "Whole body",
+    "Your immune system is attacking your own tissues - skin, joints, sometimes organs. It flares and settles.",
+    "body", ["joints"], ["lupus", "systemic lupus erythematosus", "sle"], ["M32"]),
+  C("fibromyalgia", "Fibromyalgia", "Whole body",
+    "Your nervous system is turning up the volume on pain signals, so you hurt all over even though the tissues are not damaged.",
+    "body", ["core"], ["fibromyalgia"], ["M79.7"]),
+  C("allergic-reaction", "Allergic reaction", "Whole body",
+    "Your immune system reacted to something as if it were dangerous. That is the rash, swelling or wheeze.",
+    "body", ["core"], ["allergic reaction", "anaphylaxis", "allergy", "drug allergy", "food allergy"], ["T78.4", "T78.2", "T78.0", "T88.6"]),
+  C("febrile-seizure", "Febrile seizure (children)", "Whole body",
+    "A fast rise in temperature triggered a brief seizure. It is frightening to see, but it does not harm the brain and most children never have another.",
+    "head", ["brain"], ["febrile seizure", "febrile convulsion"], ["R56.0"]),
+  C("hand-foot-mouth", "Hand, foot and mouth disease", "Whole body",
+    "A common childhood virus causing small blisters on the hands, feet and in the mouth. It clears on its own in about a week.",
+    "skin", ["surface"], ["hand foot and mouth", "hand, foot and mouth", "hfmd", "coxsackie"], ["B08.4"]),
 ];
-
-
-/**
- * Clinical vocabulary an EHR or a discharge summary actually uses, keyed by
- * condition. Kept separate from the display table above so the human-readable
- * part stays readable. Applied at module load.
- */
-const CLINICAL_VOCAB: Record<string, { synonyms: string[]; icd10: string[] }> = {
-  "distal-radius-fracture": { synonyms: ["lower end of radius", "lower end of the radius", "fracture of the lower end of", "distal end of radius", "distal radial"], icd10: ["S52.5", "S52.6"] },
-  "scaphoid-fracture": { synonyms: [], icd10: ["S62.0"] },
-  "carpal-tunnel": { synonyms: [], icd10: ["G56.0"] },
-  "meniscus-tear": { synonyms: ["tear of meniscus", "medial meniscus", "lateral meniscus"], icd10: ["S83.2", "M23.2"] },
-  "acl-tear": { synonyms: ["sprain of anterior cruciate"], icd10: ["S83.5"] },
-  "knee-osteoarthritis": { synonyms: ["osteoarthritis of knee", "primary osteoarthritis of knee"], icd10: ["M17"] },
-  "rotator-cuff-tear": { synonyms: ["rotator cuff syndrome", "incomplete rotator cuff tear", "complete rotator cuff tear"], icd10: ["M75.1", "S46.0"] },
-  "shoulder-dislocation": { synonyms: ["dislocation of shoulder joint", "anterior dislocation of humerus"], icd10: ["S43.0"] },
-  "frozen-shoulder": { synonyms: [], icd10: ["M75.0"] },
-  "lumbar-disc-herniation": { synonyms: ["intervertebral disc displacement", "lumbar radiculopathy", "disc displacement"], icd10: ["M51.1", "M51.2", "M54.1"] },
-  "spinal-stenosis": { synonyms: [], icd10: ["M48.06", "M48.0"] },
-  "compression-fracture": { synonyms: ["wedge compression fracture", "fracture of lumbar vertebra"], icd10: ["S32.0", "M80.08", "M48.5"] },
-  "atrial-fibrillation": { synonyms: ["paroxysmal atrial fibrillation", "persistent atrial fibrillation"], icd10: ["I48"] },
-  "myocardial-infarction": { synonyms: ["st elevation myocardial infarction", "non-st elevation myocardial infarction", "non st elevation", "type 2 mi", "s/p pci", "s/p des"], icd10: ["I21", "I22", "I25.2"] },
-  "heart-failure": { synonyms: ["heart failure with reduced ejection", "heart failure with preserved ejection", "acute on chronic heart failure", "chf exacerbation"], icd10: ["I50"] },
-  "angina": { synonyms: ["unstable angina"], icd10: ["I20"] },
-  "pneumonia": { synonyms: ["pneumonia, unspecified organism", "bacterial pneumonia", "aspiration pneumonia"], icd10: ["J18", "J15", "J13", "J69.0"] },
-  "copd": { synonyms: ["chronic obstructive pulmonary disease", "acute exacerbation of copd", "aecopd"], icd10: ["J44"] },
-  "asthma": { synonyms: ["acute asthma", "status asthmaticus"], icd10: ["J45", "J46"] },
-  "pulmonary-embolism": { synonyms: ["pulmonary thromboembolism", "segmental pe", "subsegmental pe"], icd10: ["I26"] },
-  "concussion": { synonyms: ["concussion without loss of consciousness", "concussion with loss of consciousness"], icd10: ["S06.0"] },
-  "ischemic-stroke": { synonyms: ["cerebral infarction", "acute ischemic stroke", "ischaemic stroke"], icd10: ["I63"] },
-  "tia": { synonyms: ["transient cerebral ischemic attack"], icd10: ["G45.9", "G45"] },
-  "migraine": { synonyms: ["migraine without aura", "migraine with aura"], icd10: ["G43"] },
-  "appendicitis": { synonyms: ["acute appendicitis"], icd10: ["K35", "K36", "K37"] },
-  "cholecystitis": { synonyms: ["acute cholecystitis", "calculus of gallbladder", "choledocholithiasis"], icd10: ["K80", "K81"] },
-  "diverticulitis": { synonyms: ["diverticulitis of large intestine"], icd10: ["K57"] },
-  "gerd": { synonyms: ["gastro-esophageal reflux disease", "gastroesophageal reflux disease"], icd10: ["K21"] },
-  "ankle-sprain": { synonyms: ["sprain of ankle", "sprain of calcaneofibular", "sprain of talofibular", "lateral ankle sprain"], icd10: ["S93.4", "S93.6"] },
-  "ankle-fracture": { synonyms: ["fracture of lateral malleolus", "fracture of medial malleolus", "bimalleolar", "trimalleolar"], icd10: ["S82.5", "S82.6", "S82.8"] },
-  "achilles-rupture": { synonyms: ["rupture of achilles", "achilles tendon tear"], icd10: ["S86.0"] },
-  "hip-fracture": { synonyms: ["fracture of femoral neck", "fracture of neck of femur", "intertrochanteric fracture", "fracture of head and neck of femur"], icd10: ["S72.0", "S72.1", "S72.2"] },
-  "hip-osteoarthritis": { synonyms: ["osteoarthritis of hip", "primary osteoarthritis of hip"], icd10: ["M16"] },
-  "type-2-diabetes": { synonyms: ["type 2 diabetes mellitus", "diabetes mellitus type 2", "diabetes type 2", "niddm"], icd10: ["E11"] },
-  "hypertension": { synonyms: ["essential hypertension", "essential (primary) hypertension", "hypertensive"], icd10: ["I10", "I11", "I12", "I13"] },
-  "uti": { synonyms: ["urinary tract infection, site not specified", "acute cystitis", "acute pyelonephritis"], icd10: ["N39.0", "N30", "N10"] },
-  "cellulitis": { synonyms: ["cellulitis of", "cellulitis and abscess"], icd10: ["L03"] },
-};
-
-for (const c of CONDITIONS) {
-  const v = CLINICAL_VOCAB[c.id];
-  if (!v) continue;
-  c.synonyms.push(...v.synonyms);
-  c.icd10 = v.icd10;
-}
 
 export const byId = (id: string) => CONDITIONS.find((c) => c.id === id) ?? null;
 
+/** Categories, in the order they are defined. */
 export const REGIONS = [...new Set(CONDITIONS.map((c) => c.region))];
 
 export interface ConditionMatch {
   condition: Condition;
-  /** The phrase or code in the text that produced the match. */
   matched: string;
 }
 
 const esc = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+/** Phrases that use a condition's name to mean something else entirely. */
+const NOT_THIS: Record<string, RegExp> = {
+  depression: /\bst[ -]?(segment )?depression\b/,
+  stroke: /\bheat ?stroke\b/,
+  burn: /\bheartburn\b/,
+};
+
 /**
  * Match free text against the library.
  *
- * ICD-10 codes are checked first and outrank any phrase: an EHR export leads
- * with "S52.502A" and follows it with wording ("fracture of the lower end of
- * right radius") that no synonym list will ever fully cover, and a code is
- * exact. Among phrases the longest wins, so "transient ischemic attack" is not
- * captured by "stroke" and "hip osteoarthritis" not by "osteoarthritis".
+ * ICD-10 codes are checked first and outrank any phrase - an EHR export leads
+ * with "S52.502A" and follows it with wording no synonym list fully covers.
+ * Among phrases the longest wins, so "transient ischemic attack" is not taken
+ * by "stroke" and "hip osteoarthritis" not by "osteoarthritis".
  */
 export function matchConditionDetailed(text: string): ConditionMatch | null {
   const raw = text.toUpperCase();
@@ -284,12 +727,17 @@ export function matchConditionDetailed(text: string): ConditionMatch | null {
     }
   }
 
-  const t = ` ${text.toLowerCase().replace(/[^a-z0-9\s'/-]/g, " ").replace(/\s+/g, " ")} `;
+  // Punctuation becomes space on both sides, so "ankle sprain, lateral" and
+  // "pneumonia, unspecified organism" match the same way they were written.
+  const norm = (x: string) => x.toLowerCase().replace(/[^a-z0-9\s'/-]/g, " ").replace(/\s+/g, " ").trim();
+  const t = ` ${norm(text)} `;
   let best: { c: Condition; s: string } | null = null;
   for (const c of CONDITIONS) {
-    for (const syn of [...c.synonyms, c.label.toLowerCase()]) {
-      const s = syn.toLowerCase();
-      // Word-boundary match so "pe" does not fire inside "pelvis".
+    if (NOT_THIS[c.id]?.test(t)) continue;
+    for (const syn of [...c.synonyms, c.label]) {
+      const s = norm(syn);
+      if (!s) continue;
+      // Word-boundary match so "mi" does not fire inside "minor".
       if (!new RegExp(`(^|\\s)${esc(s)}(\\s|$)`).test(t)) continue;
       if (!best || s.length > best.s.length) best = { c, s };
     }
@@ -302,10 +750,8 @@ export function matchCondition(text: string): Condition | null {
 }
 
 /**
- * The principal diagnosis among several. Order in the note matters, but a
- * diagnosis with a specific diagram beats a systemic one listed first: a
- * wrist fracture with "hypertension" as a secondary should show the wrist,
- * not a body outline.
+ * The principal diagnosis among several: first in the note wins, except that
+ * a diagnosis with a specific drawing beats a whole-body one listed earlier.
  */
 export function chooseCondition(candidates: string[]): ConditionMatch | null {
   const matches = candidates

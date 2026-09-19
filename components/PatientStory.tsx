@@ -31,7 +31,7 @@ interface Props {
  * costs nothing) with the browser voice as fallback. The next slide's audio is
  * prefetched while the current one plays, so there is no gap.
  */
-export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initialBody = "neutral", onBack }: Props) {
+export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initialBody = "male", onBack }: Props) {
   const [body, setBody] = useState<BodyType>(initialBody);
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(true);
@@ -178,9 +178,8 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
               {(["female", "male"] as BodyType[]).map((b) => (
                 <button
                   key={b}
-                  onClick={() => setBody((cur) => (cur === b ? "neutral" : b))}
-                  className="chip"
-                  style={body === b ? { background: "var(--accent)", color: "var(--accent-ink)", borderColor: "var(--accent)" } : undefined}
+                  onClick={() => setBody(b)}
+                  className={`chip ${body === b ? "on" : ""}`}
                 >
                   {b === "female" ? "Female" : "Male"}
                 </button>
@@ -196,7 +195,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
 
         {slide.kind === "howto" && slide.art && (
           <div className="flex items-end gap-6 mb-6">
-            <div className="w-40 sm:w-56 float-card p-4">
+            <div className="w-40 sm:w-56 p-4">
               <HowToArt id={slide.art} />
             </div>
                       </div>
@@ -224,10 +223,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
           <ol className="mt-6 space-y-3">
             {slide.steps.map((st, n) => (
               <li key={n} className="flex gap-4 items-start" style={{ fontSize: "clamp(1.15rem, 2.4vw, 1.8rem)", lineHeight: 1.3 }}>
-                <span
-                  className="flex-none w-9 h-9 rounded-full flex items-center justify-center text-base font-bold"
-                  style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
-                >
+                <span className="flex-none w-8 display-sm italic" style={{ color: "var(--accent-text)" }}>
                   {n + 1}
                 </span>
                 <span>{st}</span>

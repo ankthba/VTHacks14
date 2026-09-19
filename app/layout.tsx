@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Fraunces, Nunito_Sans } from "next/font/google";
+import { Lora, Figtree } from "next/font/google";
 import "./globals.css";
 import { APP_NAME, APP_DESCRIPTION, APP_TAGLINE } from "@/lib/brand";
 
-/* Fraunces is a soft serif with an optical-size axis and a "wonk" - it reads
-   handmade rather than editorial. Nunito Sans has rounded terminals and stays
-   very legible at the sizes an older patient reads. */
-const display = Fraunces({
+/* Lora for headlines: a warm, calligraphic serif that stays readable at the
+   sizes an older patient reads. Figtree for everything else: friendly, open,
+   and it does not look like a code editor. */
+const display = Lora({
   variable: "--font-display",
   subsets: ["latin"],
   weight: "variable",
-  axes: ["SOFT", "WONK", "opsz"],
+  style: ["normal", "italic"],
 });
-const body = Nunito_Sans({
+const body = Figtree({
   variable: "--font-body",
   subsets: ["latin"],
   weight: "variable",

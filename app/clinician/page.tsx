@@ -90,7 +90,7 @@ export default function ClinicianPage() {
         </p>
       </header>
 
-      <section className="float-card p-6">
+      <section className="card p-6">
         <div className="grid gap-4 sm:grid-cols-3">
           <label className="block sm:col-span-2">
             <span className="block text-sm font-semibold mb-1">

@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
 /*
- * Granola-derived layout language; warm beige ground, matcha for actions.
+ * Warm beige ground, matcha for actions, and no boxes.
  *
- * Ivory-beige rather than white or grey, deep matcha green as the only action
- * colour, and a large serif at regular weight with tight tracking for display.
+ * The page is a document: type, hairlines and whitespace. Nothing floats,
+ * nothing casts a shadow, nothing is a pill. Ivory-beige rather than white or
+ * grey, and one action colour.
  *
  * Two departures from it, both because this is a medical accessibility tool:
  *
@@ -44,8 +45,7 @@
   --ok: #3f6335;
   --ok-bg: #e6efdb;
 
-  --radius-card: 14px;
-  --radius-pill: 999px;
+  --radius: 4px;
 }
 
 @theme inline {
@@ -87,34 +87,31 @@ body::before {
 body > * { position: relative; z-index: 1; }
 
 /*
- * Display type: serif, regular weight, tight tracking, leading just under 1.
- * The restraint is the point - weight 400 at a large size, not bold.
- */
-/*
- * Display type: a soft serif at a medium weight with the "wonk" on, tracking
- * left alone. The old setting - hairline serif, weight 400, -0.02em - was the
- * cold part.
+ * Display type: a warm serif at medium weight, tracking barely tightened,
+ * leading just over 1. Not a hairline, not bold.
  */
 .display {
   font-family: var(--font-display), Georgia, serif;
-  font-weight: 600;
-  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 72;
-  letter-spacing: -0.005em;
-  line-height: 1.02;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.06;
 }
 
 .display-sm {
   font-family: var(--font-display), Georgia, serif;
   font-weight: 600;
-  font-variation-settings: "SOFT" 80, "WONK" 1, "opsz" 36;
-  letter-spacing: 0;
-  line-height: 1.15;
+  letter-spacing: -0.005em;
+  line-height: 1.2;
 }
 
-/* Pill buttons, straight from the source. */
+/* Buttons: a square-cornered block of matcha, or a hairline box. */
 .btn {
-  border-radius: var(--radius-pill);
-  padding: 10px 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius);
+  padding: 11px 22px;
   font-weight: 600;
   transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
 }
@@ -122,7 +119,6 @@ body > * { position: relative; z-index: 1; }
 .btn-primary {
   background: var(--accent);
   color: var(--accent-ink);
-  box-shadow: inset 0 -2px 0 rgba(28, 38, 18, 0.12);
 }
 .btn-primary:hover:not(:disabled) {
   background: var(--accent-hover);
@@ -134,26 +130,55 @@ body > * { position: relative; z-index: 1; }
   border: 1px solid var(--line);
 }
 .btn-secondary:hover:not(:disabled) {
-  background: var(--surface-warm);
-  border-color: var(--accent-text);
+  border-color: var(--foreground);
 }
 
+/* Small choices: plain text with a hairline under it. The chosen one is inked. */
 .chip {
-  border-radius: var(--radius-pill);
-  background: var(--surface-warm);
-  border: 1px solid var(--line-soft);
-  padding: 5px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  padding: 4px 2px;
   font-size: 14px;
+  color: var(--muted);
+  cursor: pointer;
 }
 .chip:hover:not(:disabled) {
-  border-color: var(--accent-text);
-  background: #fff;
+  color: var(--foreground);
+  border-bottom-color: var(--foreground);
 }
+.chip.on {
+  color: var(--accent-text);
+  border-bottom: 2px solid var(--accent);
+  font-weight: 600;
+}
+select.chip { appearance: none; padding-right: 18px; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23675d51' stroke-width='1.5'/></svg>"); background-repeat: no-repeat; background-position: right 2px center; }
 
+/* Category tabs: a run of words, the current one underlined in matcha. */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 18px;
+  border-bottom: 1px solid var(--line-soft);
+  padding-bottom: 8px;
+}
+.tab {
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  font-size: 15px;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+.tab:hover { color: var(--foreground); }
+.tab.on { color: var(--foreground); border-bottom-color: var(--accent); font-weight: 600; }
+
+/* A card is a hairline above a block. Nothing more. */
 .card {
-  background: var(--surface);
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-card);
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
 }
 
 :focus-visible {
@@ -164,19 +189,11 @@ body > * { position: relative; z-index: 1; }
 @media print {
   .no-print { display: none !important; }
   body { background: #fff; font-size: 12pt; }
-  .print-sheet { box-shadow: none !important; border: none !important; padding: 0 !important; }
+  body::before { display: none; }
+  .print-sheet { border: none !important; padding: 0 !important; }
   a[href]::after { content: " (" attr(href) ")"; font-size: 9pt; color: #444; }
   .finding-card { break-inside: avoid; }
 }
-
-/*
- * Layout primitives taken from the same source.
- *
- * The dominant pattern there is NOT a grid of bordered cards - it is lists
- * separated by hairlines, an icon in a small rounded square, and whitespace
- * doing the work that borders usually do. Boxes are reserved for the one thing
- * that should float above the page.
- */
 
 /* Hairline-divided list. Rows carry no border of their own. */
 .list-hairline > * + * {
@@ -190,41 +207,25 @@ body > * { position: relative; z-index: 1; }
   padding: 18px 0;
 }
 
-/* Small rounded square holding a line-art icon or a short glyph. */
+/* A glyph at the start of a row. No box around it. */
 .icon-box {
   flex: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: var(--surface-warm);
-  border: 1px solid var(--line-soft);
+  width: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  line-height: 1;
+  font-size: 20px;
+  line-height: 1.4;
 }
 
-/* The one element allowed to float above the page. */
-.float-card {
-  background: var(--surface);
-  border: 1px solid var(--line-soft);
-  border-radius: 16px;
-  box-shadow:
-    0 1px 2px rgba(42, 37, 32, 0.05),
-    0 8px 24px -8px rgba(42, 37, 32, 0.14);
-}
-
-/* Inline metadata: "Today", "4 medicines". */
+/* Inline metadata: small, spaced, quiet. */
 .meta-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--line-soft);
-  background: var(--surface);
-  padding: 4px 12px;
-  font-size: 13px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--muted);
   white-space: nowrap;
 }
@@ -234,33 +235,22 @@ body > * { position: relative; z-index: 1; }
   border-top: 1px solid var(--line-soft);
   padding-top: 40px;
 }
+.section { margin-top: 40px; }
 
-.section {
-  margin-top: 40px;
-}
+.lede { font-size: 17px; line-height: 1.55; }
+.lede strong { font-weight: 600; }
 
-/* Emphasis inside a sentence, the way their feature rows read. */
-.lede {
-  font-size: 17px;
-  line-height: 1.55;
-}
-.lede strong {
-  font-weight: 600;
-}
-
-/*
- * Product chrome. A wordmark, a quiet nav, a numbered flow. Fewer boxes: the
- * page is one document with a sticky preview, not a stack of equal cards.
- */
+/* Product chrome: a wordmark, a quiet nav, numbered sections down the page. */
 .nav {
   display: flex;
   align-items: center;
   gap: 28px;
   padding: 18px 0;
-  border-bottom: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line);
 }
 .wordmark {
   font-family: var(--font-display), Georgia, serif;
+  font-weight: 600;
   font-size: 26px;
   letter-spacing: -0.01em;
   color: var(--foreground);
@@ -273,58 +263,55 @@ body > * { position: relative; z-index: 1; }
 }
 .nav a:not(.wordmark):hover { color: var(--foreground); }
 
-/* A numbered step: circle + label, the rail of the composer. */
+/* A numbered step: a serif numeral in the margin, then the heading. */
 .step {
   display: flex;
   align-items: baseline;
-  gap: 14px;
-  margin-bottom: 14px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 .step-n {
   flex: none;
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-  background: var(--accent);
-  color: var(--accent-ink);
-  transform: translateY(4px);
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--accent-text);
+  min-width: 22px;
 }
-.step-n.done { background: var(--accent-text); color: #fff; }
-.step-n.todo { background: var(--surface-warm); color: var(--muted); }
+.step-n.done { color: var(--accent-text); }
+.step-n.todo { color: var(--line); }
 
-/* The document: one tall panel, sections divided by hairlines, no nested boxes. */
-.doc {
-  background: var(--surface);
-  border: 1px solid var(--line-soft);
-  border-radius: 22px;
-  box-shadow:
-    0 1px 2px rgba(42, 37, 32, 0.04),
-    0 12px 32px -12px rgba(42, 37, 32, 0.16);
-}
-.doc > section { padding: 28px 32px; }
-.doc > section + section { border-top: 1px solid var(--line-soft); }
-@media (max-width: 640px) { .doc > section { padding: 22px 20px; } }
+/* The document: sections down the page, a hairline between each. No panel. */
+.doc > section { padding: 36px 0; }
+.doc > section:first-child { padding-top: 8px; }
+.doc > section + section { border-top: 1px solid var(--line); }
 
+/* Fields: a hairline box for a block of text, a single underline for a line. */
 .field {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #fff;
+  border-radius: 0;
+  background: transparent;
   padding: 10px 12px;
   font-size: 15px;
+  color: var(--foreground);
 }
-.field:focus { outline: 2px solid var(--accent-text); outline-offset: 1px; border-color: var(--accent-text); }
+input.field {
+  border-width: 0 0 1px 0;
+  padding: 8px 0;
+  background: transparent !important;
+}
+.field::placeholder { color: #9a8f80; }
+.field:focus { outline: none; border-color: var(--foreground); }
 .field-label {
   display: block;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 /* Quiet text action - the alternative to a second button. */
@@ -340,15 +327,16 @@ body > * { position: relative; z-index: 1; }
   cursor: pointer;
 }
 
-/* The preview is drawn as the patient slide it will become. */
+/* The preview: a rule across the top, like a column in a paper. */
 .slide-preview {
-  background: var(--background);
-  border: 1px solid var(--line-soft);
-  border-radius: 20px;
-  padding: 28px;
+  border-top: 2px solid var(--foreground);
+  padding-top: 20px;
 }
-.chip.on {
-  background: var(--accent);
-  color: var(--accent-ink);
-  border-color: var(--accent);
+
+/* The red spot on the body figure breathes, slowly. */
+@keyframes spot-breathe {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.12); }
 }
+.spot { animation: spot-breathe 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .spot { animation: none; } }

@@ -12,7 +12,7 @@ export function Anatomy3D({ view, className }: { view: DiagramId; className?: st
   return (
     <figure className={className}>
       <div
-        className="relative w-full rounded-2xl overflow-hidden border border-[color:var(--line-soft)]"
+        className="relative w-full overflow-hidden border-y border-[color:var(--line-soft)]"
         style={{ aspectRatio: "4 / 3", background: "var(--surface-warm)" }}
       >
         {!loaded && (

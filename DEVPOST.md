@@ -23,7 +23,7 @@ A clinician pastes the note they already wrote — a discharge summary, an
 after-visit summary, a clinic note in prose — and the tool assembles what the
 patient needs:
 
-- **Where on me.** A whole-body figure (female, male or neutral) with the region
+- **Where on me.** A hand-drawn whole-body figure (female or male) with a red spot over the place
   glowing, then a zoom into a marked line drawing: *this* bone, *this* socket.
 - **What happened**, in one sentence a person can repeat back.
 - **Each medicine**: what it is for, in plain words, and how to take it
@@ -43,9 +43,9 @@ author; this is a drafting tool.
 
 Next.js 16, TypeScript, Tailwind. RxNorm and RxClass for drug identity and
 class, openFDA for labels, MyMemory for key-less translation, ElevenLabs for
-voice, Sketchfab (CC BY) for the opt-in 3D models. A design system taken from
-Granola's tokens: warm neutrals, a display serif at regular weight, hairline
-lists instead of boxes, verified WCAG AA on every pairing.
+voice, Sketchfab (CC BY) for the opt-in 3D models. The look is a document,
+not an app: warm beige paper, Lora and Figtree, hairlines instead of boxes,
+no shadows, and the body figures are our own ink. WCAG AA on every pairing.
 
 The part we are proudest of is what the model is *not* allowed to do:
 
@@ -53,8 +53,8 @@ The part we are proudest of is what the model is *not* allowed to do:
   ICD-10-CM prefixes on every condition, dose patterns, pipe-delimited EHR
   fields, and prose scanning. A model fills gaps only if one is configured;
   the demo runs with none.
-- **What a diagnosis becomes is decided by a curated library** — 40 conditions
-  across 12 anatomical views, each with the synonyms a real note uses
+- **What a diagnosis becomes is decided by a curated library** — 205 conditions
+  in 21 categories across 18 anatomical views, each with the synonyms a real note uses
   ("NSTEMI", "Colles", "HNP", "s/p extraction"). A code outranks any phrase;
   the longest phrase wins.
 - **What a medicine is for comes from a curated map of ~90 drug classes**, then
@@ -184,7 +184,7 @@ already has the content and the HCP network. That's you."
 
 ## Limitations we will say out loud
 
-Label-derived and library-derived only; 40 conditions; class-based purposes
+Label-derived and library-derived only; 205 conditions; class-based purposes
 corrected by visit context but still wrong for some off-label uses (which is
 why every sentence is editable and shown first); free-tier machine translation;
 deterministic parsing tuned on six formats; schematic drawings by design;

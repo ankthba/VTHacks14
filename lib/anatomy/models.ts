@@ -35,6 +35,12 @@ export const MODELS: Record<DiagramId, Model3D> = {
   hip: { uid: "71a2dfe1a80444f89d90212a921ed0a2", title: "Human Pelvic Bone", author: "ebauer4", license: "CC BY" },
   mouth: { uid: "a47ef69ff3a4402783cff0f841bc5e0a", title: "Human skull and neck", author: "thesidekick", license: "CC BY" },
   body: { uid: "4de7b96a351a4a35b1b6e5415277ff07", title: "Skeleton", author: "diegoluga", license: "CC BY" },
+  eye: { uid: "281784b8e6ff4713991cdee224f07b09", title: "Anatomical Eye ball", author: "assetfactory", license: "Free Standard" },
+  ear: { uid: "f80bda64666c4b8aaac8f63b7b82a0a0", title: "Anatomy of the Inner Ear", author: "tilt", license: "CC BY-NC-SA" },
+  neck: { uid: "bcd9eee09ce044ef98a69c315aa792e2", title: "The human spinal column", author: "scratchi", license: "CC BY" },
+  elbow: { uid: "9f5e6584b5754ee391d26f0088ca4b5a", title: "Left Upper Limb", author: "uncgimaginglab", license: "CC BY" },
+  kidney: { uid: "822b2eeb033f42f6a8e0e141287bf34d", title: "Urinary tract", author: "eLearningUMCG", license: "CC BY-NC-SA" },
+  skin: { uid: "98476537da2e451d80d7f45dc212f9eb", title: "Human Anatomy Skin", author: "yessyekaa", license: "CC BY" },
 };
 
 /** Viewer chrome trimmed to what a patient needs: turn it, and go fullscreen. */

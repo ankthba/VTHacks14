@@ -24,7 +24,7 @@ export function FindingCard({
 
   return (
     <article
-      className="finding-card float-card p-6"
+      className="finding-card card p-6"
       style={{ background: tone.bg, borderColor: tone.fg + "33" }}
     >
       <div className="flex flex-wrap items-center gap-2 mb-2">

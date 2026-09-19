@@ -248,7 +248,7 @@ function StartScreen({
 }) {
   return (
     <div className="space-y-8">
-      <section className="float-card p-8">
+      <section className="card p-8">
         <h2 className="display-sm text-3xl">Take a photo of your bottles</h2>
         <p className="text-[color:var(--muted)] mt-2 max-w-xl">
           One photo of the whole pile, or several photos. We read the printed
