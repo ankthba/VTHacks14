@@ -7,6 +7,7 @@ import { ScheduleGrid } from "@/components/ScheduleGrid";
 import { ReconcileTable } from "@/components/ReconcileTable";
 import { ReadAloud } from "@/components/ReadAloud";
 import { CanITake } from "@/components/CanITake";
+import { CardDeck, type MedCardView } from "@/components/CardDeck";
 import { SCENARIOS } from "@/lib/fixtures";
 import type { BottleRecord } from "@/lib/schemas";
 import type { AnalysisResult, NormalizedMed, ReconcileRow } from "@/lib/types";
@@ -15,6 +16,7 @@ import { displayName } from "@/lib/display";
 type Stage = "start" | "review" | "results";
 
 interface ApiResult extends AnalysisResult {
+  cards: MedCardView[];
   dischargeMeds: NormalizedMed[];
   reconciliation: ReconcileRow[] | null;
   summaries: { med_id: string; name: string; what_its_for: string; source_url: string | null }[];
@@ -314,6 +316,8 @@ function StartScreen({
   );
 }
 
+type View = "cards" | "details";
+
 function Results({
   result,
   bottles,
@@ -330,9 +334,27 @@ function Results({
   onRestart: () => void;
 }) {
   const high = result.findings.filter((f) => f.severity === "high").length;
+  const [view, setView] = useState<View>("cards");
 
   return (
     <div className="space-y-10">
+      {/* The simple view opens first. Someone who cannot read a medicine label
+          cannot read a findings list either, so the detailed page is secondary. */}
+      <div className="no-print flex rounded-xl border-2 border-[color:var(--foreground)] overflow-hidden">
+        {(["cards", "details"] as View[]).map((v) => (
+          <button
+            key={v}
+            onClick={() => setView(v)}
+            className="flex-1 px-4 py-3 text-lg font-bold"
+            style={{
+              background: view === v ? "var(--foreground)" : "transparent",
+              color: view === v ? "#fff" : "var(--foreground)",
+            }}
+          >
+            {v === "cards" ? "One at a time" : "All the details"}
+          </button>
+        ))}
+      </div>
       <section className="no-print flex flex-wrap items-center gap-3">
         <button
           onClick={() => window.print()}
@@ -358,7 +380,11 @@ function Results({
         </button>
       </section>
 
-      {result.reconciliation && (
+      {view === "cards" && (
+        <CardDeck cards={result.cards} lang={LANG_TAG[language] ?? "en-US"} />
+      )}
+
+      {view === "details" && result.reconciliation && (
         <section>
           <h2 className="text-2xl font-bold mb-1">
             Discharge list vs what is on the table
@@ -372,7 +398,7 @@ function Results({
         </section>
       )}
 
-      {result.warnings.length > 0 && (
+      {view === "details" && result.warnings.length > 0 && (
         <section className="rounded-xl border p-4" style={{ background: "var(--moderate-bg)", borderColor: "var(--moderate)" }}>
           <h2 className="font-bold" style={{ color: "var(--moderate)" }}>
             What this check could not cover
@@ -383,6 +409,7 @@ function Results({
         </section>
       )}
 
+      {view === "details" && (
       <section>
         <h2 className="text-2xl font-bold mb-1">Your medications</h2>
         <p className="text-[color:var(--muted)] mb-4 text-[15px]">
@@ -395,7 +422,9 @@ function Results({
           ))}
         </div>
       </section>
+      )}
 
+      {view === "details" && (
       <section>
         <h2 className="text-2xl font-bold mb-1">
           Things to ask your pharmacist about
@@ -409,14 +438,18 @@ function Results({
           {result.findings.map((f) => <FindingCard key={f.id} finding={f} />)}
         </div>
       </section>
+      )}
 
       <CanITake current={bottles} demo={demo} />
 
+      {view === "details" && (
       <section>
         <h2 className="text-2xl font-bold mb-4">Your daily schedule</h2>
         <ScheduleGrid schedule={result.schedule} />
       </section>
+      )}
 
+      {view === "details" && (
       <section className="print-sheet">
         <h2 className="text-2xl font-bold mb-1">The one-pager</h2>
         <p className="no-print text-[color:var(--muted)] mb-4 text-[15px]">
@@ -428,6 +461,7 @@ function Results({
           {result.onePager}
         </pre>
       </section>
+      )}
     </div>
   );
 }

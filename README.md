@@ -45,6 +45,54 @@ PillPile computes that number and shows the arithmetic.
 
 ---
 
+## Who this is for, and what opens first
+
+Someone holding a bottle they cannot read — because the print is small, because
+English is not their first language, because reading is hard, or because there
+are nine bottles and no one ever explained any of them.
+
+That reframes the output. A person who cannot read a medicine label cannot read
+a dense findings page either, so **the first thing the app shows is one bottle
+at a time**: the name in the largest type on the page, one sentence saying what
+it does, one sentence saying how to take it, and a button to hear all of it in
+their language. The detailed findings view is behind a toggle, for the person
+helping them.
+
+```
+  STRONG PAIN
+
+  Norco
+  This is a strong pain medicine.
+
+  HOW TO TAKE IT
+  One pill, up to 4 times a day. Only when you need it.
+
+  ASK YOUR PHARMACIST
+  Both contain acetaminophen
+```
+
+**The plain language is curated and deterministic**, keyed on ATC and EPC class
+identifiers in `lib/plainPurpose.ts` — not generated per request. "An
+angiotensin converting enzyme inhibitor indicated for the treatment of
+hypertension" becomes "This lowers your blood pressure" the same way every time,
+with no API key, and the short strings survive translation intact. When a drug
+falls outside the curated list the card says so and shows the label text rather
+than inventing a simpler version.
+
+Translation only ever *translates* these strings. The model still never
+originates a clinical claim.
+
+### What it will not do
+
+It will not identify a loose, unlabelled pill. We checked: the NLM's RxImage and
+Pillbox APIs are both retired and unreachable, and reverse-searching openFDA by
+imprint code worked for 1 of 4 real codes we tried — failing on both opioid
+imprints. A confidently wrong answer about an opioid is worse than no answer, so
+an unidentified item gets an honest card instead: *take it to any pharmacy, they
+will identify it for free, and you do not need an appointment.*
+
+---
+
 ## "Can I take this?"
 
 The app was one-shot: scan, read, close. But the question people actually have

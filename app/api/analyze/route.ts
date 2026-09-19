@@ -6,11 +6,24 @@ import { renderOnePagerLLM, summarizeMeds } from "@/lib/onepager";
 import { BottleRecordSchema } from "@/lib/schemas";
 import { getScenario } from "@/lib/fixtures";
 import { reconcile } from "@/lib/reconcile";
+import { buildCards, cardTranslationPrompt, type MedCard } from "@/lib/cards";
+import { generateJson } from "@/lib/llm";
+import { firstSentence } from "@/lib/openfda";
 import { activeProvider } from "@/lib/llm";
 import { z } from "zod";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
+
+const TranslatedCardsSchema = z.array(
+  z.object({
+    med_id: z.string(),
+    shortLabel: z.string(),
+    purpose: z.string(),
+    howToTake: z.string(),
+    warning: z.string().nullish(),
+  }),
+);
 
 const BodySchema = z.object({
   bottles: z.array(BottleRecordSchema).optional(),
@@ -97,6 +110,55 @@ export async function POST(req: NextRequest) {
     };
 
     const summaries = await summarizeMeds(meds);
+
+    // Plain-language cards: the primary view for someone who cannot read the
+    // label. Purpose and directions come from curated deterministic mappings,
+    // so this works with no model and says the same thing every time.
+    const fallbacks: Record<string, string | null> = {};
+    for (const s of summaries) {
+      fallbacks[s.med_id] = firstSentence([s.what_its_for], 160);
+    }
+    let cards: MedCard[] = buildCards(meds, result.findings, fallbacks);
+
+    if (body.language !== "English" && activeProvider() !== "none") {
+      try {
+        const translated = await generateJson(
+          cardTranslationPrompt(cards, body.language),
+          TranslatedCardsSchema,
+        );
+        const byId = new Map(translated.map((t) => [t.med_id, t]));
+        cards = cards.map((c) => {
+          const t = byId.get(c.med_id);
+          if (!t) return c;
+          const merged = {
+            ...c,
+            shortLabel: t.shortLabel,
+            purpose: t.purpose,
+            howToTake: t.howToTake,
+            warning: t.warning ?? null,
+          };
+          return {
+            ...merged,
+            spoken: [
+              `${c.name}.`,
+              merged.purpose,
+              merged.howToTake,
+              merged.warning ? merged.warning : "",
+            ]
+              .filter(Boolean)
+              .join(" "),
+          };
+        });
+      } catch {
+        warnings.push(
+          `The cards could not be translated into ${body.language}, so they are shown in English.`,
+        );
+      }
+    } else if (body.language !== "English") {
+      warnings.push(
+        `No language model key is set, so the cards stay in English. The checks themselves are unaffected.`,
+      );
+    }
     const onePager = await renderOnePagerLLM(
       result,
       summaries,
@@ -106,6 +168,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ...result,
+      cards,
       summaries,
       onePager: onePager.text,
       onePagerGenerated: onePager.generated,
