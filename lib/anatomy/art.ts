@@ -204,6 +204,21 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       lid: { x: 0.12, y: 0.25, s: 0.7 },                                     // the lid edge
     },
   },
+  // The neck from the front: hyoid, larynx, thyroid gland and windpipe, the
+  // long muscles either side. The spine sits behind the larynx in this view.
+  neck: {
+    src: asset("/anatomy/neck.png"),
+    w: 765,
+    h: 787,
+    label: "The neck, from the front",
+    spots: {
+      thyroid: { x: 0.5, y: 0.73, s: 1 },                                    // the butterfly gland below the larynx
+      muscle: [{ x: 0.26, y: 0.57, s: 0.8 }, { x: 0.74, y: 0.57, s: 0.8 }],  // the long muscles either side
+      gland: [{ x: 0.22, y: 0.37, s: 0.6 }, { x: 0.79, y: 0.37, s: 0.6 }],   // lymph glands under the jaw
+      vertebra: { x: 0.5, y: 0.52, s: 0.9 },                                 // the spine, behind the larynx
+      disc: { x: 0.5, y: 0.6, s: 0.8 },                                      // a disc, behind the larynx
+    },
+  },
 };
 
 /** Every spot for a mark, whether the drawing has one view or two. */
