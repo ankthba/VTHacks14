@@ -1,5 +1,7 @@
 import { CONDITIONS, REGIONS, type DiagramId } from "@/lib/anatomy/conditions";
 import { Diagram } from "@/components/Diagram";
+import { InkArrow } from "@/components/Ink";
+import { IS_STATIC, asset } from "@/lib/staticMode";
 
 /** Every view once, drawn plain: the red belongs to a diagnosis, not a catalogue. */
 function uniqueViews(): DiagramId[] {
@@ -13,8 +15,17 @@ export const metadata = { title: `${APP_NAME} - anatomy library` };
 /** Every condition in the library, with its structure marked. */
 export default function DiagramsPage() {
   return (
-    <main className="flex-1 w-full max-w-6xl mx-auto px-4 py-8">
-      <h1 className="display text-5xl">Anatomy library</h1>
+    <main className="flex-1 w-full max-w-6xl mx-auto px-5 pb-16">
+      <nav className="nav">
+        <a href={IS_STATIC ? "../" : "/"} className="wordmark flex items-center gap-2">
+          <img src={asset("/anatomy/spot.png")} alt="" width={18} height={17} draggable={false} />
+          {APP_NAME}
+        </a>
+        <a href={IS_STATIC ? "../" : "/"} className="flex items-center gap-2">
+          <InkArrow className="inline-block -scale-x-100" /> Back
+        </a>
+      </nav>
+      <h1 className="display text-5xl mt-12">Anatomy library</h1>
       <p className="text-lg text-[color:var(--muted)] mt-3 max-w-2xl">
         {CONDITIONS.length} conditions across{" "}
         {uniqueViews().length} anatomical views. Every red spot on a condition
