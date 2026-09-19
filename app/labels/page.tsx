@@ -1,8 +1,10 @@
 import { SCENARIOS } from "@/lib/fixtures";
 import type { BottleRecord } from "@/lib/schemas";
 
+import { APP_NAME } from "@/lib/brand";
+
 export const metadata = {
-  title: "PillPile - printable demo labels",
+  title: `${APP_NAME} - printable demo labels`,
 };
 
 /**

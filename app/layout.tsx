@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, Instrument_Serif } from "next/font/google";
 import "./globals.css";
+import { APP_NAME, APP_DESCRIPTION, APP_TAGLINE } from "@/lib/brand";
 
 /* Stand-ins for Granola's licensed quadrant/melange: a display serif used at
    regular weight, paired with a neutral sans from the same family. */
@@ -12,9 +13,8 @@ const display = Instrument_Serif({
 const body = Instrument_Sans({ variable: "--font-body", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "PillPile - medication reconciliation from a photo",
-  description:
-    "Photograph your pill bottles and get a plain-language sheet of questions to ask your pharmacist. Educational demo, not medical advice.",
+  title: `${APP_NAME} - ${APP_TAGLINE}`,
+  description: APP_DESCRIPTION,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
