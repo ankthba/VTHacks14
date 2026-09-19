@@ -87,6 +87,22 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       coccyx: { x: 0.72, y: 0.985, s: 0.5 },                                     // the tailbone tip, side view
     },
   },
+  // The heart from the front: aorta and great vessels above, atria either side,
+  // coronary arteries over the ventricles, apex at the bottom.
+  heart: {
+    src: asset("/anatomy/heart.png"),
+    w: 687,
+    h: 1008,
+    label: "The heart and its great vessels",
+    spots: {
+      atria: [{ x: 0.27, y: 0.24, s: 0.8 }, { x: 0.75, y: 0.5, s: 0.8 }],  // the two upper chambers
+      coronary: { x: 0.5, y: 0.74, s: 1.1 },                                // the artery down the front
+      vessels: { x: 0.27, y: 0.08, s: 1.1 },                                // the aorta and its branches
+      valve: { x: 0.44, y: 0.3, s: 0.7 },                                   // the aortic valve at the root
+      pericardium: { x: 0.48, y: 0.54, s: 2.6 },                            // the sac around the whole heart
+      "chest-wall": { x: 0.48, y: 0.5, s: 1.5 },                            // the chest in front of the heart
+    },
+  },
 };
 
 /** Every spot for a mark, whether the drawing has one view or two. */
