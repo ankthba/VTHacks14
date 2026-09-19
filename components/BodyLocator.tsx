@@ -37,7 +37,7 @@ export type BodyType = "neutral" | "female" | "male";
  * hair - kept schematic rather than anatomical, because the point is "which
  * body is this" not a figure study.
  */
-function Figure({ region, body }: { region: DiagramId; body: BodyType }) {
+export function Figure({ region, body }: { region: DiagramId; body: BodyType }) {
   const p = REGION[region];
   const f = body === "female";
   const m = body === "male";
@@ -50,7 +50,7 @@ function Figure({ region, body }: { region: DiagramId; body: BodyType }) {
         {/* Head and hair. */}
         <ellipse cx="100" cy="40" rx="24" ry="30" />
         {f && <path d="M76 44 Q72 10 100 8 Q128 10 124 44 Q126 70 118 84 M82 84 Q74 70 76 44" />}
-        {m && <path d="M78 30 Q90 8 122 22" />}
+        {m && <path d="M77 34 Q82 12 100 10 Q118 12 123 34" />}
         <path d="M92 70 L92 84 M108 70 L108 84" />
         {/* Torso: shoulders, waist, hips. */}
         <path d={`M${100 - shoulder} 100 Q100 88 ${100 + shoulder} 100 L${100 + waist} 190 L${100 + hip} 240 Q${100 + hip - 4} 262 ${100 + hip - 20} 270 L${100 - hip + 20} 270 Q${100 - hip + 4} 262 ${100 - hip} 240 L${100 - waist} 190 Z`} />
