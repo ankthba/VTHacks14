@@ -29,23 +29,37 @@ const REGION: Record<DiagramId, { x: number; y: number; r: number }> = {
   body: { x: 100, y: 200, r: 90 },
 };
 
-function Figure({ region }: { region: DiagramId }) {
+export type BodyType = "neutral" | "female" | "male";
+
+/**
+ * Three silhouettes with the same limb positions, so every region lands in the
+ * same place. Differences are proportion only - shoulder and hip width, waist,
+ * hair - kept schematic rather than anatomical, because the point is "which
+ * body is this" not a figure study.
+ */
+function Figure({ region, body }: { region: DiagramId; body: BodyType }) {
   const p = REGION[region];
+  const f = body === "female";
+  const m = body === "male";
+  const shoulder = m ? 60 : f ? 50 : 56; // half-width at the shoulders
+  const hip = m ? 46 : f ? 56 : 50;      // half-width at the hips
+  const waist = f ? 40 : m ? 50 : 46;    // half-width at the waist
   return (
     <svg viewBox="0 0 200 440" className="w-full h-auto" role="img" aria-label="Where on the body" style={{ color: "var(--foreground)" }}>
       <g fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-        {/* Head, neck. */}
+        {/* Head and hair. */}
         <ellipse cx="100" cy="40" rx="24" ry="30" />
+        {f && <path d="M76 44 Q72 10 100 8 Q128 10 124 44 Q126 70 118 84 M82 84 Q74 70 76 44" />}
+        {m && <path d="M78 30 Q90 8 122 22" />}
         <path d="M92 70 L92 84 M108 70 L108 84" />
-        {/* Torso. */}
-        <path d="M56 100 Q100 88 144 100 L150 200 Q146 250 128 270 L72 270 Q54 250 50 200 Z" />
+        {/* Torso: shoulders, waist, hips. */}
+        <path d={`M${100 - shoulder} 100 Q100 88 ${100 + shoulder} 100 L${100 + waist} 190 L${100 + hip} 240 Q${100 + hip - 4} 262 ${100 + hip - 20} 270 L${100 - hip + 20} 270 Q${100 - hip + 4} 262 ${100 - hip} 240 L${100 - waist} 190 Z`} />
         {/* Arms. */}
-        <path d="M56 100 Q30 150 26 250 Q24 262 32 270 Q42 262 40 250 Q44 170 60 130" />
-        <path d="M144 100 Q170 150 174 250 Q176 262 168 270 Q158 262 160 250 Q156 170 140 130" />
+        <path d={`M${100 - shoulder} 100 Q30 150 26 250 Q24 262 32 270 Q42 262 40 250 Q44 170 ${100 - shoulder + 6} 130`} />
+        <path d={`M${100 + shoulder} 100 Q170 150 174 250 Q176 262 168 270 Q158 262 160 250 Q156 170 ${100 + shoulder - 6} 130`} />
         {/* Legs. */}
         <path d="M74 270 L70 350 L74 428 Q84 436 96 428 L96 350 L100 300 L104 350 L104 428 Q116 436 126 428 L130 350 L126 270" />
       </g>
-      {/* The region, pulsing. */}
       <circle cx={p.x} cy={p.y} r={p.r} fill="var(--high-bg)" stroke="var(--high)" strokeWidth={3} opacity={0.9}>
         <animate attributeName="r" values={`${p.r};${p.r + 6};${p.r}`} dur="1.6s" repeatCount="indefinite" />
       </circle>
@@ -57,10 +71,12 @@ function Figure({ region }: { region: DiagramId }) {
 export function BodyLocator({
   view,
   marks,
+  body = "neutral",
   autoZoomMs = 1800,
 }: {
   view: DiagramId;
   marks: string[];
+  body?: BodyType;
   autoZoomMs?: number;
 }) {
   const [zoomed, setZoomed] = useState(false);
@@ -94,7 +110,7 @@ export function BodyLocator({
         }}
       >
         <div className="h-full" style={{ aspectRatio: "200 / 440" }}>
-          <Figure region={view} />
+          <Figure region={view} body={body} />
         </div>
       </div>
       <div

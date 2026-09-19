@@ -5,6 +5,7 @@ import { CONDITIONS, REGIONS } from "@/lib/anatomy/conditions";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 import { Diagram } from "@/components/Diagram";
 import { PatientStory } from "@/components/PatientStory";
+import type { BodyType } from "@/components/BodyLocator";
 import { HOWTOS } from "@/lib/howto";
 import { DEMO_NOTES } from "@/lib/demoNotes";
 import type { DiagramId } from "@/lib/anatomy/conditions";
@@ -56,6 +57,7 @@ export default function ExplainPage() {
   const [howtoIds, setHowtoIds] = useState<string[]>([]);
   const [freeInstruction, setFreeInstruction] = useState("");
   const [language, setLanguage] = useState("English");
+  const [bodyType, setBodyType] = useState<BodyType>("neutral");
 
   const [noteText, setNoteText] = useState("");
   const [noteBusy, setNoteBusy] = useState(false);
@@ -182,6 +184,7 @@ export default function ExplainPage() {
         marks={card.marks}
         langTag={card.langTag}
         rtl={card.rtl}
+        body={bodyType}
         onBack={() => setPatientView(false)}
       />
     );
@@ -505,8 +508,20 @@ export default function ExplainPage() {
         {/* Live preview - what the patient is about to see. */}
         <aside className="lg:sticky lg:top-6 h-fit space-y-4">
           <section className="float-card p-6">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
               <h2 className="display-sm text-2xl">Preview</h2>
+              <div className="flex gap-1">
+                {(["female", "male"] as BodyType[]).map((b) => (
+                  <button
+                    key={b}
+                    onClick={() => setBodyType((cur) => (cur === b ? "neutral" : b))}
+                    className="chip"
+                    style={bodyType === b ? { background: "var(--accent)", color: "var(--accent-ink)", borderColor: "var(--accent)" } : undefined}
+                  >
+                    {b === "female" ? "Female" : "Male"}
+                  </button>
+                ))}
+              </div>
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}

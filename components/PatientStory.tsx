@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Diagram } from "@/components/Diagram";
-import { BodyLocator } from "@/components/BodyLocator";
+import { BodyLocator, type BodyType } from "@/components/BodyLocator";
 import { HowToArt } from "@/components/HowToArt";
 import { Anatomy3D } from "@/components/Anatomy3D";
 import type { DiagramId } from "@/lib/anatomy/conditions";
@@ -14,6 +14,7 @@ interface Props {
   marks: string[];
   langTag: string;
   rtl: boolean;
+  body?: BodyType;
   onBack: () => void;
 }
 
@@ -28,7 +29,8 @@ interface Props {
  * costs nothing) with the browser voice as fallback. The next slide's audio is
  * prefetched while the current one plays, so there is no gap.
  */
-export function PatientStory({ slides, diagram, marks, langTag, rtl, onBack }: Props) {
+export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initialBody = "neutral", onBack }: Props) {
+  const [body, setBody] = useState<BodyType>(initialBody);
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [voice, setVoice] = useState<"elevenlabs" | "browser" | null>(null);
@@ -156,12 +158,24 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, onBack }: P
       <section className="flex-1 flex flex-col justify-center px-6 sm:px-12 py-8 max-w-5xl w-full mx-auto">
         {slide.kind === "picture" && diagram && (
           <div className="mx-auto w-full max-w-[440px] mb-8" onClick={(e) => e.stopPropagation()}>
-            {show3d ? <Anatomy3D view={diagram} className="no-print" /> : <BodyLocator view={diagram} marks={marks} />}
-            {diagram !== "body" && (
-              <button onClick={() => setShow3d((v) => !v)} className="chip no-print mt-3">
-                {show3d ? "Back to the drawing" : "See it in 3D"}
-              </button>
-            )}
+            {show3d ? <Anatomy3D view={diagram} className="no-print" /> : <BodyLocator view={diagram} marks={marks} body={body} />}
+            <div className="flex flex-wrap gap-2 mt-3 no-print">
+              {(["female", "male"] as BodyType[]).map((b) => (
+                <button
+                  key={b}
+                  onClick={() => setBody((cur) => (cur === b ? "neutral" : b))}
+                  className="chip"
+                  style={body === b ? { background: "var(--accent)", color: "var(--accent-ink)", borderColor: "var(--accent)" } : undefined}
+                >
+                  {b === "female" ? "Female" : "Male"}
+                </button>
+              ))}
+              {diagram !== "body" && (
+                <button onClick={() => setShow3d((v) => !v)} className="chip">
+                  {show3d ? "Back to the drawing" : "See it in 3D"}
+                </button>
+              )}
+            </div>
           </div>
         )}
 
