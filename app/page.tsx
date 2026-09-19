@@ -621,13 +621,15 @@ export default function Home() {
                   items={languages.map((l) => ({ id: l, label: l, on: l === language }))}
                   onPick={setLanguage}
                 />
-                <div className="flex gap-1">
-                  {(["female", "male"] as BodyType[]).map((b) => (
-                    <button key={b} onClick={() => setBodyType(b)} className={`chip ${bodyType === b ? "on" : ""}`}>
-                      {b === "female" ? "Female" : "Male"}
-                    </button>
-                  ))}
-                </div>
+                {(hovered ?? selected)?.diagram === "body" && (
+                  <div className="flex gap-1">
+                    {(["female", "male"] as BodyType[]).map((b) => (
+                      <button key={b} onClick={() => setBodyType(b)} className={`chip ${bodyType === b ? "on" : ""}`}>
+                        {b === "female" ? "Female" : "Male"}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {(hovered ?? selected) ? (

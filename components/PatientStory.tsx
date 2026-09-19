@@ -197,7 +197,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
         {slide.kind === "picture" && diagram && (
           <div className="mx-auto w-full max-w-[440px] mb-6 lg:mb-0" style={{ maxWidth: "min(440px, 58vh)" }} onClick={(e) => e.stopPropagation()}>
             <BodyLocator view={diagram} marks={marks} body={body} />
-            <div className="flex flex-wrap gap-2 mt-3 no-print">
+            {diagram === "body" && <div className="flex flex-wrap gap-2 mt-3 no-print">
               {(["female", "male"] as BodyType[]).map((b) => (
                 <button
                   key={b}
@@ -207,7 +207,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
                   {b === "female" ? "Female" : "Male"}
                 </button>
               ))}
-            </div>
+            </div>}
           </div>
         )}
 
