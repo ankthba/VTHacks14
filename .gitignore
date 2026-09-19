@@ -44,3 +44,7 @@ next-env.d.ts
 # when the conference wifi does not. Regenerate with `npm run precache`.
 !.cache/
 !.env.example
+
+# macOS/iCloud conflict copies
+*[[:space:]]2.json
+*[[:space:]]2.ts
