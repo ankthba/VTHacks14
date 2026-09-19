@@ -187,10 +187,9 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
                       </div>
         )}
 
-        {slide.kind === "medicine" && (
-          <p className="text-sm font-semibold uppercase tracking-[0.1em] text-[color:var(--muted)] mb-3">
-            {slides.slice(0, i + 1).filter((s) => s.kind === "medicine").length} /{" "}
-            {slides.filter((s) => s.kind === "medicine").length}
+        {slide.kicker && (
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[color:var(--muted)] mb-3">
+            {slide.kicker}
           </p>
         )}
 
