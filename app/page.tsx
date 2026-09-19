@@ -95,21 +95,29 @@ export default function ExplainPage() {
       const json = await r.json();
       if (!r.ok) throw new Error(json.detail ?? json.error ?? "Could not read the note.");
 
-      if (json.conditionId) {
-        const c = CONDITIONS.find((x) => x.id === json.conditionId);
-        if (c) {
-          setRegion(c.region);
-          setConditionId(c.id);
-          setCustomHeadline(c.plain);
-        }
+      const c = json.conditionId ? CONDITIONS.find((x) => x.id === json.conditionId) : undefined;
+      if (c) {
+        setRegion(c.region);
+        setConditionId(c.id);
+        setCustomHeadline(c.plain);
       }
-      if (json.medications?.length) {
-        setMeds(json.medications.map((m: { name: string; strength?: string | null; sig: string | null }) => ({ name: m.name, strength: m.strength ?? null, sig: m.sig ?? "" })));
-      }
+      const parsedMeds = (json.medications ?? []).map(
+        (m: { name: string; strength?: string | null; sig: string | null }) => ({ name: m.name, strength: m.strength ?? null, sig: m.sig ?? "" }),
+      );
+      if (parsedMeds.length) setMeds(parsedMeds);
       const instr = [...(json.instructions ?? []), ...(json.followUp ?? [])];
       if (instr.length) setInstructions(instr);
-      if (json.howtoIds?.length) setHowtoIds(json.howtoIds);
+      const parsedHowtos: string[] = json.howtoIds ?? [];
+      if (parsedHowtos.length) setHowtoIds(parsedHowtos);
       setSkippedLines(json.skipped ?? []);
+
+      const snap: Snapshot = {
+        conditionId: c?.id ?? conditionId,
+        customHeadline: c?.plain ?? customHeadline,
+        meds: parsedMeds.length ? parsedMeds : meds,
+        instructions: instr.length ? instr : instructions,
+        howtoIds: parsedHowtos.length ? parsedHowtos : howtoIds,
+      };
 
       const bits = [
         json.conditionLabel ? `matched "${json.conditionLabel}"` : "no diagnosis in the library",
@@ -118,7 +126,7 @@ export default function ExplainPage() {
         ...(json.howtoIds?.length ? [`${json.howtoIds.length} how-to walkthrough(s) attached`] : []),
       ];
       setNoteStatus(`Read the note (${json.method}): ${bits.join(", ")}. Review below, then turn the screen.`);
-      setTimeout(() => build(false), 0);
+      void build(false, snap);
     } catch (e) {
       setNoteError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -126,7 +134,19 @@ export default function ExplainPage() {
     }
   }
 
-  async function build(showPatient: boolean) {
+  type Snapshot = {
+    conditionId: string | null;
+    customHeadline: string;
+    meds: typeof meds;
+    instructions: string[];
+    howtoIds: string[];
+  };
+
+  async function build(showPatient: boolean, snap?: Snapshot) {
+    // State read through a closure can be a render behind - ingestNote calls
+    // this right after setting the parsed values, before React has re-rendered.
+    // Callers with fresh data pass it explicitly.
+    const cur: Snapshot = snap ?? { conditionId, customHeadline, meds, instructions, howtoIds };
     // Browsers only allow audio that starts inside a user gesture. The click on
     // "Turn the screen around" is that gesture, but the first clip arrives
     // after a fetch - so unlock playback now with a silent clip, while the
@@ -146,13 +166,13 @@ export default function ExplainPage() {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          conditionId,
-          customHeadline: customHeadline || null,
-          medNames: meds
+          conditionId: cur.conditionId,
+          customHeadline: cur.customHeadline || null,
+          medNames: cur.meds
             .filter((m) => m.name.trim())
             .map((m) => ({ name: m.name, strength: m.strength ?? null, sig: m.sig, purpose: m.purpose ?? null, howToTake: m.howToTake ?? null })),
-          instructions,
-          howtoIds,
+          instructions: cur.instructions,
+          howtoIds: cur.howtoIds,
           language,
         }),
       });
@@ -162,14 +182,18 @@ export default function ExplainPage() {
       // Pull the generated sentences back into the rows so the clinician can
       // reword them. Only for English previews - the story is built fresh.
       if (json.card && language === "English") {
-        const kept = meds.filter((m) => m.name.trim());
         const byIdx = new Map<number, { purpose: string; howToTake: string }>(
           json.card.meds.map((m: { sourceIndex: number; purpose: string; howToTake: string }) => [m.sourceIndex, m]),
         );
-        setMeds(kept.map((m, i) => {
-          const g = byIdx.get(i);
-          return g ? { ...m, purpose: m.purpose ?? g.purpose, howToTake: m.howToTake ?? g.howToTake } : m;
-        }));
+        setMeds((prev) => {
+          let k = -1;
+          return prev.map((m) => {
+            if (!m.name.trim()) return m;
+            k += 1;
+            const g = byIdx.get(k);
+            return g ? { ...m, purpose: m.purpose ?? g.purpose, howToTake: m.howToTake ?? g.howToTake } : m;
+          });
+        });
       }
       // Anything dropped at build time is a line the patient will NOT hear.
       // It is shown here, and the screen is not turned until it has been seen.
