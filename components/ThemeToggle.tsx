@@ -44,7 +44,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
           <path className="star2" d="M20.6 12.2 L20.6 12.3" strokeWidth="2.4" />
         </svg>
       )}
-      <span className="ml-1.5">{dark ? "Paper" : "Chalkboard"}</span>
+      <span className="ml-1.5">{dark ? "Paper" : "Chalk"}</span>
     </button>
   );
 }
