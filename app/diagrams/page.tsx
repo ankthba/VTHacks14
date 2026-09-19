@@ -3,6 +3,7 @@ import { Diagram } from "@/components/Diagram";
 import { VIEWS } from "@/lib/anatomy/views";
 import { InkArrow } from "@/components/Ink";
 import { UpButton } from "@/components/UpButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { IS_STATIC, asset } from "@/lib/staticMode";
 
 /** Every view once, drawn plain: the red belongs to a diagnosis, not a catalogue. */
@@ -36,6 +37,7 @@ export default function DiagramsPage() {
         <a href={IS_STATIC ? "../" : "/"} className="flex items-center gap-2">
           <InkArrow className="inline-block -scale-x-100" /> Back
         </a>
+        <ThemeToggle className="ml-auto" />
       </nav>
       <h1 className="display text-5xl mt-12">Anatomy library</h1>
       <p className="text-lg text-[color:var(--muted)] mt-3 max-w-2xl">
@@ -51,7 +53,7 @@ export default function DiagramsPage() {
               <Diagram id={id} fit />
             </div>
             <p className="text-sm font-semibold mt-3">{VIEWS[id].label}</p>
-            <p className="text-[13px] leading-snug text-[color:var(--muted)] mt-1">{VIEWS[id].plain}</p>
+            <p className="view-plain text-[13px] leading-snug text-[color:var(--muted)]">{VIEWS[id].plain}</p>
           </a>
         ))}
       </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Lora, Figtree } from "next/font/google";
 import "./globals.css";
 import { APP_NAME, APP_DESCRIPTION, APP_TAGLINE } from "@/lib/brand";
+import { THEME_BOOT } from "@/components/ThemeToggle";
 
 /* Lora for headlines: a warm, calligraphic serif that stays readable at the
    sizes an older patient reads. Figtree for everything else: friendly, open,
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${display.variable} ${body.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
         {/*
           The disclaimer is in the root layout, not a component someone can
           forget to include. It is on every screen and on every printout.

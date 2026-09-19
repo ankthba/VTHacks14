@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { InkArrow, InkCheck, InkRing, InkUnderline } from "@/components/Ink";
 import { Menu } from "@/components/Menu";
+import { PrescriberCheck } from "@/components/PrescriberCheck";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { CONDITIONS, REGIONS } from "@/lib/anatomy/conditions";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 import { Diagram } from "@/components/Diagram";
@@ -339,9 +341,8 @@ export default function Home() {
             {APP_NAME}
           </a>
           <a href={IS_STATIC ? "./diagrams/" : "/diagrams"}>Anatomy library</a>
-          {!IS_STATIC && <a href="/clinician">Prescriber check</a>}
-          {!IS_STATIC && <a href="/pillpile">Medication checker</a>}
-          <a href="https://github.com/ankthba/VTHacks14" className="ml-auto" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <ThemeToggle className="ml-auto" />
+          <a href="https://github.com/ankthba/VTHacks14" target="_blank" rel="noopener noreferrer">GitHub</a>
         </nav>
 
         <header className="pt-12 pb-10 rise" style={{ animationDelay: "60ms" }}>
@@ -510,6 +511,8 @@ export default function Home() {
                   ))}
                 </div>
               </div>
+
+              {meds.some((m) => m.name.trim()) && <PrescriberCheck meds={meds} />}
 
               {/* What to do */}
               <div className="mt-7">

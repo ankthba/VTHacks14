@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Diagram } from "@/components/Diagram";
 import { BodyLocator, type BodyType } from "@/components/BodyLocator";
 import { InkCheck, InkSound, InkStroke } from "@/components/Ink";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { HowToArt } from "@/components/HowToArt";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 import type { Slide } from "@/lib/explain";
@@ -277,7 +278,8 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
           {voice && <InkSound speaking={playing} className="text-[color:var(--accent-text)]" />}
           {voice === "browser" ? "Built-in voice" : voice === "elevenlabs" ? "Voice: ElevenLabs" : ""}
         </span>
-        <button onClick={onBack} className="underline">
+        <ThemeToggle />
+        <button onClick={onBack} className="link-action">
           Back to the clinician view
         </button>
       </footer>

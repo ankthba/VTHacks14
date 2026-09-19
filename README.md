@@ -138,18 +138,15 @@ the page arrives unstyled.
 
 | Route | |
 |---|---|
-| `/` | The explain tool. Clinician side, then *Turn the screen around* |
+| `/` | The explain tool. Clinician side, with *Before you prescribe* under the medicines, then *Turn the screen around* |
 | `/diagrams` | The anatomy library: every condition with its structure marked |
-| `/clinician` | Prescriber check: label-grounded interactions, renal/hepatic sections, access, prior-auth draft |
-| `/pillpile` | The original patient medication checker this grew out of |
-| `/labels` | Printable synthetic bottle labels for props |
 
 ## Where it came from
 
 The project began as PillPile, a patient-facing checker that found hidden
 duplicate ingredients (Norco + Tylenol → 5,300 mg of acetaminophen a day) by
-set intersection over RxNorm identifiers, with a 40-case eval that caught five
-real bugs. That engine still powers every medication sentence here. The pivot
+set intersection over RxNorm identifiers. That engine still powers every
+medication sentence here and the prescriber check on the main screen. The pivot
 was recognising that the same discipline, computed, cited, refusing to guess,
 mattered more on the screen a doctor turns toward a patient.
 

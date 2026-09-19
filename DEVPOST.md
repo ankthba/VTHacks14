@@ -127,9 +127,9 @@ bottles and found hidden duplicate ingredients by set intersection over RxNorm
 IDs (Norco + Tylenol → 5,300 mg of acetaminophen a day). That engine, its eval
 set, and its citation discipline still power every medication sentence here.
 The pivot was realising the same rigor mattered more on the screen a doctor
-turns toward a patient. PillPile lives on at `/pillpile`, and its prescriber
-tool (label-grounded interactions, renal dosing, generic availability, a
-prior-auth draft) at `/clinician`.
+turns toward a patient. Its prescriber check (label-grounded interactions,
+boxed warnings, specific populations, generic availability, a prior-auth
+draft) now sits on the main screen, under the medicines it is checking.
 
 ---
 

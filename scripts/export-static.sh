@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 
 ASIDE=".static-aside"
 restore() {
-  for d in api clinician pillpile explain; do
+  for d in api; do
     [ -d "$ASIDE/$d" ] && rm -rf "app/$d" && mv "$ASIDE/$d" "app/$d"
   done
   rmdir "$ASIDE" 2>/dev/null || true
@@ -15,7 +15,7 @@ restore() {
 trap restore EXIT
 
 mkdir -p "$ASIDE"
-for d in api clinician pillpile explain; do
+for d in api; do
   [ -d "app/$d" ] && mv "app/$d" "$ASIDE/$d"
 done
 

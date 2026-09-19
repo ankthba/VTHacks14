@@ -48,6 +48,14 @@
   --ok-bg: #e6efdb;
 
   --radius: 4px;
+
+  /* Every straight line on the page is one of these: a pen stroke, not a rule. */
+  --wave-line: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23d8cfbf%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+  --wave-soft: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23e6dfd2%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+  --wave-fg: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%232a2520%27%20stroke-width%3D%272.2%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+  --wave-accent: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23c3d8a6%27%20stroke-width%3D%272.4%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+  --wave-accent-text: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%234b6a26%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+  --wave-muted: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23675d51%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
 }
 
 @theme inline {
@@ -142,23 +150,23 @@ body > * { position: relative; z-index: 1; }
 /* Small choices: plain text, an underline that draws itself when you arrive. */
 .chip {
   border: 0;
-  border-bottom: 1px solid var(--line);
   border-radius: 0;
   background-color: transparent;
-  padding: 4px 2px 5px;
+  padding: 4px 2px 6px;
   font-size: 14px;
   color: var(--muted);
   cursor: pointer;
   transition: color 120ms ease, background-size 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+/* Two strokes: a faint one always there, a matcha one drawn over it when you arrive. */
 .chip:not(select) {
-  background-image: linear-gradient(var(--accent), var(--accent));
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 0% 2px;
+  background-image: var(--wave-accent), var(--wave-line);
+  background-repeat: no-repeat, repeat-x;
+  background-position: 0 100%, 0 100%;
+  background-size: 0% 4px, 300px 3px;
 }
 .chip:hover:not(:disabled) { color: var(--foreground); }
-.chip:not(select):hover:not(:disabled), .chip.on { background-size: 100% 2px; border-bottom-color: transparent; }
+.chip:not(select):hover:not(:disabled), .chip.on { background-size: 100% 4px, 300px 3px; }
 .chip.on { color: var(--accent-text); font-weight: 600; }
 select.chip { appearance: none; padding-right: 18px; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23675d51' stroke-width='1.5'/></svg>"); background-repeat: no-repeat; background-position: right 2px center; }
 
@@ -167,8 +175,8 @@ select.chip { appearance: none; padding-right: 18px; background-image: url("data
   display: flex;
   flex-wrap: wrap;
   gap: 2px 18px;
-  border-bottom: 1px solid var(--line-soft);
-  padding-bottom: 8px;
+  background: var(--wave-soft) repeat-x 0 100% / 300px 3px;
+  padding-bottom: 10px;
 }
 .tab {
   border: 0;
@@ -179,18 +187,21 @@ select.chip { appearance: none; padding-right: 18px; background-image: url("data
   color: var(--muted);
   cursor: pointer;
   background-color: transparent;
-  background-image: linear-gradient(var(--accent), var(--accent));
+  background-image: var(--wave-accent);
   background-repeat: no-repeat;
   background-position: 0 100%;
-  background-size: 0% 2px;
+  background-size: 0% 4px;
   transition: color 120ms ease, background-size 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.tab:hover { color: var(--foreground); background-size: 100% 2px; }
-.tab.on { color: var(--foreground); background-size: 100% 2px; font-weight: 600; }
+.tab:hover { color: var(--foreground); background-size: 100% 4px; }
+.tab.on { color: var(--foreground); background-size: 100% 4px; font-weight: 600; }
 
 /* A card is a hairline above a block. Nothing more. */
 .card {
-  border-top: 1px solid var(--line);
+  background-image: var(--wave-line);
+  background-repeat: repeat-x;
+  background-position: 0 0;
+  background-size: 300px 3px;
   padding-top: 16px;
 }
 
@@ -210,7 +221,7 @@ select.chip { appearance: none; padding-right: 18px; background-image: url("data
 
 /* Hairline-divided list. Rows carry no border of their own. */
 .list-hairline > * + * {
-  border-top: 1px solid var(--line-soft);
+  background: var(--wave-soft) repeat-x 0 0 / 300px 3px;
 }
 
 .row {
@@ -245,7 +256,7 @@ select.chip { appearance: none; padding-right: 18px; background-image: url("data
 
 /* Sections are separated by space and a hairline, not by boxes. */
 .section + .section {
-  border-top: 1px solid var(--line-soft);
+  background: var(--wave-soft) repeat-x 0 0 / 300px 3px;
   padding-top: 40px;
 }
 .section { margin-top: 40px; }
@@ -258,8 +269,8 @@ select.chip { appearance: none; padding-right: 18px; background-image: url("data
   display: flex;
   align-items: center;
   gap: 28px;
-  padding: 18px 0;
-  border-bottom: 1px solid var(--line);
+  padding: 18px 0 20px;
+  background: var(--wave-line) repeat-x 0 100% / 300px 3px;
 }
 .wordmark {
   font-family: var(--font-display), Georgia, serif;
@@ -307,7 +318,7 @@ select.chip { appearance: none; padding-right: 18px; background-image: url("data
 /* The document: sections down the page, a hairline between each. No panel. */
 .doc > section { padding: 36px 0; }
 .doc > section:first-child { padding-top: 8px; }
-.doc > section + section { border-top: 1px solid var(--line); }
+.doc > section + section { background: var(--wave-line) repeat-x 0 0 / 300px 3px; }
 
 /* Fields: a hairline box for a block of text, a single underline for a line. */
 .field {
@@ -320,10 +331,11 @@ select.chip { appearance: none; padding-right: 18px; background-image: url("data
   color: var(--foreground);
 }
 input.field {
-  border-width: 0 0 1px 0;
-  padding: 8px 0;
-  background: transparent !important;
+  border: 0;
+  padding: 8px 0 9px;
+  background: var(--wave-line) repeat-x 0 100% / 300px 3px !important;
 }
+input.field:focus { background-image: var(--wave-fg) !important; }
 .field::placeholder { color: #9a8f80; }
 .field:focus { outline: none; border-color: var(--foreground); }
 .field-label {
@@ -345,18 +357,18 @@ input.field {
   color: var(--accent-text);
   cursor: pointer;
   background-color: transparent;
-  background-image: linear-gradient(var(--accent-text), var(--accent-text));
+  background-image: var(--wave-accent-text);
   background-repeat: no-repeat;
   background-position: 0 100%;
-  background-size: 100% 1px;
-  transition: background-size 160ms ease;
+  background-size: 100% 3px;
+  transition: background-size 160ms ease, color 120ms ease;
 }
-.link-action:hover { background-size: 100% 2px; }
+.link-action:hover { background-size: 100% 4px; color: var(--foreground); }
 
 /* The preview: a rule across the top, like a column in a paper. */
 .slide-preview {
-  border-top: 2px solid var(--foreground);
-  padding-top: 20px;
+  background: var(--wave-fg) repeat-x 0 0 / 300px 4px;
+  padding-top: 22px;
 }
 
 /* The red spot on the body figure breathes, slowly. */
@@ -576,3 +588,72 @@ html { scroll-behavior: smooth; }
 .menu-item.on { color: var(--accent-text); font-weight: 600; }
 .menu-item.on::before { content: "\2713\00a0\00a0"; }
 .menu-trigger { white-space: nowrap; }
+
+/* What a view is, told when you rest on it. Always told where there is no pointer. */
+.view-plain {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  overflow: hidden;
+  transition: max-height 260ms ease, opacity 200ms ease, margin-top 200ms ease;
+}
+.view-link:hover .view-plain, .view-link:focus-visible .view-plain {
+  max-height: 4em;
+  opacity: 1;
+  margin-top: 4px;
+}
+@media (hover: none) { .view-plain { max-height: 4em; opacity: 1; margin-top: 4px; } }
+
+/* Tailwind's straight hairlines, where the markup still uses them. */
+.border-t, .border-b, .border-y { border-color: transparent !important; }
+.border-t, .border-y { background-image: var(--wave-soft); background-repeat: repeat-x; background-position: 0 0; background-size: 300px 3px; }
+.border-b { background-image: var(--wave-soft); background-repeat: repeat-x; background-position: 0 100%; background-size: 300px 3px; }
+
+/*
+ * Dark mode: deep green paper, beige ink and beige buttons. Only ever on by
+ * the button, never by the system setting. The drawings are masks, so they
+ * simply take the new ink.
+ */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #0f1f17;
+  --surface: #14271e;
+  --surface-warm: #1a3126;
+  --foreground: #efe7d6;
+  --foreground-deep: #efe7d6;
+  --muted: #b9ad98;
+  --line: #33513f;
+  --line-soft: #27402f;
+  --ink: #efe7d6;
+  --accent: #e9dfc8;
+  --accent-hover: #f6efdd;
+  --accent-ink: #14271e;
+  --accent-text: #d9cdb0;
+  --lime: #d9cdb0;
+  --on-dark: #0f1f17;
+  --high: #f0a08f;
+  --high-bg: #3a1f1a;
+  --moderate: #e8c97a;
+  --moderate-bg: #3a3118;
+  --ok: #b9d8a1;
+  --ok-bg: #1e3524;
+  --wave-line: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%2333513f%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+  --wave-soft: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%2327402f%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+  --wave-fg: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23efe7d6%27%20stroke-width%3D%272.2%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+  --wave-accent: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23e9dfc8%27%20stroke-width%3D%272.4%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+  --wave-accent-text: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23d9cdb0%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+  --wave-muted: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20300%206%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M1%203.4%20C%2030%201.6%2C%2070%205.2%2C%20110%203.2%20S%20180%201.4%2C%20220%204.1%20S%20280%202.2%2C%20299%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23b9ad98%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+}
+:root[data-theme="dark"] .ink-green { --ink: #cfe0c0; }
+:root[data-theme="dark"] body::before { opacity: 0.05; filter: invert(1); }
+:root[data-theme="dark"] .field::placeholder, :root[data-theme="dark"] .field.note::placeholder { color: #7f8f80; }
+:root[data-theme="dark"] .menu-item.active, :root[data-theme="dark"] .menu-item:hover { background: #21382c; }
+.theme-toggle { display: inline-flex; align-items: center; }
+
+/* Paper is paper: printing always uses the light tokens. */
+@media print {
+  :root, :root[data-theme="dark"] {
+    --background: #fff; --surface: #fff; --surface-warm: #f2eee6; --foreground: #111; --muted: #444;
+    --line: #bbb; --line-soft: #ddd; --ink: #111; --accent: #c3d8a6; --accent-ink: #1c2612; --accent-text: #3f6335;
+  }
+}
