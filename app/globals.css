@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+/*
+ * Deliberately light-only and high-contrast. The audience is an elderly or
+ * low-vision patient reading a printed sheet, and the demo runs on a projector.
+ */
+:root {
+  --background: #f7f7f5;
+  --surface: #ffffff;
+  --foreground: #141414;
+  --muted: #55555f;
+  --line: #d9d9d4;
+  --accent: #1c4fd8;
+  --high: #a4161a;
+  --high-bg: #fdf0ef;
+  --moderate: #9a5b00;
+  --moderate-bg: #fdf6ea;
+  --ok: #1d6b3f;
+  --ok-bg: #eef7f1;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+/* Visible focus for keyboard users - this app is meant to be accessible. */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; font-size: 12pt; }
+  .print-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+  a[href]::after { content: " (" attr(href) ")"; font-size: 9pt; color: #444; }
+  .finding-card { break-inside: avoid; }
+}
