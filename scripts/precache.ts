@@ -3,6 +3,10 @@
  * that every RxNorm and openFDA response lands in .cache/, which is committed.
  * Run this before the demo, then verify with `npm run verify:offline`.
  */
+import { loadEnvLocal } from "./loadenv";
+
+loadEnvLocal();
+
 import { SCENARIOS } from "../lib/fixtures";
 import { normalizeAll } from "../lib/normalize";
 import { deterministicFindings, buildSchedule } from "../lib/analyze";

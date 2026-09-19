@@ -1,3 +1,7 @@
+import { loadEnvLocal } from "./loadenv";
+
+loadEnvLocal();
+
 import { normalizeAll } from "../lib/normalize";
 import { deterministicFindings, buildSchedule, sortFindings } from "../lib/analyze";
 import type { BottleRecord } from "../lib/schemas";

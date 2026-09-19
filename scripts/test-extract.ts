@@ -9,6 +9,10 @@
  * whether extraction feeds the checks correctly - a plausible-looking JSON blob
  * that resolves to nothing is the failure mode worth catching.
  */
+import { loadEnvLocal } from "./loadenv";
+
+loadEnvLocal();
+
 import { promises as fs } from "fs";
 import path from "path";
 import { extractFromImages } from "../lib/extract";

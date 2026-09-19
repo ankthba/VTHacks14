@@ -6,6 +6,10 @@
  * correctness depends on what a given FDA label happens to say, which is not
  * something we can hold a fixed ground truth over.
  */
+import { loadEnvLocal } from "./loadenv";
+
+loadEnvLocal();
+
 import { CASES, type Expect } from "../eval/cases";
 import { RECONCILE_CASES } from "../eval/reconcile-cases";
 import { reconcile } from "../lib/reconcile";
