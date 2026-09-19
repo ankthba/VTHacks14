@@ -85,6 +85,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
     if (!playing) return;
     let cancelled = false;
     stopAll();
+    setVoice(null); // the label describes THIS slide's voice, never the last one's
     fetchAudio(i + 1); // prefetch
 
     (async () => {
@@ -99,8 +100,11 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
           else if (!cancelled) setPlaying(false);
         };
         a.play().catch(() => {
-          // Autoplay blocked until a gesture: leave the slide up, wait for a tap.
-          setPlaying(false);
+          // Two reasons play() rejects: autoplay is blocked until a gesture
+          // (leave the slide up, wait for a tap), or this slide was already
+          // left - stopAll() paused a clip that was still starting. Only the
+          // first should stop the story.
+          if (!cancelled) setPlaying(false);
         });
         return;
       }
