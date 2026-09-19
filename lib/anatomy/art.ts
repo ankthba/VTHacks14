@@ -248,6 +248,49 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       hamstring: { x: 0.21, y: 0.92, s: 0.8 },                               // the back of the thigh
     },
   },
+  // Both kidneys from the front with their vessels. The bladder is not drawn;
+  // its spot sits below, where it would be.
+  kidney: {
+    src: asset("/anatomy/kidney.png"),
+    w: 1065,
+    h: 1062,
+    label: "The kidneys",
+    spots: {
+      kidney: { x: 0.18, y: 0.38, s: 1 },                                    // the left-hand kidney
+      ureter: { x: 0.33, y: 0.58, s: 0.6 },                                  // where the tube leaves the kidney
+      bladder: { x: 0.5, y: 0.86, s: 1 },                                    // below, between the hips
+      prostate: { x: 0.5, y: 0.95, s: 0.6 },                                 // just under the bladder
+    },
+  },
+  // The foot and ankle, bones, seen from above and slightly to the side.
+  ankle: {
+    src: asset("/anatomy/ankle.png"),
+    w: 883,
+    h: 999,
+    label: "Bones of the ankle and foot",
+    spots: {
+      malleolus: { x: 0.83, y: 0.45, s: 0.7 },                               // the ankle bone
+      ligament: { x: 0.81, y: 0.55, s: 0.7 },                                // just below it, on the outside
+      achilles: { x: 0.88, y: 0.29, s: 0.7 },                                // the cord at the back
+      plantar: { x: 0.85, y: 0.73, s: 0.8 },                                 // under the heel
+      metatarsal: { x: 0.5, y: 0.73, s: 0.8 },                               // the long bones of the foot
+      toe: { x: 0.5, y: 0.9, s: 0.6 },                                       // the big toe
+      nail: { x: 0.5, y: 0.96, s: 0.4 },                                     // its nail
+    },
+  },
+  // A block of skin: surface on top, a hair down through the layers, fat below.
+  skin: {
+    src: asset("/anatomy/skin.png"),
+    w: 785,
+    h: 880,
+    label: "The skin, in section",
+    spots: {
+      surface: { x: 0.5, y: 0.18, s: 1.4 },                                  // the outer layer
+      deep: { x: 0.36, y: 0.62, s: 1.3 },                                    // the thick layer beneath
+      follicle: { x: 0.48, y: 0.55, s: 0.7 },                                // the hair root
+      wound: { x: 0.24, y: 0.29, s: 0.8 },                                   // a cut through the surface
+    },
+  },
 };
 
 /** Every spot for a mark, whether the drawing has one view or two. */

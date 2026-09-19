@@ -608,20 +608,29 @@ html { scroll-behavior: smooth; }
 .menu-item.on::before { content: "\2713\00a0\00a0"; }
 .menu-trigger { white-space: nowrap; }
 
-/* What a view is, told when you rest on it. Always told where there is no pointer. */
+/* What a view is: a small sheet that floats up under the tile while you rest on it. */
+.view-link { position: relative; }
 .view-plain {
-  max-height: 0;
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 6px);
+  z-index: 25;
+  width: max-content;
+  max-width: 240px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px 6px 12px 6px / 6px 12px 6px 14px;
+  color: var(--foreground);
   opacity: 0;
-  margin-top: 0;
-  overflow: hidden;
-  transition: max-height 260ms ease, opacity 200ms ease, margin-top 200ms ease;
+  transform: translate(-50%, 6px);
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.view-link:hover .view-plain, .view-link:focus-visible .view-plain {
-  max-height: 4em;
-  opacity: 1;
-  margin-top: 4px;
+.view-link:hover .view-plain, .view-link:focus-visible .view-plain { opacity: 1; transform: translate(-50%, 0); }
+@media (hover: none) {
+  .view-plain { position: static; opacity: 1; transform: none; max-width: none; width: auto; padding: 0; border: 0; background: none; margin-top: 4px; color: var(--muted); }
 }
-@media (hover: none) { .view-plain { max-height: 4em; opacity: 1; margin-top: 4px; } }
 
 /* Tailwind's straight hairlines, where the markup still uses them. */
 .border-t, .border-b, .border-y { border-color: transparent !important; }
