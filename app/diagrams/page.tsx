@@ -29,9 +29,11 @@ export default function DiagramsPage() {
       <h2 className="display-sm text-3xl mt-10 mb-4">The views</h2>
       <div className="grid gap-4 grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
         {uniqueViews().map((v) => (
-          <div key={v.id} className="card p-3">
-            <Diagram id={v.id} marks={v.marks} />
-            <p className="text-sm font-semibold mt-2 capitalize">{v.id}</p>
+          <div key={v.id} className="card">
+            <div className="aspect-square w-full flex items-center justify-center">
+              <Diagram id={v.id} marks={v.marks} fit />
+            </div>
+            <p className="text-sm font-semibold mt-3 capitalize">{v.id}</p>
           </div>
         ))}
       </div>
@@ -43,8 +45,8 @@ export default function DiagramsPage() {
           <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
             {CONDITIONS.filter((c) => c.region === r).map((c) => (
               <div key={c.id} className="card">
-                <div className="max-w-[160px] mx-auto">
-                  <Diagram id={c.diagram} marks={c.marks} />
+                <div className="aspect-square w-full max-w-[200px] mx-auto flex items-center justify-center">
+                  <Diagram id={c.diagram} marks={c.marks} fit />
                 </div>
                 <p className="font-semibold mt-3">{c.label}</p>
                 <p className="text-sm text-[color:var(--muted)]">{c.plain}</p>
