@@ -19,7 +19,9 @@
     "typecheck": "tsc --noEmit",
     "precache:tts": "tsx scripts/precache-tts.ts",
     "verify:explain": "tsx scripts/verify-explain.ts",
-    "verify": "npm run typecheck && npm run verify:explain && npm run eval && npm run eval:otc"
+    "verify": "npm run typecheck && npm run verify:explain && npm run eval && npm run eval:otc",
+    "export:demo": "tsx scripts/export-demo.ts",
+    "export:static": "sh scripts/export-static.sh"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

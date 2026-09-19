@@ -47,6 +47,8 @@ export interface Slide {
   /** For a how-to: the picture, and the numbered steps shown on the one slide. */
   art?: HowToArt;
   steps?: string[];
+  /** Static builds: a prebuilt clip for this slide, relative to the site root. */
+  audio?: string;
 }
 
 export interface ExplainCard {

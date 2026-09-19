@@ -8,6 +8,7 @@ import { Anatomy3D } from "@/components/Anatomy3D";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 import type { Slide } from "@/lib/explain";
 import { bestVoice, whenVoicesReady } from "@/lib/voices";
+import { asset } from "@/lib/staticMode";
 
 interface Props {
   slides: Slide[];
@@ -50,12 +51,17 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
       if (n < 0 || n >= slides.length) return Promise.resolve(null);
       const hit = cache.current.get(n);
       if (hit) return hit;
+      // The static site ships prebuilt clips with the slide; the full app asks
+      // the server, which serves from its own cache before ElevenLabs.
       const once = () =>
-        fetch("/api/tts", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ text: slides[n].spoken }),
-        }).then(async (r) => (r.ok ? URL.createObjectURL(await r.blob()) : null));
+        (slides[n].audio
+          ? fetch(asset(slides[n].audio!))
+          : fetch("/api/tts", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ text: slides[n].spoken }),
+            })
+        ).then(async (r) => (r.ok ? URL.createObjectURL(await r.blob()) : null));
       const p: Promise<string | null> = lane.current
         .then(once)
         .then(async (url) => {
