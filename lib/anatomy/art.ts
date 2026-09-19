@@ -57,6 +57,20 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       "patellar-tendon": { x: 0.375, y: 0.56, s: 0.7 }, // kneecap down to the shin
     },
   },
+  // Shoulder from the front: humerus at left, clavicle across the top, shoulder blade at right.
+  shoulder: {
+    src: asset("/anatomy/shoulder.png"),
+    w: 855,
+    h: 956,
+    label: "Bones and tendons of the shoulder",
+    spots: {
+      "humerus-head": { x: 0.31, y: 0.29, s: 1 },    // the ball of the joint
+      cuff: { x: 0.3, y: 0.22, s: 0.9 },             // over the top of the ball, under the acromion
+      ac: { x: 0.35, y: 0.19, s: 0.6 },              // where the collarbone meets the shoulder blade
+      biceps: { x: 0.32, y: 0.37, s: 0.7 },          // front of the ball, into the groove
+      clavicle: { x: 0.61, y: 0.18, s: 0.8 },        // mid-shaft of the collarbone
+    },
+  },
 };
 
 /** The default spot, as a fraction of the drawing's width. */
