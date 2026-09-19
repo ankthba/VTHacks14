@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { InkArrow, InkCheck, InkRing, InkUnderline } from "@/components/Ink";
+import { InkArrow, InkCheck, InkGlass, InkRing, InkUnderline } from "@/components/Ink";
 import { Menu } from "@/components/Menu";
 import { PrescriberCheck } from "@/components/PrescriberCheck";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -477,13 +477,16 @@ export default function Home() {
                   />
                 ) : (
                   <>
-                    <input
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder={`Search ${CONDITIONS.length} conditions - "ankle", "UTI", "S52"`}
-                      className="field mb-4"
-                      aria-label="Search conditions"
-                    />
+                    <label className="search mb-4">
+                      <InkGlass />
+                      <input
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder={`Search ${CONDITIONS.length} conditions: "ankle", "UTI", "S52"`}
+                        className="field"
+                        aria-label="Search conditions"
+                      />
+                    </label>
                     {!query.trim() && (
                       <div className="tabs mb-3">
                         {REGIONS.map((r) => (

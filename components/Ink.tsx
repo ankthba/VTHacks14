@@ -61,3 +61,14 @@ export function InkSound({ className = "", speaking }: { className?: string; spe
     </svg>
   );
 }
+
+/** A magnifying glass with a glint, drawn a little crooked, that peers in when you type. */
+export function InkGlass({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" className={`ink-glass ${className}`} aria-hidden fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10 3.6 C 13.8 3.2, 16.6 6, 16.3 9.6 C 16 13.2, 13 15.6, 9.6 15.3 C 6.2 15, 3.9 12.3, 4.1 9.2 C 4.3 6, 6.7 3.9, 10 3.6 Z" />
+      <path d="M14.6 14.2 L 20.6 20.4" strokeWidth="2.8" />
+      <path d="M7.2 7.6 C 7.8 6.6, 8.7 6, 9.7 5.9" className="glint" strokeWidth="1.6" />
+    </svg>
+  );
+}
