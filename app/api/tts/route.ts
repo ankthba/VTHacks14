@@ -63,6 +63,13 @@ export async function POST(req: NextRequest) {
     // Miss - fall through to the API.
   }
 
+  // Rehearsal switch: TTS_DISABLED=1 in .env.local keeps the cache serving
+  // (free) and sends everything else to the browser voice, so a day of
+  // testing costs no characters. Remove the line to wire ElevenLabs back in.
+  if (process.env.TTS_DISABLED === "1") {
+    return NextResponse.json({ error: "TTS disabled for testing", fallback: "browser" }, { status: 503 });
+  }
+
   const call = () =>
     fetch(`https://api.elevenlabs.io/v1/text-to-speech/${DEFAULT_VOICE}`, {
       method: "POST",

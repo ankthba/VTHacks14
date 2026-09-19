@@ -93,7 +93,7 @@ export function Diagram({
     viewBox: "0 0 300 360",
     className,
     role: "img" as const,
-    style: { color: "var(--foreground)", ...sizing },
+    style: { color: "var(--ink)", ...sizing },
   };
 
   // ---- Forearm, wrist and hand - anterior (palm-up) view -------------------

@@ -219,6 +219,20 @@ export const ART: Partial<Record<DiagramId, ArtDiagram>> = {
       disc: { x: 0.5, y: 0.6, s: 0.8 },                                      // a disc, behind the larynx
     },
   },
+  // The arm bent at the elbow, hand to the left: the joint sits at the right.
+  elbow: {
+    src: asset("/anatomy/elbow.png"),
+    w: 1041,
+    h: 903,
+    label: "The elbow",
+    spots: {
+      olecranon: { x: 0.89, y: 0.56, s: 0.7 },                               // the point of the elbow
+      "lateral-epicondyle": { x: 0.83, y: 0.49, s: 0.6 },                    // the outer knob
+      "medial-epicondyle": { x: 0.78, y: 0.61, s: 0.6 },                     // the inner knob
+      "radial-head": { x: 0.74, y: 0.63, s: 0.6 },                           // just below the joint
+      nerve: { x: 0.69, y: 0.7, s: 0.7 },                                    // the nerve running down the forearm
+    },
+  },
 };
 
 /** Every spot for a mark, whether the drawing has one view or two. */

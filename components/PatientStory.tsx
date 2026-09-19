@@ -60,13 +60,15 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
               headers: { "content-type": "application/json" },
               body: JSON.stringify({ text: slides[n].spoken }),
             })
-        ).then(async (r) => (r.ok ? URL.createObjectURL(await r.blob()) : null));
+        ).then(async (r) => (r.ok ? URL.createObjectURL(await r.blob()) : r.status === 503 ? "off" : null));
       const p: Promise<string | null> = lane.current
         .then(once)
         .then(async (url) => {
+          if (url === "off") return null; // no voice service: straight to the browser voice
           if (url) return url;
           await new Promise((res) => setTimeout(res, 900));
-          return once();
+          const again = await once();
+          return again === "off" ? null : again;
         })
         .catch(() => null);
       lane.current = p.catch(() => null);

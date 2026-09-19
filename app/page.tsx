@@ -64,6 +64,27 @@ export default function Home() {
   const [query, setQuery] = useState("");
   /** A condition the pointer is resting on: the preview shows it before it is chosen. */
   const [hoverId, setHoverId] = useState<string | null>(null);
+  // The preview follows a resting pointer, not a passing one: a short dwell
+  // before it swaps, and nothing while the page is scrolling under the mouse.
+  const hoverTimer = useRef<number | null>(null);
+  const scrollingUntil = useRef(0);
+  useEffect(() => {
+    const onScroll = () => { scrollingUntil.current = Date.now() + 250; };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  const hoverStart = (id: string) => {
+    if (hoverTimer.current) window.clearTimeout(hoverTimer.current);
+    hoverTimer.current = window.setTimeout(() => {
+      if (Date.now() < scrollingUntil.current) return;
+      setHoverId(id);
+    }, 280);
+  };
+  const hoverEnd = () => {
+    if (hoverTimer.current) window.clearTimeout(hoverTimer.current);
+    hoverTimer.current = null;
+    setHoverId(null);
+  };
   const [conditionId, setConditionId] = useState<string | null>(null);
   const [choosing, setChoosing] = useState(false);
   const [customHeadline, setCustomHeadline] = useState("");
@@ -432,10 +453,10 @@ export default function Home() {
                         <button
                           key={c.id}
                           onClick={() => { setConditionId(c.id); setRegion(c.region); setCustomHeadline(c.plain); setChoosing(false); setQuery(""); setHoverId(null); }}
-                          onMouseEnter={() => setHoverId(c.id)}
-                          onMouseLeave={() => setHoverId(null)}
+                          onMouseEnter={() => hoverStart(c.id)}
+                          onMouseLeave={hoverEnd}
                           onFocus={() => setHoverId(c.id)}
-                          onBlur={() => setHoverId(null)}
+                          onBlur={hoverEnd}
                           className="row w-full text-left py-3 hover:opacity-75"
                         >
                           <span
@@ -565,7 +586,7 @@ export default function Home() {
               </div>
 
               {(hovered ?? selected) ? (
-                <div key={(hovered ?? selected)!.id} className="mx-auto max-w-[220px] mb-5 rise"><Diagram id={(hovered ?? selected)!.diagram} marks={(hovered ?? selected)!.marks} /></div>
+                <div key={(hovered ?? selected)!.id} className="mx-auto max-w-[220px] mb-5 fade"><Diagram id={(hovered ?? selected)!.diagram} marks={(hovered ?? selected)!.marks} /></div>
               ) : (
                 <div className="mx-auto h-44 mb-5 flex items-end justify-center gap-6 transition-opacity duration-500" aria-hidden style={{ opacity: noteBusy ? 1 : 0.3 }}>
                   <div className="h-full"><Figure region="body" body="female" spot={false} searching={noteBusy} /></div>
@@ -573,7 +594,7 @@ export default function Home() {
                 </div>
               )}
               {(hovered?.plain || customHeadline || selected?.plain) && (
-                <p key={hovered?.id ?? "chosen"} className="display-sm rise" style={{ fontSize: "1.6rem" }}>{hovered?.plain || customHeadline || selected?.plain}</p>
+                <p key={hovered?.id ?? "chosen"} className="display-sm fade" style={{ fontSize: "1.6rem" }}>{hovered?.plain || customHeadline || selected?.plain}</p>
               )}
 
               {meds.filter((m) => m.name.trim()).length > 0 && (
