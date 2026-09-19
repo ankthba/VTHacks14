@@ -8,6 +8,15 @@ function uniqueViews(): DiagramId[] {
   return [...new Set(CONDITIONS.map((c) => c.diagram))];
 }
 
+const slug = (r: string) => r.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+/** The category a view belongs to: the one that uses it most. */
+function homeOf(view: DiagramId): string {
+  const counts = new Map<string, number>();
+  for (const c of CONDITIONS) if (c.diagram === view) counts.set(c.region, (counts.get(c.region) ?? 0) + 1);
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+}
+
 import { APP_NAME } from "@/lib/brand";
 
 export const metadata = { title: `${APP_NAME} - anatomy library` };
@@ -34,17 +43,17 @@ export default function DiagramsPage() {
       <h2 className="display-sm text-3xl mt-10 mb-4">The views</h2>
       <div className="grid gap-x-10 gap-y-12 grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
         {uniqueViews().map((id) => (
-          <div key={id} className="card">
+          <a key={id} href={`#${slug(homeOf(id))}`} className="card view-link block">
             <div className="aspect-square w-full flex items-center justify-center p-[5%]">
               <Diagram id={id} fit />
             </div>
             <p className="text-sm font-semibold mt-3 capitalize">{id}</p>
-          </div>
+          </a>
         ))}
       </div>
 
       {REGIONS.map((r) => (
-        <section key={r}>
+        <section key={r} id={slug(r)} className="scroll-mt-8">
           <h2 className="display-sm text-3xl mt-14 mb-1">{r}</h2>
           <p className="text-sm text-[color:var(--muted)] mb-5">{CONDITIONS.filter((c) => c.region === r).length} conditions</p>
           <div className="grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">

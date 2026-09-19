@@ -441,3 +441,11 @@ input.field {
   height: 0.24em;
   color: var(--accent);
 }
+
+/* In-page jumps glide; a view tile lifts its drawing a touch on hover. */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+.view-link { color: inherit; text-decoration: none; }
+.view-link > div { transition: transform 200ms ease; }
+.view-link:hover > div { transform: translateY(-3px); }
+.view-link:hover p { color: var(--accent-text); }
