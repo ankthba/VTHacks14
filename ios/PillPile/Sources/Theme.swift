@@ -7,25 +7,25 @@ enum Theme {
     /// action colour. Severity colours stay semantic and are only warmed to sit
     /// in the palette - a warning that reads as decoration is a broken warning.
     /// Every pairing below clears WCAG AA against its own surface.
-    static let background = Color(hex: 0xFCFCF8)
-    static let surface = Color.white
-    static let surfaceWarm = Color(hex: 0xF7F7F2)
-    static let foreground = Color(hex: 0x292929)
-    static let foregroundDeep = Color(hex: 0x0E0F0C)
-    static let muted = Color(hex: 0x6B6B63)
-    static let line = Color(hex: 0xD5D5D2)
-    static let lineSoft = Color(hex: 0xE8E8E2)
+    static let background = Color(hex: 0xF3EEE4)
+    static let surface = Color(hex: 0xFAF7F1)
+    static let surfaceWarm = Color(hex: 0xEBE5D8)
+    static let foreground = Color(hex: 0x2A2520)
+    static let foregroundDeep = Color(hex: 0x1F1B17)
+    static let muted = Color(hex: 0x675D51)
+    static let line = Color(hex: 0xD8CFBF)
+    static let lineSoft = Color(hex: 0xE6DFD2)
 
-    static let accent = Color(hex: 0x5B6F00)
-    static let accentInk = Color(hex: 0xFCFCF8)
-    static let lime = Color(hex: 0xB2C248)
+    static let accent = Color(hex: 0x4E7541)
+    static let accentInk = Color(hex: 0xF3EEE4)
+    static let lime = Color(hex: 0xA9C98A)
 
     static let high = Color(hex: 0x9A2F1E)
-    static let highBG = Color(hex: 0xFBF1EE)
-    static let moderate = Color(hex: 0x85610C)
-    static let moderateBG = Color(hex: 0xFAF5E8)
-    static let ok = Color(hex: 0x4A5D0A)
-    static let okBG = Color(hex: 0xF2F5E6)
+    static let highBG = Color(hex: 0xF8E9E3)
+    static let moderate = Color(hex: 0x7F5D0A)
+    static let moderateBG = Color(hex: 0xF6EFDB)
+    static let ok = Color(hex: 0x3F6335)
+    static let okBG = Color(hex: 0xE6EFDB)
 
     static func severityColor(_ s: String) -> Color {
         switch s {

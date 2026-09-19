@@ -7,6 +7,7 @@ import { HowToArt } from "@/components/HowToArt";
 import { Anatomy3D } from "@/components/Anatomy3D";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 import type { Slide } from "@/lib/explain";
+import { bestVoice, whenVoicesReady } from "@/lib/voices";
 
 interface Props {
   slides: Slide[];
@@ -110,8 +111,12 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
       }
       if (typeof window !== "undefined" && window.speechSynthesis) {
         setVoice("browser");
+        await whenVoicesReady();
+        if (cancelled) return;
         const u = new SpeechSynthesisUtterance(slide.spoken);
         u.lang = langTag;
+        const v = bestVoice(langTag);
+        if (v) u.voice = v;
         u.rate = 0.9;
         u.onend = () => {
           if (!cancelled && i < slides.length - 1) advance();

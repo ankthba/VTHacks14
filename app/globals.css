@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 /*
- * Granola-inspired design language.
+ * Granola-derived layout language; warm beige ground, matcha for actions.
  *
- * Warm neutrals rather than blue-greys, a deep olive as the action colour, and
- * a large serif at regular weight with tight tracking for display type.
+ * Ivory-beige rather than white or grey, deep matcha green as the only action
+ * colour, and a large serif at regular weight with tight tracking for display.
  *
  * Two departures from it, both because this is a medical accessibility tool:
  *
@@ -16,27 +16,31 @@
  *    on a projector.
  */
 :root {
-  --background: #fcfcf8;
-  --surface: #ffffff;
-  --surface-warm: #f7f7f2;
-  --foreground: #292929;
-  --foreground-deep: #0e0f0c;
-  --muted: #6b6b63;
-  --line: #d5d5d2;
-  --line-soft: #e8e8e2;
+  /* Warm ivory-beige ground with cream surfaces and warm brown-black text -
+     the calm of a reading page. Green appears only on things you can press,
+     and it is matcha: deep enough to carry white type, soft enough not to
+     shout. */
+  --background: #f3eee4;
+  --surface: #faf7f1;
+  --surface-warm: #ebe5d8;
+  --foreground: #2a2520;
+  --foreground-deep: #1f1b17;
+  --muted: #675d51;
+  --line: #d8cfbf;
+  --line-soft: #e6dfd2;
 
-  --accent: #5b6f00;
-  --accent-hover: #788c15;
-  --accent-ink: #fcfcf8;
-  --lime: #b2c248;
+  --accent: #4e7541;
+  --accent-hover: #43663a;
+  --accent-ink: #f7faf0;
+  --lime: #a9c98a;
 
-  /* Semantic, warmed to the palette. */
+  /* Semantic, warmed to sit in the palette. A warning still reads as one. */
   --high: #9a2f1e;
-  --high-bg: #fbf1ee;
-  --moderate: #85610c;
-  --moderate-bg: #faf5e8;
-  --ok: #4a5d0a;
-  --ok-bg: #f2f5e6;
+  --high-bg: #f8e9e3;
+  --moderate: #7f5d0a;
+  --moderate-bg: #f6efdb;
+  --ok: #3f6335;
+  --ok-bg: #e6efdb;
 
   --radius-card: 12px;
   --radius-pill: 999px;
@@ -184,8 +188,8 @@ body {
   border: 1px solid var(--line-soft);
   border-radius: 16px;
   box-shadow:
-    0 1px 2px rgba(41, 41, 41, 0.04),
-    0 8px 24px -8px rgba(41, 41, 41, 0.10);
+    0 1px 2px rgba(42, 37, 32, 0.05),
+    0 8px 24px -8px rgba(42, 37, 32, 0.14);
 }
 
 /* Inline metadata: "Today", "4 medicines". */

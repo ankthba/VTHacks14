@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { bestVoice, whenVoicesReady } from "@/lib/voices";
 
 type State = "idle" | "loading" | "playing";
 
@@ -21,15 +22,18 @@ export function ReadAloud({ text, lang }: { text: string; lang: string }) {
     setState("idle");
   }
 
-  function speakInBrowser() {
+  async function speakInBrowser() {
     if (typeof window === "undefined" || !window.speechSynthesis) {
       setNote("This browser cannot read text aloud.");
       setState("idle");
       return;
     }
+    await whenVoicesReady();
     const u = new SpeechSynthesisUtterance(text.slice(0, 6000));
     u.rate = 0.92;
     u.lang = lang;
+    const v = bestVoice(lang);
+    if (v) u.voice = v;
     u.onend = () => setState("idle");
     u.onerror = () => setState("idle");
     window.speechSynthesis.cancel();
