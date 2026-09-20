@@ -12,15 +12,12 @@ export interface Person {
 export const TEAM: Person[] = [
   {
     name: "Aniketh Bandlamudi",
-    college: "University of Virginia",
-    links: [
-      { label: "aniketh.net", href: "https://aniketh.net" },
-      { label: "GitHub", href: "https://github.com/ankthba" },
-    ],
+    college: "CS & Applied Math @ UVA",
+    links: [],
   },
   {
     name: "Lauren Kim",
-    college: "Virginia Tech",
+    college: "Mechanical Engineering @ Virginia Tech",
     links: [],
   },
 ];
