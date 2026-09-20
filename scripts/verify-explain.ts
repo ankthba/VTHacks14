@@ -93,6 +93,22 @@ F/u: neurology 6 weeks`,
     meds: ["Sumatriptan"],
     notMeds: ["Headache (QOD)", "Caffeine - limit"],
   },
+  {
+    name: "Medicine: header, blank line, dash sigs",
+    note: `Assessment:
+- Acute upper respiratory infection
+- Cough
+- Nasal congestion
+
+Medicine:
+
+- Acetaminophen 500 mg - take 1 tablet by mouth every 6 hours as needed for pain or fever.
+- Benzonatate 100 mg - take 1 capsule by mouth three times daily as needed for cough.
+- Increase fluids and rest.`,
+    condition: "common-cold",
+    meds: ["Acetaminophen", "Benzonatate"],
+    notMeds: ["Increase fluids and rest."],
+  },
   ...DEMO_NOTES.map((d) => ({
     name: `demo: ${d.title}`,
     note: d.note,

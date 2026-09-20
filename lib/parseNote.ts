@@ -65,6 +65,8 @@ const SECTION_ALIASES: Record<keyof ParsedNote, string[]> = {
     "discharge medications", "discharge meds", "meds at discharge", "medications at discharge",
     "medications on discharge", "new medications", "new meds", "current medications",
     "medications (active)", "active medications", "take these medicines", "prescribed",
+    "medicine", "medicines", "medicine list", "drugs", "drug list", "prescription", "rx list",
+    "treatment", "plan medications", "medications prescribed", "home medications", "home meds",
   ],
   instructions: [
     "instructions", "discharge instructions", "patient instructions", "activity", "diet",
@@ -116,6 +118,12 @@ const INSTRUCTION_CUES =
 const FOLLOWUP_CUES =
   /\b(f\/u|follow.?up|rtc|return|come back|call|911|ed\b|er\b|emergency|clinic|appointment|see (?:your|the)|recheck|repeat (?:x-?ray|film|labs?|imaging)|in \d+ ?(?:day|wk|week|month))/i;
 
+/** "500 mg - take 1 tablet" leaves the dash on the sig; it is a separator, not words. */
+function tidySig(raw: string): string | null {
+  const s = raw.replace(/^[\s\-\u2013\u2014:;,]+/, "").trim();
+  return s || null;
+}
+
 function normaliseHeader(line: string): keyof ParsedNote | null {
   const h = line
     .toLowerCase()
@@ -146,11 +154,11 @@ function parseMedLine(value: string): ParsedNote["medications"][number] | null {
   if (value.includes("|")) {
     const [head, ...rest] = value.split("|").map((x) => x.trim());
     const m = head.match(/^([A-Za-z][A-Za-z0-9\-/ ]{1,40}?)\s+(\d+(?:\.\d+)?\s*(?:mg|mcg|g|ml|units?|%|meq))\b/i);
-    if (m) return { name: m[1].trim(), strength: m[2].trim(), sig: rest.join(" ").trim() || null };
-    return { name: head, strength: null, sig: rest.join(" ").trim() || null };
+    if (m) return { name: m[1].trim(), strength: m[2].trim(), sig: tidySig(rest.join(" ")) };
+    return { name: head, strength: null, sig: tidySig(rest.join(" ")) };
   }
   const m = value.match(MED_LINE);
-  if (m) return { name: m[1].trim(), strength: m[2].trim(), sig: m[3].trim() || null };
+  if (m) return { name: m[1].trim(), strength: m[2].trim(), sig: tidySig(m[3]) };
   return null;
 }
 
