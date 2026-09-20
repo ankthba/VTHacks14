@@ -207,24 +207,32 @@ export default function Home() {
       // searching the body in the preview, and it should be seen to land.
       await new Promise((r) => setTimeout(r, Math.max(0, 1400 - (Date.now() - started))));
 
+      // A note replaces everything from the last one, including what it
+      // does not have: a cold with no prescriptions must not inherit the
+      // wrist's ibuprofen.
       const c = json.conditionId ? CONDITIONS.find((x) => x.id === json.conditionId) : undefined;
       if (c) {
         setRegion(c.region);
         setConditionId(c.id);
         setCustomHeadline(c.plain);
         setChoosing(false);
+      } else {
+        setConditionId(null);
+        setCustomHeadline("");
+        setChoosing(true);
       }
       const parsedMeds: MedRow[] = (json.medications ?? []).map((m) => ({
         name: m.name,
         strength: m.strength ?? null,
         sig: m.sig ?? "",
       }));
-      if (parsedMeds.length) setMeds(parsedMeds);
+      setMeds(parsedMeds);
       const instr = [...(json.instructions ?? []), ...(json.followUp ?? [])];
-      if (instr.length) setInstructions(instr);
+      setInstructions(instr);
       const parsedHowtos = json.howtoIds ?? [];
-      if (parsedHowtos.length) setHowtoIds(parsedHowtos);
+      setHowtoIds(parsedHowtos);
       setSkippedLines(json.skipped ?? []);
+      setCard(null);
 
       const bits = [
         c ? `matched "${c.label}"` : "no diagnosis in the library",
@@ -235,11 +243,11 @@ export default function Home() {
       setNoteStatus(bits.join(" · "));
 
       const snap: Snapshot = {
-        conditionId: c?.id ?? conditionId,
-        customHeadline: c?.plain ?? customHeadline,
-        meds: parsedMeds.length ? parsedMeds : meds,
-        instructions: instr.length ? instr : instructions,
-        howtoIds: parsedHowtos.length ? parsedHowtos : howtoIds,
+        conditionId: c?.id ?? null,
+        customHeadline: c?.plain ?? "",
+        meds: parsedMeds,
+        instructions: instr,
+        howtoIds: parsedHowtos,
         noteText: source,
       };
       void build(false, snap);
