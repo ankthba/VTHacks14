@@ -1,12 +1,11 @@
 import { SiteNav } from "@/components/SiteNav";
-import { InkUnderline, InkRing } from "@/components/Ink";
+import { InkUnderline } from "@/components/Ink";
+import { InkImage } from "@/components/InkImage";
 import { APP_NAME } from "@/lib/brand";
 import { TEAM, VALUES } from "@/lib/team";
 import { asset } from "@/lib/staticMode";
 
 export const metadata = { title: `${APP_NAME}: the team` };
-
-const initials = (name: string) => name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 
 export default function TeamPage() {
   return (
@@ -32,14 +31,7 @@ export default function TeamPage() {
         {TEAM.map((p, n) => (
           <article key={p.name} className="person rise" style={{ animationDelay: `${120 + n * 90}ms` }}>
             <div className="portrait">
-              {p.photo ? (
-                <img src={p.photo} alt="" className="block w-full h-full object-cover" />
-              ) : (
-                <span className="portrait-initials display">
-                  <InkRing className="portrait-ring" draw />
-                  {initials(p.name)}
-                </span>
-              )}
+              <InkImage src={asset(p.portrait)} alt={`${p.name}, drawn in ink`} className="portrait-ink" />
             </div>
             <div>
               <p className="eyebrow">{String(n + 1).padStart(2, "0")}</p>

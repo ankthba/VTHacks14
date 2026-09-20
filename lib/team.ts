@@ -1,12 +1,13 @@
 /**
- * The people: a name and a college. Edit here; the page reads this. A person
- * without a photo gets their initials in a drawn ring.
+ * The people: a name, a college and an ink portrait. Edit here; the page
+ * reads this.
  */
 export interface Person {
   name: string;
   college: string;
   links: { label: string; href: string }[];
-  photo?: string;
+  /** An ink portrait in public/anatomy, drawn like everything else. */
+  portrait: string;
 }
 
 export const TEAM: Person[] = [
@@ -14,11 +15,13 @@ export const TEAM: Person[] = [
     name: "Aniketh Bandlamudi",
     college: "CS & Applied Math @ UVA",
     links: [],
+    portrait: "/anatomy/portrait-aniketh.png",
   },
   {
     name: "Lauren Kim",
     college: "Mechanical Engineering & Math @ Virginia Tech",
     links: [],
+    portrait: "/anatomy/portrait-lauren.png",
   },
 ];
 
