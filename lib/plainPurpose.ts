@@ -142,7 +142,7 @@ const RULES: Rule[] = [
 /** A short plain sentence from an FDA label's indications, when the class map has nothing. */
 function fromLabel(text: string | null | undefined): string | null {
   if (!text) return null;
-  let t = text
+  const t = text
     .replace(/^\s*\d*\s*INDICATIONS? (AND|&) USAGE:?\s*/i, "")
     .replace(/\(\s*\d+(\.\d+)?\s*\)/g, "")
     .replace(/\s+/g, " ")
@@ -150,7 +150,7 @@ function fromLabel(text: string | null | undefined): string | null {
   // "X is indicated for the treatment of Y in adults" -> "This is used for Y."
   const m = t.match(/indicated (?:for|to|in)\s+(?:the\s+)?(?:treatment of\s+|management of\s+|relief of\s+|prevention of\s+|reduce\s+|reduction of\s+)?([^.;:]{8,110})/i);
   if (m) {
-    let what = m[1].trim().replace(/\s+in (adults?|adult patients|patients)\b.*$/i, "");
+    const what = m[1].trim().replace(/\s+in (adults?|adult patients|patients)\b.*$/i, "");
     return `This is used for ${what.charAt(0).toLowerCase()}${what.slice(1)}.`;
   }
   const first = t.split(/(?<=[.])\s/)[0];

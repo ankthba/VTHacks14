@@ -12,7 +12,12 @@ restore() {
   done
   rmdir "$ASIDE" 2>/dev/null || true
 }
-trap restore EXIT
+# Restore on any exit, including an interrupted build, and refuse to leave the
+# tree without its routes: an earlier interrupted run lost app/api and the
+# loss went into a commit.
+trap restore EXIT INT TERM
+restore
+[ -d app/api ] || { echo "app/api is missing; restore it from git before building" >&2; exit 1; }
 
 mkdir -p "$ASIDE"
 for d in api; do

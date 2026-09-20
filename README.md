@@ -11,7 +11,7 @@ for the fridge. Then the clinician turns the screen around.
 Built at VTHacks 14, September 2026, for the Impiricus track: *build the next
 HCP engagement tool.*
 
-**Live demo:** https://aniketh.net/aperta/
+**Live demo:** https://aperta.health/ (also at https://aniketh.net/aperta/)
 
 Paste any note there. The parser, the card builder and the prescriber check
 are deterministic code that run in the page itself against RxNorm, the FDA

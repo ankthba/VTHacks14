@@ -4,7 +4,7 @@
 
 Paste the discharge note. Turn the screen around. The patient understands.
 
-**Try it:** https://aniketh.net/aperta/ (paste any note) · **Code:** https://github.com/ankthba/VTHacks14
+**Try it:** https://aperta.health/ (paste any note) · **Code:** https://github.com/ankthba/VTHacks14
 
 ## Inspiration
 
@@ -53,8 +53,8 @@ away and the patient's page swings in.
 Next.js 16, TypeScript, Tailwind. RxNorm and RxClass for drug identity and
 class, openFDA for labels and the NDC directory, MyMemory for key-less
 translation, the browser's own voice for read-aloud with ElevenLabs as an
-option. Every drawing was made by hand in Procreate and dropped in as a mask,
-so one file reads as black ink on paper and beige ink on the dark board.
+option. Every drawing was made by hand in Procreate and dropped in as black ink
+on transparency; a colour filter turns it beige on the dark board.
 
 The published site has no server and needs none: the parser, the card builder
 and the prescriber check are deterministic code that run in the page against

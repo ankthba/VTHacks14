@@ -215,7 +215,7 @@ export async function buildExplainCard(input: {
   // says; the translator only changes the language it says it in.
   const language = input.language && LANGUAGES[input.language] ? input.language : "English";
   const lang = LANGUAGES[language];
-  let phrases = { ...PHRASES };
+  const phrases = { ...PHRASES };
   let translation = { provider: "none", untranslated: 0 };
   let finalHeadline = headline;
 
