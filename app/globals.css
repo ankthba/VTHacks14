@@ -787,6 +787,9 @@ html { scroll-behavior: smooth; }
   place-items: center;
 }
 .portrait-ink { width: 84%; height: 84%; }
+/* The portraits are always black ink; on the dark board the arch becomes a paper print. */
+.portrait { --ink: #1f1c19; }
+:root[data-theme="dark"] .portrait { background: #f4efe4; }
 .values {
   display: grid;
   grid-template-columns: 0.8fr 1.2fr;
