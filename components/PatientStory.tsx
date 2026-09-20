@@ -344,6 +344,7 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
               {howtos.map((h, n) => (
                 <section key={n}>
                   <p className="print-kicker">{h.kicker ?? "How to do it"}</p>
+                  {h.art && <div className="print-howto-pic"><HowToArt id={h.art} /></div>}
                   <h2 className="display-sm print-h2">{h.title}</h2>
                   {h.steps && h.steps.length > 0 && (
                     <ol className="print-steps">

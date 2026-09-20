@@ -1,10 +1,22 @@
 import type { HowToArt as ArtId } from "@/lib/howto";
+import { HOWTO_ART } from "@/lib/howtoArt";
+import { InkImage } from "@/components/InkImage";
 
 /**
  * One simple picture per procedure: the object in the hand, nothing else.
  * Line art in currentColor, the same visual language as the anatomy.
  */
 export function HowToArt({ id, className }: { id: ArtId; className?: string }) {
+  // The clinician's own drawing, when there is one.
+  const drawn = HOWTO_ART[id];
+  if (drawn) {
+    return (
+      <div className={className} role="img" aria-label={drawn.label} style={{ width: "100%", aspectRatio: `${drawn.w} / ${drawn.h}` }}>
+        <InkImage src={drawn.src} className="block w-full h-full" />
+      </div>
+    );
+  }
+
   const base = {
     fill: "none",
     stroke: "currentColor",

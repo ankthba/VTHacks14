@@ -716,6 +716,7 @@ html { scroll-behavior: smooth; }
   .print-list li { display: flex; align-items: flex-start; gap: 7pt; padding: 4pt 0; font-size: 13pt; }
   .print-box { flex: none; display: inline-block; width: 12pt; height: 12pt; border: 1.3pt solid #222; border-radius: 2pt; margin-top: 3pt; }
   .print-h2 { font-size: 15pt; margin-bottom: 4pt; }
+  .print-howto-pic { width: 34mm; margin: 2pt 0 6pt; }
   .print-steps { list-style: none; padding: 0; margin: 0; }
   .print-steps li { display: flex; gap: 8pt; padding: 3pt 0; }
   .print-n { flex: none; width: 14pt; font-family: var(--font-display), Georgia, serif; font-style: italic; color: #333; }
