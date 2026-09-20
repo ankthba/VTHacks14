@@ -10,4 +10,5 @@ export const HOWTO_ART: Partial<Record<HowToArt, { src: string; w: number; h: nu
   syringe: { src: asset("/anatomy/howto-syringe.png"), w: 1003, h: 442, label: "The syringe for rinsing the socket" },
   inhaler: { src: asset("/anatomy/howto-inhaler.png"), w: 1248, h: 698, label: "The inhaler pushed into its spacer" },
   crutches: { src: asset("/anatomy/howto-crutches.png"), w: 888, h: 1561, label: "A pair of crutches" },
+  eyedrops: { src: asset("/anatomy/howto-eyedrops.png"), w: 333, h: 894, label: "The eye-drop bottle" },
 };
