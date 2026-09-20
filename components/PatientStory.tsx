@@ -19,6 +19,8 @@ interface Props {
   rtl: boolean;
   body?: BodyType;
   onBack: () => void;
+  /** Open on this screen instead of the first (deep links and screenshots). */
+  initialIndex?: number;
 }
 
 /**
@@ -32,9 +34,9 @@ interface Props {
  * costs nothing) with the browser voice as fallback. The next slide's audio is
  * prefetched while the current one plays, so there is no gap.
  */
-export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initialBody = "male", onBack }: Props) {
+export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initialBody = "male", onBack, initialIndex = 0 }: Props) {
   const [body, setBody] = useState<BodyType>(initialBody);
-  const [i, setI] = useState(0);
+  const [i, setI] = useState(Math.min(initialIndex, slides.length - 1));
   const [playing, setPlaying] = useState(true);
   const [voice, setVoice] = useState<"elevenlabs" | "browser" | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);

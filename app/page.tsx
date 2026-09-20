@@ -151,11 +151,16 @@ export default function Home() {
     meds: MedRow[];
     instructions: string[];
     howtoIds: string[];
+    /** Set when the caller has fresher values than state (a chained call). */
+    noteText?: string;
+    language?: string;
   };
 
   /** The note is the input. Everything below fills from it for review. */
-  async function ingestNote(files?: FileList | null) {
-    if (!noteText.trim() && !files?.length) return;
+  async function ingestNote(files?: FileList | null, textOverride?: string): Promise<Snapshot | null> {
+    const source = textOverride ?? noteText;
+    if (textOverride !== undefined) setNoteText(textOverride);
+    if (!source.trim() && !files?.length) return null;
     setNoteBusy(true);
     setNoteError(null);
     setNoteStatus(null);
@@ -174,24 +179,24 @@ export default function Home() {
 
       if (IS_STATIC) {
         const bundle = await loadDemoBundle();
-        const hit = bundle.notes.find((n) => n.note.trim() === noteText.trim());
+        const hit = bundle.notes.find((n) => n.note.trim() === source.trim());
         if (hit) {
           json = hit.parse as unknown as typeof json;
         } else {
           // The published site has no server, and needs none: the parser is
           // deterministic code, so it runs right here in the page.
-          const det = parseDeterministic(noteText);
+          const det = parseDeterministic(source);
           const primary = chooseCondition(det.diagnoses);
           json = {
             ...det,
             conditionId: primary?.condition.id ?? null,
-            howtoIds: detectHowTos([...det.instructions, ...det.followUp, noteText]),
+            howtoIds: detectHowTos([...det.instructions, ...det.followUp, source]),
             method: "deterministic",
           };
         }
       } else {
         const fd = new FormData();
-        fd.append("text", noteText);
+        fd.append("text", source);
         Array.from(files ?? []).forEach((f) => fd.append("images", f));
         const r = await fetch("/api/parse-note", { method: "POST", body: fd });
         json = await r.json();
@@ -229,22 +234,51 @@ export default function Home() {
       ];
       setNoteStatus(bits.join(" · "));
 
-      void build(false, {
+      const snap: Snapshot = {
         conditionId: c?.id ?? conditionId,
         customHeadline: c?.plain ?? customHeadline,
         meds: parsedMeds.length ? parsedMeds : meds,
         instructions: instr.length ? instr : instructions,
         howtoIds: parsedHowtos.length ? parsedHowtos : howtoIds,
-      });
+        noteText: source,
+      };
+      void build(false, snap);
+      return snap;
     } catch (e) {
       setNoteError(e instanceof Error ? e.message : String(e));
+      return null;
     } finally {
       setNoteBusy(false);
     }
   }
 
+  /**
+   * Deep links, for demos and screenshots: ?note=wrist|wisdom&turn=1&slide=3
+   * &lang=Spanish&theme=dark&body=female. The page loads, reads the note,
+   * and turns itself.
+   */
+  const [initialSlide, setInitialSlide] = useState(0);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const q = new URLSearchParams(window.location.search);
+    const demo = DEMO_NOTES.find((d) => d.id === q.get("note"));
+    if (!demo) return;
+    const lang = q.get("lang") ?? "English";
+    if (q.get("theme") === "dark") document.documentElement.dataset.theme = "dark";
+    if (q.get("body") === "female") setBodyType("female");
+    setLanguage(lang);
+    setInitialSlide(Math.max(0, Number(q.get("slide") ?? 0) || 0));
+    (async () => {
+      const snap = await ingestNote(undefined, demo.note);
+      if (snap && q.get("turn")) await build(true, { ...snap, language: lang });
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function build(showPatient: boolean, snap?: Snapshot) {
     const cur: Snapshot = snap ?? { conditionId, customHeadline, meds, instructions, howtoIds };
+    const text = cur.noteText ?? noteText;
+    const lang = cur.language ?? language;
 
     // Audio may only start inside a user gesture. The turn is that gesture;
     // the first clip arrives after a fetch, so unlock playback now.
@@ -266,8 +300,8 @@ export default function Home() {
 
       if (IS_STATIC) {
         const bundle = await loadDemoBundle();
-        const hit = bundle.notes.find((n) => n.note.trim() === noteText.trim());
-        const prebuilt = hit?.cards[language] as Card | undefined;
+        const hit = bundle.notes.find((n) => n.note.trim() === text.trim());
+        const prebuilt = hit?.cards[lang] as Card | undefined;
         if (prebuilt) {
           json = { card: prebuilt, warnings: [] };
         } else {
@@ -282,7 +316,7 @@ export default function Home() {
             medOverrides: Object.fromEntries(cur.meds.filter((m) => m.name.trim()).map((m, i) => [i, { purpose: m.purpose ?? null, howToTake: m.howToTake ?? null }])),
             instructions: cur.instructions,
             howtoIds: cur.howtoIds,
-            language,
+            language: lang,
           });
           json = {
             card: card as unknown as Card,
@@ -301,7 +335,7 @@ export default function Home() {
               .map((m) => ({ name: m.name, strength: m.strength ?? null, sig: m.sig, purpose: m.purpose ?? null, howToTake: m.howToTake ?? null })),
             instructions: cur.instructions,
             howtoIds: cur.howtoIds,
-            language,
+            language: lang,
           }),
         });
         json = await r.json();
@@ -352,6 +386,7 @@ export default function Home() {
           rtl={card.rtl}
           body={bodyType}
           onBack={() => turnTo(false)}
+          initialIndex={initialSlide}
         />
       </div>
     );
