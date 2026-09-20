@@ -38,6 +38,6 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "How can I reach the team?",
-    a: "Open an issue on the GitHub repository, or write to Aniketh through aniketh.net.",
+    a: "Open an issue on the GitHub repository.",
   },
 ];
