@@ -8,139 +8,63 @@ Paste the discharge note. Turn the screen around. The patient understands.
 
 ## Inspiration
 
-Patients forget most of what they are told in a visit and misremember much of
-the rest. The fix everyone agrees on is teach-back, where the patient says it
-back in their own words, and it takes minutes a fifteen-minute slot does not
-have. So the explanation evaporates in the parking lot, and the call three
-days later is "what was I supposed to do with the syringe?"
+Patients often forget most of what they are told in a visit and misremember much of the rest. The fix is using a platform that can explain and retain the information from a doctor's visit. It takes minutes; a fifteen-minute slot does not have. So the forgotten visit quickly turns around to be a simple instruction sheet that can help the patient tenfold.
 
-The most valuable screen in medicine is the one the doctor turns toward the
-patient. Nobody owns it. That is where we built.
+We believe the most valuable screen in medicine is the one the doctor turns toward the patient. It brings clarity from misrecollection.
 
 ## What it does
 
-A clinician pastes the note they already wrote: a discharge summary, an
-after-visit summary, a clinic note in prose, an EHR export that leads with
-ICD-10 codes. Aperta assembles what the patient needs and shows the clinician
-every sentence before the screen turns.
+A clinician pastes the note they already wrote: a discharge summary, an after-visit summary, a clinic note, an EHR export with ICD-10 codes. Aperta assembles what the patient needs and shows the clinician every sentence before the screen turns.
 
-- **Where on me.** A hand-drawn body, hers or his, with a red spot over the
-  place, then a zoom into a drawing of the part with the structure marked:
-  *this* bone, *this* socket, *this* valve. Every drawing is our own ink,
-  eighteen views, and every spot is a real structure.
-- **What happened**, in one sentence a person can repeat back, from a library
-  of 205 conditions in 21 categories.
-- **Each medicine**: what it is for, in plain words, and how to take it
-  ("One pill, three times a day. Take it with food. For 7 days.").
-- **Before you prescribe.** On the same screen as the list, one medicine is
-  checked against the rest: duplicates, labelled interactions, the boxed
-  warning, specific populations, dosing, contraindications, and whether a
-  generic exists. Lifted from the FDA label, with a link back to it.
-- **What to do next**, and **how to actually do it**: nine step-by-step
-  walkthroughs (rinsing a tooth socket with the syringe, an inhaler with a
-  spacer, crutches, eye drops, a sling, a dressing, an injection pen, ice and
-  elevation, splint care), attached automatically when the note calls for
-  them.
-- In **Spanish, Vietnamese, Chinese or Arabic**, **read aloud** one screen at
-  a time, advancing when the voice finishes, and **printed** as a one-sheet
-  handout for the fridge.
-
-Then the clinician presses one button and the screen turns: their page swings
-away and the patient's page swings in.
+- **Where on me**: A hand-drawn body with a red spot over the place, then a zoom into a drawing of the part with the structure marked: *this* bone, *this* socket. Every drawing is hand-drawn, eighteen views, and every spot is a real structure.
+- **What happened**: In one sentence, a person can repeat back from a library of 205 conditions in 21 categories.
+- **Each medicine**: Clear instructions on when and how many times the patient should take the medicine.
+- **Before you prescribe**: On the same screen, one medicine is checked against the rest: duplicates, labelled interactions, the boxed warning, specific populations, dosing, contraindications, whether a generic exists. Lifted from the FDA label, with a link back to it.
+- **What to do next** & **how to actually do it**: Nine step-by-step walkthroughs (rinsing a tooth socket with the syringe, an inhaler with a spacer, crutches, eye drops, a sling, a dressing, an injection pen, ice and elevation, splint care), attached automatically when the note calls for them.
+- In **Spanish, Vietnamese, Chinese, or Arabic** & **read aloud features**: Each screen is read aloud, with ElevenLabs on the example notes and the browser's own voice for anything else. Additionally, there is a print-out feature for the HCP to share with the patient.
 
 ## How we built it
 
-Next.js 16, TypeScript, Tailwind. RxNorm and RxClass for drug identity and
-class, openFDA for labels and the NDC directory, MyMemory for key-less
-translation, the browser's own voice for read-aloud with ElevenLabs as an
-option. Every drawing was made by hand in Procreate and dropped in as black ink
-on transparency; a colour filter turns it beige on the dark board.
+Next.js 16 with the App Router, TypeScript and Tailwind v4, exported as a fully static site. Drug identity and class come from RxNorm and RxClass, labels and packaging from openFDA, translation from MyMemory, which needs no key. Read-aloud uses ElevenLabs clips baked in at build time for the example notes, and the browser's own voice for anything a clinician pastes. Every drawing was made by hand in Procreate and exported as black ink on transparency, so one file reads as black ink on paper and beige ink on the dark board.
 
-The published site has no server and needs none: the parser, the card builder
-and the prescriber check are deterministic code that run in the page against
-public services, so any note pasted at the demo link works.
+The published site has no backend and needs none. The parser, the card builder and the prescriber check are ordinary TypeScript running in the page, so any note pasted at the demo link works with no key, and the note itself never reaches a server of ours.
 
-The part we are proudest of is what the model is *not* allowed to do:
+Four rules run through the code:
 
-- **Parsing is deterministic first.** Section headers (about sixty aliases),
-  ICD-10 prefixes on every condition, dose patterns, pipe-delimited EHR
-  fields, prose scanning. A model fills gaps only if one is configured; the
-  demo runs with none.
-- **What a diagnosis becomes is decided by the library.** Each condition
-  carries the words a real note uses ("NSTEMI", "Colles", "HNP", "s/p
-  extraction") and its codes. A code outranks any phrase; the longest phrase
-  wins; "ST depression" on an ECG line is not depression.
-- **What a medicine is for comes from a curated map of about ninety drug
-  classes**, then a visit-context layer (topiramate for a migraine patient is
-  "taken every day to make migraines happen less often", not "prevents
-  seizures"), then the label's own indication simplified. Never "ask your
-  pharmacist." The doctor is in the room.
-- **Translation only translates.** Drug names are never translated; they must
-  match the bottle.
+- **Parsing is deterministic first.** Around eighty section-header aliases, ICD-10 prefixes on every condition, dose patterns, pipe-delimited EHR fields, and a prose scan for notes written with no headers at all. A model fills gaps only when one is configured, and the demo runs with none.
+- **The library decides what a diagnosis becomes.** Each of the 205 conditions carries the words a real note uses for it ("NSTEMI", "Colles", "HNP", "s/p extraction") and its ICD-10 prefixes. A code outranks any phrase, the longest phrase wins, and "ST depression" on an ECG line is not depression.
+- **What a medicine is for comes from 95 curated class rules**, keyed on ATC and EPC identifiers rather than drug names, then a visit-context layer for the cases where the class alone misleads, then the label's own indication. Never "ask your pharmacist", because the doctor is in the room.
+- **Translation only translates.** Drug names pass through untouched, because the patient has to match them to the bottle.
+
+Nothing clinical is generated. Which drawing, which sentence and which warning a note turns into is decided by code and by the library, and the clinician reads all of it before the screen turns around.
 
 ## Challenges
 
-**A real note produced 48 slides, and slide two was a symptom.** A line
-reading `Headache (QOD)` under *Medications* was pushed through as a drug, and
-RxNorm's fuzzy matcher resolved it to an aspirin and caffeine headache powder.
-Every how-to step also had its own slide. We rebuilt both: a line is a
-medication only if it reads as a drug order and the resolution shares a word
-with what was printed; everything else is shown to the clinician as **Not
-used** and the screen does not turn until they have seen it. A how-to is one
-screen with its steps numbered on it. That note is now five screens.
+**A real note produced 48 slides, and slide two was a symptom.** A line reading `Headache (QOD)` under *Medications* was pushed through as a drug, and RxNorm's fuzzy matcher resolved it to a headache powder. Every step of every how-to had a slide of its own as well. Now a line is a medication only if it reads as a drug order and the resolution shares a word with what was printed, anything else is handed back to the clinician under **Not used**, and a walkthrough is one screen with its steps numbered on it. That note is five screens.
 
-**"Real 3D anatomy" was the wrong ask.** We embedded photographic organ models
-and they read as gory to someone who has just had bad news, and a third-party
-model cannot be marked with *your* fracture. So we removed 3D and drew every
-part ourselves: eighteen views, each spot checked against the drawing on a
-labelled sheet before it shipped.
+**No two notes are written the same way.** Testers pasted things the parser had never seen: "Medicine:" where we expected "Medications", sigs that started with a dash, prose with no headers anywhere, and a second note pasted over the first that left the old prescription sitting on screen. Each one became a case in a regression suite that now runs eight note formats on every change, so fixing one note cannot quietly break another.
 
-**The library was forty conditions and it was nothing.** It is now 205, in the
-categories a patient would look under, and the matcher had to grow with it:
-punctuation normalised on both sides, guards for phrases that use a
-condition's name to mean something else, and a search that takes a name, a
-clinical term or a code.
+**"Real 3D anatomy" was the wrong ask.** Photographic organ models read as gory to someone who has just had bad news, and a third-party model cannot be marked with *your* fracture. So we cut 3D and drew all eighteen views ourselves. Getting them in took a small pipeline of its own: crop each drawing to its ink, recolour it to the ink of the page, then print a labelled sheet of every condition's red spot on its drawing and check them by eye. The spot for a Colles fracture sits on the lower end of the radius because someone looked.
 
-**Design is where the hours went.** Three passes to get from "tasteful but
-generic" to something with craft: the interface is drawn in the same ink as
-the anatomy, the marks draw themselves, the screen literally turns, the spot
-searches the body while a note is read and lands with a bounce. And the
-things we took out: cards, shadows, pills, native dropdowns, em dashes, the
-system dark mode.
+**Design is where the hours went.** Three passes to get from tasteful-but-generic to something with craft: the interface is drawn in the same ink as the anatomy, the marks draw themselves, the screen literally turns, and the spot searches the body while a note is read and lands with a bounce. The rest was subtraction: cards, shadows, pills, native dropdowns, the system dark mode.
 
-**Free tiers are budgets.** The ElevenLabs tier is 10,000 characters; we spent
-half of it on text we then restructured. Audio is cached by text hash, and a
-one-line switch reads everything with the browser voice while rehearsing.
-Lesson: bake last.
+## Accomplishments that we're proud of
 
-## Accomplishments
-
-- Runs end to end with **zero API keys**, including the published site.
-  Adding keys adds voice quality, photo input and a prior-auth letter, never a
-  finding.
-- **Every anatomical view is hand-drawn**, with every condition's spot placed
-  on a real structure.
-- A **note-parsing regression** across seven formats (prose H&P, an EHR export
-  with codes, a cardiac discharge, a terse ED note, junk under Medications,
-  both demo notes) that runs on every change.
-- A **refusal discipline** you can demo: type a symptom under Medications and
-  watch it get handed back instead of read aloud.
+- Runs end to end with **zero API keys**, including the published site. Keys add voice quality, photo input and a prior-auth letter, never a finding.
+- **Every anatomical view is hand-drawn**, with every condition's spot on a real structure.
+- A **note-parsing regression** across eight formats that runs on every change.
+- A **refusal discipline** you can demo: type a symptom under Medications and watch it get handed back instead of read aloud.
 - **The turn.** Nobody else's demo turns the laptop around.
 
 ## What we learned
 
-The hard problem was never rendering anatomy or calling a model. It was
-refusing to guess in a domain where a confident wrong sentence ("take the
-headache powder", "usually inexpensive") is a harm, and making that refusal
-visible so a judge, and a clinician, can trust the rest. The second lesson was
-that craft is a series of removals.
+The hard problem was never rendering anatomy or calling a model. It was refusing to guess in a domain where a confident wrong sentence is a harm, and making that refusal visible so a judge, and a clinician, can trust the rest. The second lesson: craft is a series of removals.
 
 ## What's next
 
-Teach-back: the patient says it back, the tool checks that the three facts
-that matter survived. Pharmacist-validated purpose sentences. A bladder for
-the kidney drawing. Per-clinic phrasing. And the recorded voice for every
-screen once the character budget allows.
+Teach-back: the patient says it back, the tool checks that the three facts that matter survived. Pharmacist-validated purpose sentences. Per-clinic phrasing. The recorded voice on every screen once the character budget allows.
+
+*Educational demo. Not medical advice. No real patient data was used.*
 
 ---
 
