@@ -216,10 +216,10 @@ export function PatientStory({ slides, diagram, marks, langTag, rtl, body: initi
        <div>
         {slide.kind === "howto" && slide.art && (
           <div className="flex items-end gap-6 mb-6">
-            <div className="w-40 sm:w-56 p-4">
-              <HowToArt id={slide.art} />
+            <div className="h-36 sm:h-48 flex items-end">
+              <HowToArt id={slide.art} fit />
             </div>
-                      </div>
+          </div>
         )}
 
         {slide.kicker && (

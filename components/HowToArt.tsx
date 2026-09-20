@@ -6,12 +6,16 @@ import { InkImage } from "@/components/InkImage";
  * One simple picture per procedure: the object in the hand, nothing else.
  * Line art in currentColor, the same visual language as the anatomy.
  */
-export function HowToArt({ id, className }: { id: ArtId; className?: string }) {
+export function HowToArt({ id, className, fit = false }: { id: ArtId; className?: string; fit?: boolean }) {
+  // Size by the container's height instead of its width when asked, so a
+  // tall drawing (crutches) takes the same room as a wide one (a syringe).
+  const sizing = fit ? { height: "100%", width: "auto", maxWidth: "100%" } : { width: "100%", height: "auto" };
+
   // The clinician's own drawing, when there is one.
   const drawn = HOWTO_ART[id];
   if (drawn) {
     return (
-      <div className={className} role="img" aria-label={drawn.label} style={{ width: "100%", aspectRatio: `${drawn.w} / ${drawn.h}` }}>
+      <div className={className} role="img" aria-label={drawn.label} style={{ aspectRatio: `${drawn.w} / ${drawn.h}`, ...sizing }}>
         <InkImage src={drawn.src} className="block w-full h-full" />
       </div>
     );
@@ -28,7 +32,7 @@ export function HowToArt({ id, className }: { id: ArtId; className?: string }) {
     viewBox: "0 0 240 240",
     className,
     role: "img" as const,
-    style: { color: "var(--foreground)", width: "100%", height: "auto" },
+    style: { color: "var(--ink)", ...sizing },
   };
   const hi = { stroke: "var(--high)", fill: "var(--high-bg)" };
 
