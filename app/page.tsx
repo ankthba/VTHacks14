@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { InkArrow, InkCheck, InkGlass, InkRing, InkUnderline } from "@/components/Ink";
 import { Menu } from "@/components/Menu";
 import { PrescriberCheck } from "@/components/PrescriberCheck";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { SiteNav } from "@/components/SiteNav";
 import { CONDITIONS, REGIONS } from "@/lib/anatomy/conditions";
 import type { DiagramId } from "@/lib/anatomy/conditions";
 import { Diagram } from "@/components/Diagram";
@@ -401,22 +401,7 @@ export default function Home() {
   return (
     <div className={`ink-green flex-1 w-full ${flip ? `turn ${flip}` : ""}`}>
       <div className="max-w-6xl mx-auto px-5">
-        <nav className="nav rise">
-          <a href={IS_STATIC ? "./" : "/"} className="wordmark flex items-center gap-2">
-            <img src={asset("/anatomy/spot.png")} alt="" width={18} height={17} draggable={false} />
-            {APP_NAME}
-          </a>
-          <div className="nav-links">
-            <a href={IS_STATIC ? "./" : "/"} className="nav-link on" aria-current="page">Explain a note</a>
-            <a href={IS_STATIC ? "./diagrams/" : "/diagrams"} className="nav-link">Anatomy library</a>
-          </div>
-          <div className="nav-right">
-            <ThemeToggle />
-            <a href="https://github.com/ankthba/VTHacks14" className="nav-link" target="_blank" rel="noopener noreferrer">
-              GitHub<span className="nav-ext" aria-hidden>&#8599;</span>
-            </a>
-          </div>
-        </nav>
+        <SiteNav current="explain" className="rise" />
 
         <header className="pt-12 pb-10 rise" style={{ animationDelay: "60ms" }}>
           <h1 className="display" style={{ fontSize: "clamp(2.4rem, 5vw, 4rem)" }}>

@@ -1,10 +1,8 @@
 import { CONDITIONS, REGIONS, type DiagramId } from "@/lib/anatomy/conditions";
 import { Diagram } from "@/components/Diagram";
 import { VIEWS } from "@/lib/anatomy/views";
-import { InkArrow } from "@/components/Ink";
 import { UpButton } from "@/components/UpButton";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { IS_STATIC, asset } from "@/lib/staticMode";
+import { SiteNav } from "@/components/SiteNav";
 
 /** Every view once, drawn plain: the red belongs to a diagnosis, not a catalogue. */
 function uniqueViews(): DiagramId[] {
@@ -29,24 +27,7 @@ export default function DiagramsPage() {
   return (
     <main id="top" className="flex-1 w-full max-w-6xl mx-auto px-5 pb-16">
       <UpButton />
-      <nav className="nav">
-        <a href={IS_STATIC ? "../" : "/"} className="wordmark flex items-center gap-2">
-          <img src={asset("/anatomy/spot.png")} alt="" width={18} height={17} draggable={false} />
-          {APP_NAME}
-        </a>
-        <div className="nav-links">
-          <a href={IS_STATIC ? "../" : "/"} className="nav-link flex items-center gap-2">
-            <InkArrow className="inline-block -scale-x-100" /> Explain a note
-          </a>
-          <a href="#top" className="nav-link on" aria-current="page">Anatomy library</a>
-        </div>
-        <div className="nav-right">
-          <ThemeToggle />
-          <a href="https://github.com/ankthba/VTHacks14" className="nav-link" target="_blank" rel="noopener noreferrer">
-            GitHub<span className="nav-ext" aria-hidden>&#8599;</span>
-          </a>
-        </div>
-      </nav>
+      <SiteNav current="library" depth={1} />
       <h1 className="display text-5xl mt-12">Anatomy library</h1>
       <p className="text-lg text-[color:var(--muted)] mt-3 max-w-2xl">
         {CONDITIONS.length} conditions across{" "}
