@@ -168,5 +168,5 @@ already has the content and the HCP network. That's you."
 Label-derived and library-derived only; 205 conditions; class-based purposes
 corrected by visit context but still wrong for some off-label uses, which is
 why every sentence is editable and shown first; free machine translation;
-deterministic parsing tuned on seven formats; drawings that show where, not
+deterministic parsing tuned on eight formats; drawings that show where, not
 surgical detail; educational demo, not medical advice.
