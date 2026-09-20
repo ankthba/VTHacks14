@@ -564,8 +564,10 @@ html { scroll-behavior: smooth; }
 
 /* The note: a pad of slightly darker paper, no box, grows with what you paste. */
 .field.note {
-  border: 0;
+  border: 1px solid var(--line);
   background: var(--surface-warm);
+  cursor: text;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
   border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px;
   padding: 18px 22px;
   min-height: 12.5em;
@@ -573,8 +575,9 @@ html { scroll-behavior: smooth; }
   field-sizing: content;
   line-height: 1.6;
 }
-.field.note:focus { box-shadow: inset 0 0 0 2px var(--accent); }
-.field.note::placeholder { color: #a39889; }
+.field.note:hover { border-color: var(--muted); }
+.field.note:focus { border-color: var(--accent-text); box-shadow: inset 0 0 0 1px var(--accent-text); }
+.field.note::placeholder { color: #9a8f80; font-style: italic; }
 
 /* Our own menu: a sheet of paper that rises under the trigger. */
 .menu {

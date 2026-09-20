@@ -428,18 +428,23 @@ export default function Home() {
                 <h2 className="display-sm text-2xl">Start from the note</h2>
               </div>
 
-              <div className="flex flex-wrap gap-2 mb-3">
-                {DEMO_NOTES.map((d) => (
-                  <button key={d.id} onClick={() => { setNoteText(d.note); setNoteError(null); }} className={`chip ${noteText.trim() === d.note.trim() ? "on" : ""}`}>
-                    {d.title}
-                  </button>
-                ))}
+              <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 mb-2">
+                <label htmlFor="note" className="field-label" style={{ marginBottom: 0 }}>Your note</label>
+                <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[13px] text-[color:var(--muted)]">
+                  or try an example:
+                  {DEMO_NOTES.map((d) => (
+                    <button key={d.id} onClick={() => { setNoteText(d.note); setNoteError(null); }} className={`chip ${noteText.trim() === d.note.trim() ? "on" : ""}`}>
+                      {d.title}
+                    </button>
+                  ))}
+                </span>
               </div>
               <textarea
+                id="note"
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
                 rows={7}
-                placeholder={"Discharge Diagnosis: Distal radius fracture, left\n\nDischarge Medications:\n1. Ibuprofen 600 mg PO TID with food x 7 days\n\nFollow-up:\n- Orthopedics in 2 weeks for repeat X-ray"}
+                placeholder={"Click here and paste the note: a discharge summary, a clinic note, an EHR export. Nothing is stored."}
                 className="field note text-[15px] leading-relaxed"
               />
               <input ref={noteFileRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => ingestNote(e.target.files)} />
