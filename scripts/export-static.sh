@@ -21,10 +21,10 @@ done
 
 sh scripts/declutter.sh
 rm -rf out .next .next.nosync
-# VOICE=browser (the default for now) reads every screen with the browser's
-# own voice. Build with VOICE=elevenlabs to ship the recorded clips again.
+# VOICE=elevenlabs (the default) ships the recorded clips for the example
+# notes; VOICE=browser reads every screen with the browser's own voice.
 # BASE_PATH is where the site lives on its host: /aperta under aniketh.net
 # (the default), or empty for a domain of its own: BASE_PATH= npm run export:static
-NEXT_PUBLIC_VOICE="${VOICE:-browser}" NEXT_PUBLIC_STATIC=1 NEXT_PUBLIC_BASE_PATH="${BASE_PATH-/aperta}" npx next build
+NEXT_PUBLIC_VOICE="${VOICE:-elevenlabs}" NEXT_PUBLIC_STATIC=1 NEXT_PUBLIC_BASE_PATH="${BASE_PATH-/aperta}" npx next build
 echo
 echo "static site in ./out  ($(find out -type f | wc -l | tr -d ' ') files)"
