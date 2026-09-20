@@ -8,4 +8,5 @@ import type { HowToArt } from "./howto";
  */
 export const HOWTO_ART: Partial<Record<HowToArt, { src: string; w: number; h: number; label: string }>> = {
   syringe: { src: asset("/anatomy/howto-syringe.png"), w: 1003, h: 442, label: "The syringe for rinsing the socket" },
+  inhaler: { src: asset("/anatomy/howto-inhaler.png"), w: 1248, h: 698, label: "The inhaler pushed into its spacer" },
 };
