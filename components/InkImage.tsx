@@ -1,15 +1,8 @@
 /**
- * A drawing rendered as ink of the page's choosing.
- *
- * The PNG's alpha is used as a mask over the current --ink colour, so the same
- * file reads deep green on one page and black on another. Paper does not
- * print backgrounds, so a plain image takes over in print.
+ * A drawing, as a plain image. The files are black ink on transparency; on
+ * the dark board a CSS filter turns that ink beige. A plain <img> paints
+ * predictably inside sticky columns and prints as-is, where a mask did not.
  */
 export function InkImage({ src, alt = "", className = "" }: { src: string; alt?: string; className?: string }) {
-  return (
-    <>
-      <div className={`ink-img print:hidden ${className}`} style={{ "--src": `url(${src})` } as React.CSSProperties} role={alt ? "img" : undefined} aria-label={alt || undefined} aria-hidden={alt ? undefined : true} />
-      <img src={src} alt={alt} className={`hidden print:block ${className}`} draggable={false} />
-    </>
-  );
+  return <img src={src} alt={alt} className={`ink-img ${className}`} draggable={false} aria-hidden={alt ? undefined : true} />;
 }

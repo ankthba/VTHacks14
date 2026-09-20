@@ -661,9 +661,9 @@ export default function Home() {
               </div>
 
               {(hovered ?? selected) ? (
-                <div key={(hovered ?? selected)!.id} className="mx-auto max-w-[220px] mb-5 fade"><Diagram id={(hovered ?? selected)!.diagram} marks={(hovered ?? selected)!.marks} /></div>
+                <div key={(hovered ?? selected)!.id} className="mx-auto max-w-[220px] mb-5"><Diagram id={(hovered ?? selected)!.diagram} marks={(hovered ?? selected)!.marks} /></div>
               ) : !noteBusy && regionView !== "body" ? (
-                <div key={regionView} className="mx-auto max-w-[220px] mb-5 fade" aria-hidden><Diagram id={regionView} /></div>
+                <div key={regionView} className="mx-auto max-w-[220px] mb-5" aria-hidden><Diagram id={regionView} /></div>
               ) : (
                 <div className="mx-auto h-44 mb-5 flex items-end justify-center gap-6 transition-opacity duration-500" aria-hidden style={{ opacity: noteBusy ? 1 : 0.3 }}>
                   <div className="h-full"><Figure region="body" body="female" spot={false} searching={noteBusy} /></div>
@@ -671,7 +671,7 @@ export default function Home() {
                 </div>
               )}
               {(hovered?.plain || customHeadline || selected?.plain) && (
-                <p key={hovered?.id ?? "chosen"} className="display-sm fade" style={{ fontSize: "1.6rem" }}>{hovered?.plain || customHeadline || selected?.plain}</p>
+                <p key={hovered?.id ?? "chosen"} className="display-sm" style={{ fontSize: "1.6rem" }}>{hovered?.plain || customHeadline || selected?.plain}</p>
               )}
 
               {meds.filter((m) => m.name.trim()).length > 0 && (

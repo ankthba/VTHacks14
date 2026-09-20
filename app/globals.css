@@ -553,12 +553,10 @@ html { scroll-behavior: smooth; }
 }
 .row:hover .ink-radio { transform: scale(1.1); }
 
-/* The drawings are masks over the page's ink, so a page can choose its colour. */
-.ink-img {
-  background-color: var(--ink);
-  -webkit-mask: var(--src) center / contain no-repeat;
-  mask: var(--src) center / contain no-repeat;
-}
+/* The drawings are black ink on transparency. On the dark board the ink turns beige. */
+.ink-img { object-fit: contain; }
+:root[data-theme="dark"] .ink-img { filter: invert(1) sepia(0.3) brightness(0.96); }
+:root[data-theme="dark"] .portrait .ink-img { filter: none; }
 /* Every drawing is black ink on paper. In dark mode, beige. */
 .ink-green { --ink: #1f1c19; }
 
