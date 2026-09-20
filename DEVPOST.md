@@ -18,10 +18,10 @@ A clinician pastes the note they already wrote: a discharge summary, an after-vi
 
 - **Where on me**: A hand-drawn body with a red spot over the place, then a zoom into a drawing of the part with the structure marked: *this* bone, *this* socket. Every drawing is hand-drawn, eighteen views, and every spot is a real structure.
 - **What happened**: In one sentence, a person can repeat back from a library of 205 conditions in 21 categories.
-- **Each medicine**: Clear instructions on when and how many times the patient should take the medicine.
+- **Each medicine**: Clear instructions on when and how many times the patient should take the medicine. 
 - **Before you prescribe**: On the same screen, one medicine is checked against the rest: duplicates, labelled interactions, the boxed warning, specific populations, dosing, contraindications, whether a generic exists. Lifted from the FDA label, with a link back to it.
 - **What to do next** & **how to actually do it**: Nine step-by-step walkthroughs (rinsing a tooth socket with the syringe, an inhaler with a spacer, crutches, eye drops, a sling, a dressing, an injection pen, ice and elevation, splint care), attached automatically when the note calls for them.
-- In **Spanish, Vietnamese, Chinese, or Arabic** & **read aloud features**: Each screen is read aloud, with ElevenLabs on the example notes and the browser's own voice for anything else. Additionally, there is a print-out feature for the HCP to share with the patient.
+- In **Spanish, Vietnamese, Chinese, or Arabic** & **read aloud features**: Each screen can be read aloud using ElevenLabs, as well as having different language features. Additionally, there is a print-out feature for the HCP to share with the patient.
 
 ## How we built it
 
@@ -52,7 +52,7 @@ Nothing clinical is generated. Which drawing, which sentence and which warning a
 
 - Runs end to end with **zero API keys**, including the published site. Keys add voice quality, photo input and a prior-auth letter, never a finding.
 - **Every anatomical view is hand-drawn**, with every condition's spot on a real structure.
-- A **note-parsing regression** across eight formats that runs on every change.
+- A **note-parsing regression** across seven formats that runs on every change.
 - A **refusal discipline** you can demo: type a symptom under Medications and watch it get handed back instead of read aloud.
 - **The turn.** Nobody else's demo turns the laptop around.
 
