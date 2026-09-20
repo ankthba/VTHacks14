@@ -14,13 +14,16 @@ export const TEAM: Person[] = [
   {
     name: "Aniketh Bandlamudi",
     college: "CS & Applied Math @ UVA",
-    links: [],
+    links: [
+      { label: "aniketh.net", href: "https://aniketh.net" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/in/anikethb/" },
+    ],
     portrait: "/anatomy/portrait-aniketh.png",
   },
   {
     name: "Lauren Kim",
     college: "Mechanical Engineering & Math @ Virginia Tech",
-    links: [],
+    links: [{ label: "LinkedIn", href: "https://www.linkedin.com/in/lauren-kim-554ba02bb/" }],
     portrait: "/anatomy/portrait-lauren.png",
   },
 ];
