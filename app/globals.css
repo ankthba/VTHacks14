@@ -843,3 +843,14 @@ html { scroll-behavior: smooth; }
   .values-list { grid-template-columns: 1fr; }
   .faq-a p { padding-left: 0; }
 }
+
+/* The team, as the app's two figures with their own faces. A photo, so it is
+   never masked; on the dark board it sits on a paper print instead. */
+.team-art { height: 320px; }
+.team-art img { height: 100%; width: auto; display: block; }
+:root[data-theme="dark"] .team-art img {
+  background: #f4efe4;
+  padding: 14px 18px 6px;
+  border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px;
+}
+@media (max-width: 860px) { .team-art { height: 240px; } }

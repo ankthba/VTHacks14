@@ -17,7 +17,7 @@ export const TEAM: Person[] = [
   },
   {
     name: "Lauren Kim",
-    college: "Mechanical Engineering @ Virginia Tech",
+    college: "Mechanical Engineering & Math @ Virginia Tech",
     links: [],
   },
 ];

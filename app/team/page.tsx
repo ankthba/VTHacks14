@@ -1,6 +1,5 @@
 import { SiteNav } from "@/components/SiteNav";
 import { InkUnderline, InkRing } from "@/components/Ink";
-import { InkImage } from "@/components/InkImage";
 import { APP_NAME } from "@/lib/brand";
 import { TEAM, VALUES } from "@/lib/team";
 import { asset } from "@/lib/staticMode";
@@ -24,10 +23,8 @@ export default function TeamPage() {
             We make what a doctor says easier to understand: carefully, calmly, and with respect for the person it is for.
           </p>
         </div>
-        <div className="page-hero-art" aria-hidden>
-          <div style={{ height: "100%", aspectRatio: "902 / 1149" }}>
-            <InkImage src={asset("/anatomy/bodies.png")} className="block w-full h-full" />
-          </div>
+        <div className="page-hero-art team-art">
+          <img src={asset("/anatomy/team.png")} alt="Lauren and Aniketh, drawn as the app's two figures with their own faces" draggable={false} />
         </div>
       </header>
 
