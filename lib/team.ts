@@ -1,11 +1,10 @@
 /**
- * The people. Edit here; the page reads this. A person without a photo gets
- * their initials in a drawn ring.
+ * The people: a name and a college. Edit here; the page reads this. A person
+ * without a photo gets their initials in a drawn ring.
  */
 export interface Person {
   name: string;
-  role: string;
-  bio: string;
+  college: string;
   links: { label: string; href: string }[];
   photo?: string;
 }
@@ -13,18 +12,15 @@ export interface Person {
 export const TEAM: Person[] = [
   {
     name: "Aniketh Bandlamudi",
-    role: "Product, engineering, design",
-    bio: "Built the tool end to end at VTHacks 14: the note parser, the condition library, the prescriber check, and the paper-and-ink interface. Believes the most useful thing a screen can do in an exam room is turn around.",
+    college: "University of Virginia",
     links: [
       { label: "aniketh.net", href: "https://aniketh.net" },
       { label: "GitHub", href: "https://github.com/ankthba" },
     ],
   },
   {
-    // TODO: fill in. Name, role and a line or two.
-    name: "Teammate",
-    role: "Illustration, clinical framing",
-    bio: "Drew every body, bone and organ in the app by hand, so nothing a patient sees looks like a specimen, and kept every sentence honest.",
+    name: "Lauren Kim",
+    college: "Virginia Tech",
     links: [],
   },
 ];

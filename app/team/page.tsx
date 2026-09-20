@@ -47,8 +47,7 @@ export default function TeamPage() {
             <div>
               <p className="eyebrow">{String(n + 1).padStart(2, "0")}</p>
               <h2 className="display-sm text-3xl">{p.name}</h2>
-              <p className="meta-chip mt-1">{p.role}</p>
-              <p className="mt-4 text-[15px] leading-relaxed text-[color:var(--muted)]">{p.bio}</p>
+              <p className="mt-2 text-[16px] text-[color:var(--muted)]">{p.college}</p>
               {p.links.length > 0 && (
                 <p className="mt-4 flex flex-wrap gap-4">
                   {p.links.map((l) => (
