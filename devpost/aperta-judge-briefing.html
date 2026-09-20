@@ -1,0 +1,636 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<title>Aperta: judge briefing</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Figtree:wght@400;500;650&display=swap" rel="stylesheet">
+<style>
+@page { size: Letter; margin: 16mm 15mm 14mm; }
+:root { --paper:#f7f3ea; --ink:#1f1c19; --soft:#5d574d; --line:#cfc6b4; --accent:#c3d8a6; --warn:#b4503c; }
+* { box-sizing: border-box; }
+html { background:#f7f3ea; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+@page { background:#f7f3ea; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Figtree","Avenir Next","Helvetica Neue",sans-serif; font-size:9.6pt; line-height:1.5; }
+h1,h2,h3,h4 { font-family:"Lora",Georgia,serif; font-weight:600; }
+h1 { font-size:30pt; line-height:1.05; margin:0 0 6pt; letter-spacing:-0.01em; }
+h2 { font-size:15pt; margin:0 0 3pt; }
+h3 { font-size:11.4pt; margin:14pt 0 4pt; }
+h4 { font-size:10pt; margin:10pt 0 2pt; }
+p { margin:0 0 6pt; }
+ul,ol { margin:0 0 7pt; padding-left:15pt; }
+li { margin:0 0 3pt; }
+strong { font-weight:650; }
+em { font-style:italic; }
+.sheet { page-break-after:always; }
+.sheet:last-child { page-break-after:auto; }
+.cover { height:238mm; display:flex; flex-direction:column; justify-content:center; }
+.cover h1 { font-size:58pt; }
+.cover .sub { font-size:14pt; font-family:"Lora",Georgia,serif; color:var(--soft); margin-top:2pt; }
+.cover .meta { margin-top:26pt; font-size:10pt; color:var(--soft); line-height:1.8; }
+.rule { height:5px; background:var(--accent); border-radius:60% 40% 55% 45%/55% 45% 60% 40%; margin:10pt 0 12pt; width:100%; }
+.rule.short { width:64pt; }
+.kicker { font-size:8pt; letter-spacing:.14em; text-transform:uppercase; color:var(--soft); margin:0 0 2pt; }
+table { width:100%; border-collapse:collapse; margin:4pt 0 9pt; font-size:9.2pt; }
+th,td { text-align:left; padding:3.5pt 6pt 3.5pt 0; border-bottom:1px solid var(--line); vertical-align:top; }
+th { font-size:7.8pt; letter-spacing:.1em; text-transform:uppercase; color:var(--soft); font-weight:600; }
+td.n { font-family:"Lora",Georgia,serif; font-size:11pt; white-space:nowrap; width:78pt; }
+.qa { margin:0 0 9pt; page-break-inside:avoid; }
+.qa .q { font-family:"Lora",Georgia,serif; font-size:10.4pt; font-weight:600; margin:0 0 2pt; }
+.qa .a { margin:0 0 3pt; }
+.qa .push { font-size:8.8pt; color:var(--soft); border-left:2px solid var(--line); padding-left:7pt; margin:3pt 0 0; }
+.two { column-count:2; column-gap:20pt; }
+.two .qa { break-inside:avoid; }
+.box { border:1px solid var(--line); border-radius:10px 12px 9px 11px; padding:9pt 11pt; margin:6pt 0 10pt; background:rgba(255,255,255,.4); page-break-inside:avoid; }
+.box.warn { border-color:var(--warn); }
+.box h4 { margin-top:0; }
+.say { background:rgba(195,216,166,.3); padding:1pt 3pt; border-radius:3px; }
+.mono { font-family:"SF Mono",Menlo,monospace; font-size:8.4pt; }
+.script td { border:none; padding:2.5pt 8pt 2.5pt 0; }
+.script td.t { font-family:"SF Mono",Menlo,monospace; font-size:8pt; color:var(--soft); white-space:nowrap; width:46pt; }
+.script td.do { width:150pt; }
+.foot { position:running(foot); }
+.small { font-size:8.6pt; color:var(--soft); }
+.gl { font-size:9pt; }
+.gl dt { font-weight:650; float:left; clear:left; margin-right:5pt; }
+.gl dd { margin:0 0 2.5pt 0; color:var(--soft); }
+.gl dd::before { content:""; }
+.nowrap { white-space:nowrap; }
+.check { list-style:none; padding-left:0; }
+.check li { padding-left:16pt; position:relative; }
+.check li::before { content:"□"; position:absolute; left:0; color:var(--soft); }
+
+</style></head><body>
+
+<section class="sheet cover">
+  <p class="kicker">VTHacks 14 &middot; September 2026 &middot; Impiricus track</p>
+  <h1>Aperta</h1>
+  <p class="sub">Judge briefing. Everything we might be asked, and what we say.</p>
+  <div class="rule"></div>
+  <div class="meta">
+    <strong>Aniketh Bandlamudi</strong>, CS &amp; Applied Math @ UVA<br>
+    <strong>Lauren Kim</strong>, Mechanical Engineering &amp; Math @ Virginia Tech<br><br>
+    Live: <strong>aperta.health</strong> &nbsp;&middot;&nbsp; also aniketh.net/aperta<br>
+    Code: github.com/ankthba/VTHacks14<br><br>
+    <span class="small">Educational demo. Not medical advice. No real patient data was used.<br>
+    Read the first two pages if you read nothing else.</span>
+  </div>
+</section>
+
+<section class="sheet">
+  <p class="kicker">Page one</p>
+  <h2>If you only read one page</h2>
+  <div class="rule short"></div>
+
+  <h3>The answer to "what is it?"</h3>
+  <p>A clinician pastes the note they already wrote. Aperta turns it into what the patient
+  still understands at home: where on their body, one plain sentence, each medicine and how
+  to take it, what to do next, and how to actually do it. In their language, read aloud, one
+  idea per screen, printed on one sheet. Then the clinician turns the screen around.</p>
+
+  <h3>The three sentences that do the work</h3>
+  <ol>
+    <li><strong>The moment.</strong> The most valuable screen in medicine is the one a doctor
+    turns toward a patient, and nobody owns it. A rep is never in that room.</li>
+    <li><strong>The problem.</strong> Patients forget most of what they are told in a visit.
+    The fix everyone agrees on is teach-back, and a fifteen-minute slot does not allow it, so
+    the explanation has to become an artifact instead.</li>
+    <li><strong>The discipline.</strong> Nothing clinical is generated. Which drawing and which
+    sentence a diagnosis becomes is decided by a curated library, every skipped line is shown
+    to the clinician, and the whole thing runs with no API keys.</li>
+  </ol>
+
+  <h3>The three things to show, in order</h3>
+  <ol>
+    <li>The spot searching the body and landing on the jaw.</li>
+    <li><strong>Not used</strong>: the line it refused to read as a drug.</li>
+    <li>The turn, then the walkthrough read aloud, then Spanish, then print.</li>
+  </ol>
+
+  <div class="box">
+    <h4>If a judge asks one question, it is probably this</h4>
+    <p><em>"How do you know it will not tell a patient something wrong?"</em></p>
+    <p class="say">Because nothing clinical is written by a model. The 205 plain sentences are
+    ours and fixed. What a medicine is for comes from 95 curated class rules keyed on the drug
+    classification, not on the drug's name. Warnings are quoted from the FDA label with a link
+    back to it. A model, when one is configured, only translates or fills a parsing gap, and
+    the demo runs with none. And the clinician reads every sentence before the screen turns,
+    because the screen turning is a physical act they perform.</p>
+  </div>
+</section>
+
+<section class="sheet">
+  <p class="kicker">Facts</p>
+  <h2>Numbers we must not get wrong</h2>
+  <div class="rule short"></div>
+  <table>
+    <tr><th>Number</th><th>What it is</th></tr>
+    <tr><td class="n">205</td><td>Conditions in the library, each with one plain sentence, the words a real note uses for it, its ICD-10 prefixes, and a drawing with a structure to mark.</td></tr>
+    <tr><td class="n">21</td><td>Categories a patient would look under. Head &amp; brain, Chest &amp; heart, Wrist &amp; hand, Mind &amp; mood, and so on.</td></tr>
+    <tr><td class="n">18</td><td>Hand-drawn anatomical views. Body, head, eye, ear, mouth, neck, shoulder, elbow, wrist and hand, heart, lungs, abdomen, kidneys and bladder, spine, hip, knee, ankle, skin.</td></tr>
+    <tr><td class="n">9</td><td>Step-by-step walkthroughs, each with its own drawing: socket syringe, inhaler with spacer, crutches, eye drops, sling, dressing change, injection pen, ice and elevation, splint care.</td></tr>
+    <tr><td class="n">95</td><td>Curated drug-class rules, keyed on ATC and EPC class identifiers rather than drug names.</td></tr>
+    <tr><td class="n">~80</td><td>Section-header aliases the parser knows, so "Medicine:", "Rx:", "Home medications" and "Discharge Medications" all land in the same place.</td></tr>
+    <tr><td class="n">8</td><td>Note formats in the regression suite, run on every change.</td></tr>
+    <tr><td class="n">5</td><td>Languages: English, Spanish, Vietnamese, Chinese (Simplified), Arabic. Arabic renders right to left.</td></tr>
+    <tr><td class="n">0</td><td>API keys required, including on the published site.</td></tr>
+    <tr><td class="n">2</td><td>Live URLs: aperta.health and aniketh.net/aperta. Both static, both HTTPS.</td></tr>
+  </table>
+
+  <h3>The stack, in one breath</h3>
+  <p>Next.js 16 with the App Router, TypeScript, Tailwind v4, exported as a fully static site
+  and hosted on GitHub Pages. Drug identity and class from RxNorm and RxClass at the National
+  Library of Medicine. Labels and packaging from openFDA. Translation from MyMemory. Voice from
+  ElevenLabs for the example notes, the browser's own speech for everything else. Drawings made
+  by hand in Procreate.</p>
+
+  <h3>What each service gives us</h3>
+  <table>
+    <tr><th>Service</th><th>What we ask it</th><th>Key</th></tr>
+    <tr><td>RxNav / RxNorm</td><td>What drug is this text, what are its active ingredients, what classes is it in</td><td>None</td></tr>
+    <tr><td>openFDA label</td><td>Boxed warning, contraindications, dosing, specific populations, interactions</td><td>Optional</td></tr>
+    <tr><td>openFDA NDC directory</td><td>How many marketed generics exist, as a proxy for how hard it is to fill</td><td>None</td></tr>
+    <tr><td>MyMemory</td><td>Translation of the patient sentences</td><td>None</td></tr>
+    <tr><td>ElevenLabs</td><td>Recorded voice, baked into the build for the example notes</td><td>Ours</td></tr>
+  </table>
+  <p class="small">The retired RxNav interaction endpoint is deliberately not called. It was
+  withdrawn in January 2024, so labelled interactions come from the FDA label text instead.</p>
+</section>
+<section class="sheet">
+  <p class="kicker">On stage</p>
+  <h2>The demo, click by click</h2>
+  <div class="rule short"></div>
+  <p>Ninety seconds. Paste the wisdom-tooth note, because it produces a walkthrough, which is
+  the part nobody else has.</p>
+  <table class="script">
+    <tr><td class="t">0:00</td><td class="do"><strong>Paste the note.</strong></td><td>"This is the note the surgeon already wrote. I am not asking anyone to type anything new."</td></tr>
+    <tr><td class="t">0:08</td><td class="do">Watch the spot search the body and land on the jaw.</td><td>"While it reads, the spot is looking for the place."</td></tr>
+    <tr><td class="t">0:20</td><td class="do">Point at <strong>Not used</strong>.</td><td>"It refused to read that line as a drug. Refusing is a feature, and the clinician sees what was refused."</td></tr>
+    <tr><td class="t">0:32</td><td class="do">Scroll to <strong>Before you prescribe</strong>, pick a medicine.</td><td>"Same screen as the list. Duplicates, interactions, the boxed warning, all quoted from the FDA label with a link back."</td></tr>
+    <tr><td class="t">0:45</td><td class="do"><strong>Press the button. Turn the laptop.</strong></td><td>Say nothing for two seconds. Let them watch the screen turn.</td></tr>
+    <tr><td class="t">0:52</td><td class="do">Body, jaw, back molars. Then the medicine screen.</td><td>"One idea per screen, read aloud, and it advances when the reading finishes."</td></tr>
+    <tr><td class="t">1:05</td><td class="do">The socket walkthrough, steps numbered on the drawing.</td><td>"This is the phone call three days later that nobody has to make."</td></tr>
+    <tr><td class="t">1:18</td><td class="do">Switch to <strong>Spanish</strong>.</td><td>"Drug names are never translated, because the patient has to match them to the bottle."</td></tr>
+    <tr><td class="t">1:26</td><td class="do"><strong>Print this.</strong></td><td>"One sheet for the fridge. The drawing goes with it."</td></tr>
+  </table>
+
+  <h3>Controls worth knowing</h3>
+  <ul>
+    <li><strong>Space</strong> pauses and resumes. <strong>Left and right arrows</strong> move a screen. The strokes along the top jump to a screen.</li>
+    <li>Tap the picture to zoom back out to the whole body.</li>
+    <li><strong>Evergreen</strong> is the dark mode, on only by the button, never by the system. The sun and moon toggle sits in the nav.</li>
+    <li>The anatomy library at <span class="mono">/diagrams</span> shows all 18 views and every condition, with a one-line explanation of each part on hover.</li>
+    <li>Deep links for a clean restart: <span class="mono">?note=wisdom&amp;turn=1</span>, plus <span class="mono">&amp;lang=Spanish</span>, <span class="mono">&amp;slide=3</span>, <span class="mono">&amp;theme=dark</span>.</li>
+  </ul>
+
+  <div class="box">
+    <h4>Second note, if they want another</h4>
+    <p>The broken-wrist discharge summary. It gives two medicines, a splint-care walkthrough,
+    ice and elevation, and a follow-up. Good for showing the medicine sentences and the
+    prescriber check, because ibuprofen and acetaminophen are a real duplicate-risk pair.</p>
+  </div>
+</section>
+
+<section class="sheet">
+  <p class="kicker">Under the hood</p>
+  <h2>How it works, in six steps</h2>
+  <div class="rule short"></div>
+  <ol>
+    <li><strong>Parse.</strong> The note is walked line by line. A header is recognised from
+    about eighty aliases, so "Dx:", "Medicine:", "Discharge Medications" and "Home medications"
+    all land correctly. A line before any header survives only if it unmistakably reads as a
+    drug order. Notes with no headers at all fall through to a prose scan.</li>
+    <li><strong>Refuse.</strong> Under a medications header, a line becomes a medicine only if
+    it parses as a drug order: a name followed by a number and a unit. Anything else is put in
+    front of the clinician as <strong>Not used</strong> rather than guessed at.</li>
+    <li><strong>Resolve.</strong> Each medicine goes to RxNorm for its identity, its active
+    ingredients and its classes. A resolution is kept only if the printed name shares a word
+    with the canonical name, or the line carried a dose. This is the guard that stopped
+    "Headache (QOD)" becoming an aspirin and caffeine powder.</li>
+    <li><strong>Match.</strong> The diagnosis is matched against the 205-condition library. An
+    ICD-10 prefix outranks any phrase, and among phrases the longest match wins, so "ST
+    depression" on an ECG line does not become depression. The match decides the drawing, the
+    structure to mark and the plain sentence.</li>
+    <li><strong>Build.</strong> What each medicine is for comes from 95 curated class rules
+    keyed on ATC and EPC identifiers, with a visit-context layer where the class alone
+    misleads, and the label's own indication as a last resort. How to take it is rewritten
+    from the sig. Instructions that name a procedure attach one of the nine walkthroughs.</li>
+    <li><strong>Deliver.</strong> The clinician edits anything, then turns the screen. The
+    story is read aloud, one idea per screen, in the chosen language, and prints on one sheet.</li>
+  </ol>
+
+  <h3>Why the published site needs no server</h3>
+  <p>The parser, the card builder and the prescriber check are ordinary TypeScript with no
+  Node dependencies, so the same functions that run in the API routes of the full app run
+  inside the page on the static site. The build physically moves the API routes aside, and
+  the deployed folder contains none. The page talks to the National Library of Medicine and
+  the FDA directly from the browser.</p>
+
+  <h3>What the model is allowed to do</h3>
+  <p>Only two things, and only when a key is configured, which the demo does not have. It may
+  fill a parsing gap when the deterministic pass comes back thin, copying text verbatim under
+  a schema that is validated before anything is used. It may translate, under a prompt that
+  forbids adding, softening or reinterpreting a medical statement. It never decides which
+  condition a note is, what a drug is for, or what a warning says.</p>
+</section>
+
+<section class="sheet">
+  <p class="kicker">Question bank, part one</p>
+  <h2>Product, and the Impiricus track</h2>
+  <div class="rule short"></div>
+
+  <div class="qa"><p class="q">Why is this an HCP engagement tool and not a patient app?</p>
+  <p class="a">Because a patient never opens it. The clinician opens it, in the room, from the
+  note they already wrote, and the patient only ever sees a screen that has been turned toward
+  them. Patient education is approved-content territory, adherence is the shared interest
+  between a manufacturer and a prescriber, and this earns the moment by removing work rather
+  than adding a message.</p></div>
+
+  <div class="qa"><p class="q">Who pays, and for what?</p>
+  <p class="a">Not the patient and not the physician. A manufacturer or a platform like
+  Impiricus pays to have approved patient materials delivered at the second a clinician needs
+  them: a spacer walkthrough, an injection-pen walkthrough, a plain-language purpose sentence
+  for their drug. The unit being bought is placement in the explanation, not an impression.</p>
+  <p class="push">If pushed on ethics: nothing sponsored changes a clinical finding, and the
+  clinician sees every sentence before it is shown to anybody. Content, not recommendations.</p></div>
+
+  <div class="qa"><p class="q">Why would a doctor who is already behind use this?</p>
+  <p class="a">Because it takes the note they have already written and gives back something
+  they would otherwise have to say twice. The interaction is a paste and a button. The printout
+  is the thing that stops the phone call three days later.</p></div>
+
+  <div class="qa"><p class="q">How is it measurable if nothing is stored?</p>
+  <p class="a">Nothing about the patient is stored, and we would keep it that way. What is
+  countable without touching the patient is the material: which walkthrough was turned toward
+  a patient this week, in which language, for which drug class. That is a signal a rep visit
+  cannot produce, and it needs no identifier.</p>
+  <p class="push">Be honest that this is not built yet. Today there is no analytics of any kind.</p></div>
+
+  <div class="qa"><p class="q">The EHR already prints after-visit instructions. Why is this different?</p>
+  <p class="a">The after-visit summary is the note, reformatted. It is written at a reading
+  level most patients cannot use, it has no picture of where the problem is, it does not read
+  itself aloud, and it does not exist in the patient's language. We start from the same source
+  and produce something a frightened person can repeat back.</p></div>
+
+  <div class="qa"><p class="q">Why not just use ChatGPT for this?</p>
+  <p class="a">Because a general model will always answer, and in this domain a confident wrong
+  sentence is the harm. "Take the headache powder" is a real thing a fuzzy matcher produced for
+  us. Our answer is a curated library, a refusal list the clinician sees, and warnings quoted
+  from the label rather than written. That is what makes it something a health system would let
+  into the room.</p></div>
+
+  <div class="qa"><p class="q">What is the wedge? Who is the first customer?</p>
+  <p class="a">Specialties where the instructions are procedural and the failure is expensive
+  and immediate: oral surgery, orthopaedics, ophthalmology, respiratory. Those are the visits
+  where a walkthrough is the whole value, and they are exactly the visits where a manufacturer
+  has an approved walkthrough already.</p></div>
+
+  <div class="qa"><p class="q">How does it get into a clinic? What about the EHR?</p>
+  <p class="a">Today it is a page with a paste box, which is deliberately the lowest possible
+  bar. The next step is a SMART on FHIR launch inside the chart so the note arrives without a
+  paste. Nothing about the architecture changes, because the note is already just text in and
+  a card out.</p></div>
+
+  <div class="qa"><p class="q">What stops this from being an ad?</p>
+  <p class="a">The clinician is the author of every sentence shown, the screen does not turn
+  until they have seen what was refused, and nothing sponsored can create or alter a finding.
+  Be the answer, not the ad.</p></div>
+</section>
+
+<section class="sheet">
+  <p class="kicker">Question bank, part two</p>
+  <h2>Clinical safety and trust</h2>
+  <div class="rule short"></div>
+
+  <div class="qa"><p class="q">Is this a medical device? Is it regulated?</p>
+  <p class="a">As built it is patient education, and it is labelled on every screen and every
+  printout as an educational demo and not medical advice. It makes no recommendation and no
+  diagnosis: it restates a diagnosis a clinician already made. A product decision to add
+  anything that recommends would change that answer, which is a reason we have not.</p></div>
+
+  <div class="qa"><p class="q">Who is responsible if a sentence is wrong?</p>
+  <p class="a">The clinician, and the design makes that real rather than nominal. Every
+  sentence is on their screen, editable, before the screen turns. We do not have a path where
+  something reaches a patient that a clinician has not seen.</p></div>
+
+  <div class="qa"><p class="q">Can it hallucinate?</p>
+  <p class="a">Not on the clinical path, because no model writes any of it. The plain sentences
+  are ours and fixed. The purposes are curated and keyed on drug class. The warnings are
+  quoted. With no key configured, which is how the demo runs, no model runs at all.</p></div>
+
+  <div class="qa"><p class="q">What if the drug is used off-label?</p>
+  <p class="a">This is the real weakness of a class-based purpose, and we handle it in two
+  ways. There is a visit-context layer for the cases we know: topiramate for a migraine patient
+  says it makes migraines happen less often, not that it prevents seizures. And every purpose
+  sentence is editable by the clinician before the screen turns. We would want a pharmacist to
+  validate the library before this was used for real.</p></div>
+
+  <div class="qa"><p class="q">How do you know the red spot is in the right place?</p>
+  <p class="a">Every spot is a coordinate on a drawing we made, and every one was checked on a
+  printed sheet that labels each condition beside its drawing. A Colles fracture sits on the
+  lower end of the radius, a torn meniscus on the joint line, wisdom teeth on the back molars.
+  It is our anatomy, so we can put the mark exactly where the injury is, which is something a
+  third-party 3D model cannot do.</p></div>
+
+  <div class="qa"><p class="q">What reading level is the patient text?</p>
+  <p class="a">The plain sentences are written for someone around twelve years old, which is
+  the usual target for patient material, and they describe what happened rather than what to
+  do. Telling the patient what to do is the clinician's line, so instructions are their words,
+  not ours.</p></div>
+
+  <div class="qa"><p class="q">Who checks the translation?</p>
+  <p class="a">Nobody, and we say so. It is free machine translation, which is the right call
+  for a demo and the wrong one for a clinic. A real deployment would use a translator with a
+  data agreement and human-reviewed strings, and the library is short enough that a
+  professional pass over it is affordable.</p></div>
+
+  <div class="qa"><p class="q">Does patient information leave the browser?</p>
+  <p class="a">In English, nothing from the note goes anywhere except drug names, which go to
+  the National Library of Medicine and the FDA to be identified. If a language is chosen, the
+  patient sentences, which include the instructions the clinician wrote, are sent to a public
+  translation service. That is a demo-grade choice and the first thing we would replace.
+  Nothing is stored by us at any point, there are no accounts and no history, and the note is
+  gone when the tab closes.</p>
+  <p class="push">Never say the word compliant. Say: no data is stored, and here is exactly what
+  is sent where.</p></div>
+</section>
+<section class="sheet">
+  <p class="kicker">Question bank, part three</p>
+  <h2>Technical</h2>
+  <div class="rule short"></div>
+
+  <div class="qa"><p class="q">What is deterministic and what is not?</p>
+  <p class="a">Parsing, condition matching, drug resolution, the purpose sentences, the sig
+  rewriting, the walkthrough detection and the whole prescriber check are deterministic code.
+  The only non-deterministic paths are optional: a model to fill a thin parse or read a photo,
+  and a model as a first choice for translation. The published demo has neither.</p></div>
+
+  <div class="qa"><p class="q">How does a diagnosis become a condition?</p>
+  <p class="a">Each of the 205 conditions carries ICD-10 prefixes and the words a real note
+  uses for it. A code match returns immediately and outranks every phrase. Among phrases the
+  longest match across the whole library wins, matched on word boundaries after punctuation is
+  normalised on both sides. There is also a small guard list for phrases that borrow a
+  condition's name: ST depression on an ECG line is not depression, heartburn is not a burn.</p></div>
+
+  <div class="qa"><p class="q">What happens with a note that has no headers?</p>
+  <p class="a">It falls through to a prose scan that pulls drug orders out of sentences,
+  matches the condition against the whole text, and sorts the remaining sentences into
+  instructions and follow-up by cue words. One of the eight regression cases is exactly this,
+  a free-text history and physical with no structure at all.</p></div>
+
+  <div class="qa"><p class="q">How do you identify a drug from free text?</p>
+  <p class="a">RxNorm's approximate-match endpoint gives ranked candidates, and we walk them
+  until one yields active ingredients, with a second attempt through the concept-history
+  endpoint for drugs that have been retired, which is how a discontinued brand still resolves.
+  Ingredients come back as identifiers, not strings, which is what makes the duplicate check
+  exact.</p></div>
+
+  <div class="qa"><p class="q">How does the duplicate-ingredient check actually work?</p>
+  <p class="a">Set intersection over RxNorm ingredient identifiers, for every pair in the list.
+  No string comparison and no model. Vicodin and Tylenol both contain the same acetaminophen
+  identifier, so the pair is flagged as a duplicate and the same identifier drives a running
+  total against the daily acetaminophen ceiling. Duplicate class is separate, because an ACE
+  inhibitor and an ARB share no code and still should not be taken together, so those come
+  from curated class groups.</p></div>
+
+  <div class="qa"><p class="q">A static site with no backend is calling the FDA. How?</p>
+  <p class="a">Those services allow browser requests and need no key, so the page calls them
+  directly. It means there is no server of ours in the path at all, which is good for privacy
+  and good for a hackathon budget. It also means we inherit the anonymous rate limits, and a
+  throttled request shows up as a section that is not there rather than an error.</p></div>
+
+  <div class="qa"><p class="q">How is it tested?</p>
+  <p class="a">A regression suite of eight note formats runs on every change: a prose history
+  and physical, an EHR export with codes and pipe-delimited sigs, a cardiac discharge with
+  abbreviations, a terse emergency note, a note with junk under Medications, a note using
+  "Medicine:" as its header, and both demo notes. Each case asserts the condition it must
+  resolve to, the medicines that must be found, the strings that must <em>not</em> be treated as
+  medicines, and the walkthroughs that must attach.</p></div>
+
+  <div class="qa"><p class="q">How would you scale past 205 conditions?</p>
+  <p class="a">The library is the product, so growth is editorial rather than technical: each
+  entry is one plain sentence, a drawing, a structure, synonyms and codes. The next step we
+  would take is generating candidate entries from a coded terminology and having a clinician
+  approve the sentence, so the human effort is review rather than authorship.</p></div>
+
+  <div class="qa"><p class="q">What is cached, and why is a cache committed to the repo?</p>
+  <p class="a">Every external lookup is cached by its URL, and the recorded audio by a hash of
+  its text. The cache is committed on purpose so a demo on venue wifi does not depend on three
+  public APIs being fast, and so the recorded clips ship with the build instead of being
+  fetched.</p></div>
+
+  <div class="qa"><p class="q">What did you build versus what came from a library?</p>
+  <p class="a">The parser, the condition library, the matcher, the purpose rules, the sig
+  rewriter, the prescriber check, the walkthrough detection, the card builder, the interface
+  and every drawing are ours. We call public data services for drug identity and labels. The
+  drug-identity engine came from an earlier project of ours, PillPile, which found hidden
+  duplicate ingredients by intersecting RxNorm identifiers.</p></div>
+</section>
+
+<section class="sheet">
+  <p class="kicker">Question bank, part four</p>
+  <h2>Design, accessibility, and the team</h2>
+  <div class="rule short"></div>
+
+  <div class="qa"><p class="q">Why hand-drawn anatomy instead of 3D or stock?</p>
+  <p class="a">Three reasons. A photographic organ reads as gory to someone who has just had
+  bad news. A third-party model cannot be marked with <em>your</em> fracture. And a drawing
+  prints, which a 3D viewer does not. We tried 3D first and took it out.</p></div>
+
+  <div class="qa"><p class="q">How does one drawing work on both a light and a dark screen?</p>
+  <p class="a">Each drawing is black ink on transparency, and on the dark board a colour
+  filter turns the same file into beige ink. One asset, two themes, and the portraits on the
+  team page are exempt so faces are never inverted.</p></div>
+
+  <div class="qa"><p class="q">What did you do for accessibility?</p>
+  <p class="a">Text pairings clear the AA contrast standard, the flow works from the keyboard,
+  every drawing carries a description, motion honours the reduced-motion setting, Arabic
+  renders right to left, every screen is read aloud, and the story prints. Type is sized to how
+  much text is on a screen so nothing scrolls and nothing is cut off.</p>
+  <p class="push">Honest gap: some decorative hairlines and the progress strokes are below the
+  3:1 mark for non-text contrast, and our custom dropdown does not move focus the way a native
+  one does. Both are on the list.</p></div>
+
+  <div class="qa"><p class="q">Why is dark mode off unless you click it?</p>
+  <p class="a">Because a clinician's laptop is set for the clinician, and the patient is the
+  one who has to read it. A system setting should not decide how a patient's screen looks, so
+  it is a deliberate button. It is called Evergreen, and the light one is Paper.</p></div>
+
+  <div class="qa"><p class="q">Who did what?</p>
+  <p class="a">Two of us. Lauren drew the anatomy, the walkthroughs and the portraits in
+  Procreate, and drove the design decisions about what a frightened person can take in. Aniketh
+  built the parser, the library, the matcher and the prescriber check, and wired the drawings
+  in. The design passes were argued out together, which is why so much got removed.</p></div>
+
+  <div class="qa"><p class="q">What was the hardest part?</p>
+  <p class="a">Making the thing refuse. It is easy to always produce an answer and very hard to
+  decide, in code, that a line is not a drug, and then to show that decision to a clinician in
+  a way that reads as care rather than failure.</p></div>
+
+  <div class="qa"><p class="q">What would you do with another week?</p>
+  <p class="a">Teach-back, where the patient says it back and the tool checks that the three
+  facts that mattered survived. Then form-aware dosing for inhalers, drops and pens, a
+  pharmacist pass over the purpose library, and a launch inside the chart so nothing is pasted.</p></div>
+</section>
+
+<section class="sheet">
+  <p class="kicker">Be ready for these</p>
+  <h2>Where we are weak, and what we say</h2>
+  <div class="rule short"></div>
+  <p>These are real, verified in our own code. Saying them first is better than being caught by
+  them. The pattern that works: name it, say why it is bounded, say the fix.</p>
+
+  <div class="box warn">
+    <h4>1. Dosing sentences assume a pill</h4>
+    <p>The sig rewriter counts puffs, drops and units correctly but prints the word "pill"
+    regardless, so "2 puffs twice a day" reads as "Two pills, twice a day." Patches, sprays and
+    liquid volumes are not handled at all, and durations in weeks are dropped.</p>
+    <p><strong>Say:</strong> "Our dose sentences are pill-shaped today. It counts the dose
+    correctly, but it names the form wrong for inhalers and drops, and that is the next thing
+    we fix, because for an inhaler the form <em>is</em> the instruction."</p>
+  </div>
+
+  <div class="box warn">
+    <h4>2. Some medicine lines vanish instead of being shown</h4>
+    <p>A drug order with no milligram-style strength, like "Albuterol HFA 2 puffs q4h PRN" or
+    "Latanoprost 1 drop each eye", is not accepted as a medicine, and because it sits under a
+    medications header with no instruction cue it is discarded rather than listed under Not
+    used. Combination strengths written as "Norco 5-325 mg" and percentage strengths like
+    "hydrocortisone 1% cream" also fail to parse.</p>
+    <p><strong>Say:</strong> "The refusal is right, but the reporting is not. Anything we
+    cannot read should appear under Not used, and in that specific shape it does not. It is a
+    small fix and it matters more than it looks, because silence is the one thing this project
+    is not allowed to do."</p>
+  </div>
+
+  <div class="box warn">
+    <h4>3. Drug orders written under "Plan" become diagnoses</h4>
+    <p>A note that says "Assessment and Plan: 1. Type 2 diabetes, start metformin 500 mg BID"
+    puts the whole line in the diagnosis list and finds no medicines, because Plan is not
+    treated as a medication section.</p>
+    <p><strong>Say:</strong> "We tuned on discharge summaries and after-visit summaries, where
+    medicines have their own header. A Plan section needs the line split, the diagnosis taken
+    from the first clause and the drug order from the rest. We know the shape of the fix."</p>
+  </div>
+
+  <div class="box warn">
+    <h4>4. Negations and rule-outs are not guarded</h4>
+    <p>"No history of stroke" and "rule out appendicitis" are still candidate diagnoses, and
+    only three guard patterns exist for phrases that borrow a condition's name. One of those
+    three is keyed to a condition identifier that does not exist, so it never fires.</p>
+    <p><strong>Say:</strong> "Negation handling is the first thing any clinical parser needs
+    and we have the guard list rather than the guard rule. It is a known gap with a known fix."</p>
+  </div>
+
+  <div class="box warn">
+    <h4>5. Measurability and privacy are in tension</h4>
+    <p>The pitch says which walkthroughs were shown is countable. The product stores nothing
+    and has no analytics of any kind.</p>
+    <p><strong>Say:</strong> "Today it is zero storage and zero analytics, which is the honest
+    state. The claim is about what is countable without a patient identifier, and we have not
+    built it. We would rather show you nothing than show you a number we made up."</p>
+  </div>
+
+  <div class="box warn">
+    <h4>6. Other things worth conceding quickly</h4>
+    <ul>
+      <li>Translation is free and unreviewed, and the shipped Spanish for the demo notes has at
+      least one bad line. If a judge speaks Spanish, get ahead of it.</li>
+      <li>205 conditions is small. Anything outside it falls back to a whole-body drawing and
+      the clinician's own words.</li>
+      <li>Purpose sentences are class-based, so an off-label use can read wrong until the
+      clinician edits it.</li>
+      <li>Nothing here has been validated clinically. No patient has used it.</li>
+      <li>The condition matcher can use an ICD-10 code, but in the common path the code is
+      stripped from the line before matching, so the synonym usually does the work.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="sheet">
+  <p class="kicker">Insurance</p>
+  <h2>Demo safety</h2>
+  <div class="rule short"></div>
+
+  <h3>Notes that are certain to work</h3>
+  <ul>
+    <li>The two example notes above the box. Both are prebuilt, including their recorded audio
+    and their Spanish, so they work with no network at all.</li>
+    <li>A pasted note in the shape of a discharge summary: a Diagnosis or Dx line, a
+    Medications header with milligram doses, an Instructions list, a Follow-up line.</li>
+  </ul>
+
+  <h3>If a judge wants to paste their own note</h3>
+  <p>Say yes, and set it up in one sentence: "It will work on anything shaped like a discharge
+  summary. If it hands something back as Not used, that is the point of the thing, not a
+  failure." Then watch for an inhaler, eye drops, a patch or a Plan section, because those are
+  the shapes we know are weak, and name the gap before they do.</p>
+
+  <h3>If something breaks on stage</h3>
+  <table>
+    <tr><th>What you see</th><th>What to do</th></tr>
+    <tr><td>Wifi is gone or slow</td><td>Use the two example notes. They are prebuilt and need nothing.</td></tr>
+    <tr><td>No voice on a pasted note</td><td>Expected. Recorded audio ships only for the examples, everything else uses the browser voice. Say that.</td></tr>
+    <tr><td>A section of the prescriber check is missing</td><td>A public API was throttled. Say it reports what it checked, and re-run it on a different medicine.</td></tr>
+    <tr><td>The card looks thin</td><td>Show Not used and explain the refusal. A thin card with a visible refusal is a better demo than a full one.</td></tr>
+    <tr><td>The page is in a weird state</td><td>Reload with a deep link: aperta.health/?note=wisdom&amp;turn=1</td></tr>
+  </table>
+
+  <h3>Things to never say</h3>
+  <table>
+    <tr><th>Not this</th><th>This</th></tr>
+    <tr><td>"It is HIPAA compliant."</td><td>"It stores nothing, and here is exactly what is sent where."</td></tr>
+    <tr><td>"It diagnoses."</td><td>"It restates a diagnosis the clinician already made."</td></tr>
+    <tr><td>"The AI writes the explanation."</td><td>"A curated library writes it. A model only translates or fills a parsing gap."</td></tr>
+    <tr><td>"It is accurate."</td><td>"It is deterministic, it is quoted from the label, and every sentence is reviewed by the clinician."</td></tr>
+    <tr><td>"It is safe."</td><td>"It refuses rather than guesses, and it shows you what it refused."</td></tr>
+  </table>
+</section>
+
+<section class="sheet">
+  <p class="kicker">Vocabulary</p>
+  <h2>Words that will come up</h2>
+  <div class="rule short"></div>
+  <div class="two gl">
+    <dl>
+      <dt>Sig</dt><dd>The directions on a prescription. "PO TID x 7d" is a sig.</dd>
+      <dt>PO</dt><dd>By mouth.</dd>
+      <dt>PRN</dt><dd>As needed.</dd>
+      <dt>BID, TID, QID</dt><dd>Twice, three times, four times a day.</dd>
+      <dt>q6h</dt><dd>Every six hours. "q4-6h" is a range.</dd>
+      <dt>QOD</dt><dd>Every other day.</dd>
+      <dt>ICD-10</dt><dd>The international code for a diagnosis. S52.502A is a fracture of the lower end of the radius.</dd>
+      <dt>RxNorm</dt><dd>The National Library of Medicine's naming system for drugs. Gives every drug and ingredient a stable identifier called an RxCUI.</dd>
+      <dt>RxClass</dt><dd>The companion service that says which classes a drug belongs to.</dd>
+      <dt>ATC and EPC</dt><dd>Two class systems. ATC is the international therapeutic classification, EPC is the FDA's "established pharmacologic class". Our purpose rules are keyed on these.</dd>
+      <dt>NDC</dt><dd>The national drug code for a marketed package. Counting them tells you whether a generic exists.</dd>
+      <dt>openFDA</dt><dd>The FDA's public API for label text and drug listings.</dd>
+      <dt>DailyMed</dt><dd>Where the full official label lives. Our check links back to it.</dd>
+      <dt>Boxed warning</dt><dd>The most serious warning on a label, historically called a black box.</dd>
+      <dt>Prior authorisation</dt><dd>The insurer's permission step before a drug is covered. The full app drafts the letter.</dd>
+      <dt>Teach-back</dt><dd>Asking a patient to say the plan back in their own words. The evidence-based fix we are automating around.</dd>
+      <dt>AVS</dt><dd>After-visit summary, the printout a patient leaves with today.</dd>
+      <dt>SMART on FHIR</dt><dd>The standard way an app launches inside an electronic health record with the chart's context.</dd>
+      <dt>Distal radius fracture</dt><dd>A broken wrist. A Colles fracture is the common angled version.</dd>
+      <dt>Third molar</dt><dd>A wisdom tooth.</dd>
+      <dt>NSTEMI</dt><dd>A type of heart attack.</dd>
+      <dt>HNP</dt><dd>Herniated disc.</dd>
+      <dt>HFA</dt><dd>The propellant in a metered-dose inhaler, so "albuterol HFA" is the puffer.</dd>
+    </dl>
+  </div>
+
+  <h3>Where things live</h3>
+  <table>
+    <tr><th>Thing</th><th>File</th></tr>
+    <tr><td>The condition library, 205 entries</td><td class="mono">lib/anatomy/conditions.ts</td></tr>
+    <tr><td>The parser</td><td class="mono">lib/parseNote.ts</td></tr>
+    <tr><td>Purpose and dose sentences</td><td class="mono">lib/plainPurpose.ts</td></tr>
+    <tr><td>The prescriber check</td><td class="mono">lib/prescribeCheck.ts</td></tr>
+    <tr><td>Drawings and spot coordinates</td><td class="mono">lib/anatomy/art.ts</td></tr>
+    <tr><td>The regression suite</td><td class="mono">scripts/verify-explain.ts</td></tr>
+  </table>
+  <p class="small">Run it locally with <span class="mono">npm run dev</span>. Run the checks with
+  <span class="mono">npm run verify</span>. Publish with <span class="mono">npm run export:static</span>.</p>
+
+  <div class="rule"></div>
+  <p class="small">Aperta. Educational demo, not medical advice. No real patient data was used.
+  Written for VTHacks 14, September 2026.</p>
+</section>
+</body></html>
